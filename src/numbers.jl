@@ -95,6 +95,8 @@ function pseudoscalar(::Type{<:CliffordNumber{Cl,T}}) where {Cl,T}
     return CliffordNumber{Cl,T,L}(ntuple(isequal(L), Val{L}()))
 end
 
+pseudoscalar(m::CliffordNumber) = pseudoscalar(typeof(m))
+
 #---Constructors using just the quadratic forms---------------------------------------------------#
 
 for fn in (:zero, :one, :oneunit, :pseudoscalar)
