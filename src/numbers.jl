@@ -123,21 +123,29 @@ function to_basis_str(
     )
 end
 
-summary(io::IO, m::CliffordNumber) = println(io, typeof(m), ":")
+function summary(io::IO, m::CliffordNumber)
+    println(io, "CliffordNumber{", algebra(m), ",", eltype(m), "}:")
+end
 
-#=
 function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Cl}) where Cl
     summary(io, m)
+    # Flag to mark when we've *found the first nonzero* element
+    ffn = false
+    # Print the scalar component first
+    if !iszero(m[0])
+        print(io, m[0])
+        ffn = true
+    end
     # Loop through all the grades
-    for n in grades(Cl)
+    for n in 1:dimension(Cl)
         # Find all numbers with specific Hamming weights
-        inds = findall(x -> hamming_weight(x) == n, grades(Cl))
-        for i in inds
+        inds = findall(x -> hamming_weight(x) == n, 0:(elements(Cl) - 1))
+        for i in inds .- 1
             if !iszero(m[i])
-                print(io, sign(m[i]) > 0 ? "+" : "-", " ")
-                print(io, abs(m[i]), to_basis_str(Cl, i), " ")
+                print(io, " "^ffn, sign(m[i]) > 0 ? "+"^ffn : "-")
+                print(io, " "^ffn, abs(m[i]), to_basis_str(Cl, i, pseudoscalar="i"))
+                ffn = true
             end
         end
     end
 end
-=#
