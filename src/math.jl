@@ -124,3 +124,10 @@ function *(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) where Cl
     end
     return result
 end
+
+"""
+    ⋆(m::CliffordNumber) -> CliffordNumber
+
+Calculates the Hodge dual of `m`, equivalent to multiplying `m` by its corresponding pseudoscalar.
+"""
+⋆(m::CliffordNumber) = m * pseudoscalar(m)
