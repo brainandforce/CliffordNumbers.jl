@@ -25,12 +25,13 @@ end
 CliffordNumber{Cl,T}(x::NTuple{L,<:Number}) where {Cl,T,L} = CliffordNumber{Cl,T,L}(x)
 CliffordNumber{Cl,T}(x::Vararg{<:Number,L}) where {Cl,T,L} = CliffordNumber{Cl,T,L}(x)
 
-# A constructor similar to `ntuple(::Function)`
+# Constructors similar to `ntuple(::Function)`
 # However, it deals with the offset indexing
-function CliffordNumber{Cl,T}(f::Function) where {Cl,T}
-    L = elements(Cl)
+function CliffordNumber{Cl,T,L}(f::Function) where {Cl,T,L}
     return CliffordNumber{Cl,T,L}(ntuple(i -> f(i-1), Val{L}()))
 end
+
+CliffordNumber{Cl,T}(f::Function) where {Cl,T} = CliffordNumber{Cl,T,elements(Cl)}(f)
 
 # Promote to a common type first 
 
@@ -50,10 +51,11 @@ function CliffordNumber{Cl}(f::Function) where {Cl}
     return CliffordNumber{Cl,eltype(data),L}(data)
 end
 
-function CliffordNumber{Cl,T}(x::Real) where {Cl,T}
-    L = elements(Cl)
+function CliffordNumber{Cl,T,L}(x::Real) where {Cl,T,L}
     return CliffordNumber{Cl,T,L}(ntuple(i -> T(isone(i) * x), Val{L}()))
 end
+
+CliffordNumber{Cl,T}(x::Real) where {Cl,T} = CliffordNumber{Cl,T,elements(Cl)}(x)
 
 function CliffordNumber{Cl,T1}(x::Complex{T2}) where {Cl,T1<:Real,T2<:Real}
     L = elements(Cl)
