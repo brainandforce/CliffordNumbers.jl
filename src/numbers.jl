@@ -133,6 +133,9 @@ end
 
 function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Cl}) where Cl
     summary(io, m)
+    # For a zero multivector, just print zero
+    # Make sure to cover the signed zero case for floating point elements
+    iszero(m) && print(io, m[0])
     # Flag to mark when we've *found the first nonzero* element
     ffn = false
     # Print the scalar component first
