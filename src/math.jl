@@ -1,5 +1,3 @@
-const OtherNumber = Union{Real,Complex}
-
 #---Addition--------------------------------------------------------------------------------------#
 import Base.:+
 
@@ -17,7 +15,7 @@ function +(m::CliffordNumber{<:QuadraticForm,<:Real}, n::Complex)
     return typeof(m)(data)
 end
 
-+(n::OtherNumber, m::CliffordNumber) = m + n
++(n::BaseNumber, m::CliffordNumber) = m + n
 
 #---Negation and subtraction----------------------------------------------------------------------#
 import Base.:-
@@ -36,8 +34,8 @@ import Base.://
 
 for op in (:*, :/, ://)
     @eval begin
-        $op(m::CliffordNumber{Q}, n::OtherNumber) where Q = CliffordNumber{Q}($op.(m.data, n))
-        $op(n::OtherNumber, m::CliffordNumber{Q}) where Q = CliffordNumber{Q}($op.(n, m.data))
+        $op(m::CliffordNumber{Q}, n::BaseNumber) where Q = CliffordNumber{Q}($op.(m.data, n))
+        $op(n::BaseNumber, m::CliffordNumber{Q}) where Q = CliffordNumber{Q}($op.(n, m.data))
     end
 end
 

@@ -9,7 +9,7 @@ grade of an element is given by the Hamming weight of its index. For the algebra
 the order is: 1, e₁, e₂, e₁₂, e₃, e₁₃, e₂₃, e₁₂₃ = i. This order allows for more aggressive SIMD
 optimization when calculating the geometric product.
 """
-struct CliffordNumber{Q<:QuadraticForm,T<:Union{Real,Complex},L} <: Number
+struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: Number
     data::NTuple{L,T}
     function CliffordNumber{Q,T,L}(x) where {Q,T,L}
         sz = elements(Cl)

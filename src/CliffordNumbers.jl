@@ -1,6 +1,13 @@
 module CliffordNumbers
 
 """
+    CliffordNumbers.BaseNumber
+
+Union of subtypes of `Number` provided in the Julia `Base` module: `Real` and `Complex`.
+"""
+const BaseNumber = Union{Real,Complex}
+
+"""
     CliffordNumbers.hamming_weight(i::Integer) -> Int
 
 Calculates the Hamming weight of an integer. This is used to determine the grade of a component
