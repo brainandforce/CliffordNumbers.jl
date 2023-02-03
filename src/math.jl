@@ -3,10 +3,10 @@ const OtherNumber = Union{Real,Complex}
 #---Addition--------------------------------------------------------------------------------------#
 import Base.:+
 
-+(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) where Cl = CliffordNumber{Cl}(m1.data .+ m2.data)
++(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = CliffordNumber{Q}(m1.data .+ m2.data)
 
-function +(m::CliffordNumber{Cl}, n::Union{Real,Complex}) where Cl
-    return CliffordNumber{Cl}(ntuple(i -> m.data[i] + (isone(i) * n), Val{length(m)}()))
+function +(m::CliffordNumber{Q}, n::Union{Real,Complex}) where Q
+    return CliffordNumber{Q}(ntuple(i -> m.data[i] + (isone(i) * n), Val{length(m)}()))
 end
 
 # Adding imaginary numbers to elements of real Clifford algebras (geometric algebras) should add
@@ -22,8 +22,8 @@ end
 #---Negation and subtraction----------------------------------------------------------------------#
 import Base.:-
 
--(m::CliffordNumber{Cl}) where Cl = CliffordNumber{Cl}((-).(m.data))
--(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) where Cl = m1 + (-m2)
+-(m::CliffordNumber{Q}) where Q = CliffordNumber{Cl}((-).(m.data))
+-(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = m1 + (-m2)
 
 # Automatically promote 
 
@@ -36,33 +36,33 @@ import Base.://
 
 for op in (:*, :/, ://)
     @eval begin
-        $op(m::CliffordNumber{Cl}, n::OtherNumber) where Cl = CliffordNumber{Cl}($op.(m.data, n))
-        $op(n::OtherNumber, m::CliffordNumber{Cl}) where Cl = CliffordNumber{Cl}($op.(n, m.data))
+        $op(m::CliffordNumber{Q}, n::OtherNumber) where Q = CliffordNumber{Q}($op.(m.data, n))
+        $op(n::OtherNumber, m::CliffordNumber{Q}) where Q = CliffordNumber{Q}($op.(n, m.data))
     end
 end
 
 #---Dot (inner) product---------------------------------------------------------------------------#
 
 """
-    dot(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) -> Number
-    m1 · m2 -> CliffordNumber{Cl}
+    dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> Number
+    m1 · m2 -> CliffordNumber{Q}
 
 Calculates the dot (inner) product of two Clifford numbers with quadratic form `Cl`. The result is
 a `Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
 """
-function dot(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) where Cl
-    return sum(m1[i] * m2[i] * sign_of_mult(Cl, i) for i in 0:elements(Cl)-1)
+function dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
+    return sum(m1[i] * m2[i] * sign_of_mult(Q, i) for i in 0:elements(Q)-1)
 end
 
 #---Wedge (outer) product-------------------------------------------------------------------------#
 
 """
-    wedge(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) -> CliffordNumber{Cl}
+    wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the wedge (outer) product of two Clifford numbers with quadratic form `Cl`. The result
-is another `CliffordNumber{Cl}`.
+Calculates the wedge (outer) product of two Clifford numbers with quadratic form `Q`. The result
+is another `CliffordNumber{Q}`.
 """
-function wedge(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) where Cl
+function wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
 
 end
 
@@ -84,14 +84,14 @@ function metric_sign(::Type{QuadraticForm{P,Q,R}}, i1::Integer, i2::Integer) whe
     return Int8(-1)^!isevil(xor(i1, i2))
 end
 
-metric_sign(i1::BitIndex{Cl}, i2::BitIndex{Cl}) where Cl = metric_sign(Cl, i1.i, i2.i)
-metric_sign(Cl::Type{<:QuadraticForm}, i::Integer) = metric_sign(Cl, i, i)
-metric_sign(i::BitIndex{Cl}) where Cl = metric_sign(Cl, i.i, i.i)
+metric_sign(i1::BitIndex{Q}, i2::BitIndex{Q}) where Q = metric_sign(Cl, i1.i, i2.i)
+metric_sign(Q::Type{<:QuadraticForm}, i::Integer) = metric_sign(Q, i, i)
+metric_sign(i::BitIndex{Q}) where Q = metric_sign(Q, i.i, i.i)
 
 """
     CliffordAlgebra.elementwise_product(
-        m1::CliffordNumber{Cl},
-        m2::CliffordNumber{Cl},
+        m1::CliffordNumber{Q},
+        m2::CliffordNumber{Q},
         i1::Integer,
         i2::Integer
     )
@@ -100,25 +100,25 @@ Calculates the geometric product between element `i1` of Clifford number `m1` an
 Clifford number `m2`.
 """
 @inline function elementwise_product(
-    m1::CliffordNumber{Cl},
-    m2::CliffordNumber{Cl},
+    m1::CliffordNumber{Q},
+    m2::CliffordNumber{Q},
     i1::Integer,
     i2::Integer
-) where {Cl}
-    coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Cl, i1, i2)
-    return CliffordNumber{Cl}(i -> coeff * (i == xor(i1, i2)))
+) where {Q}
+    coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+    return CliffordNumber{Q}(i -> coeff * (i == xor(i1, i2)))
 end
 
 """
-    *(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) -> CliffordNumber{Cl}
+    *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
 
 Calculates the geometric product between multivectors/Clifford numbers `m1` and `m2` which share
-the quadratic form `Cl`.
+the quadratic form `Q`.
 """
-function *(m1::CliffordNumber{Cl}, m2::CliffordNumber{Cl}) where Cl
+function *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     T = promote_type(eltype(m1), eltype(m2))
-    R = 0:elements(Cl) - 1
-    result = zero(CliffordNumber{Cl,T})
+    R = 0:elements(Q) - 1
+    result = zero(CliffordNumber{Q,T})
     for i1 in R, i2 in R 
         result += elementwise_product(m1, m2, i1, i2)
     end
@@ -131,3 +131,12 @@ end
 Calculates the Hodge dual of `m`, equivalent to multiplying `m` by its corresponding pseudoscalar.
 """
 ⋆(m::CliffordNumber) = m * pseudoscalar(m)
+
+#---Exponentials----------------------------------------------------------------------------------#
+import Base: ^, exp
+
+#=
+function ^(m::CliffordNumber, x::Number)
+
+end
+=#
