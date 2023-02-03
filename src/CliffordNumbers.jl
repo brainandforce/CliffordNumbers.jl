@@ -32,7 +32,7 @@ function subscript_string(x::Number)
 end
 
 include("quadratic.jl")
-export QuadraticForm, APS, STAplus, STAminus, PGA2D, PGA3D
+export QuadraticForm, VGA, PGA, APS, STA
 export dimension, elements, grades
 include("numbers.jl")
 export CliffordNumber

@@ -27,6 +27,21 @@ end
 #---Special geometric algebras---------------------------------------------------------------------#
 
 """
+    VGA{D} (alias for `QuadraticForm{D,0,0}`)
+
+Alias for vector/vanilla geometric algebras, which have positive-definite signatures.
+"""
+const VGA{D} = QuadraticForm{D,0,0}
+
+"""
+    PGA{D} (alias for `QuadraticForm{D,0,1}`)
+
+Alias for projective geometric algebras, which have positive-definite signatures except in one
+dimension, which is degenerate (squares to zero).
+"""
+const PGA{D} = QuadraticForm{D,0,1}
+
+"""
     APS
 
 The algebra of physical space, Cl(3,0,0).
@@ -35,33 +50,12 @@ An alias for `QuadraticForm{3,0,0}`.
 const APS = QF{3,0,0}
 
 """
-    STAplus
-
-Spacetime algebra with a mostly positive signature (mathematician's convention), Cl(3,1,0).
-An alias for `QuadraticForm{3,1,0}`.
-"""
-const STAplus = QF{3,1,0}
-
-"""
-    STAminus
+    STA
 
 Spacetime algebra with a mostly negative signature (particle physicist's convention), Cl(1,3,0).
 An alias for `QuadraticForm{1,3,0}`.
+
+The negative signature is used by default to distinguish this algebra from conformal geometric
+algebras, which use a mostly positive signature by convention.
 """
 const STAminus = QF{1,3,0}
-
-"""
-    PGA3D
-
-Projective geometric algebra of 2 dimensions and 1 projective dimension, Cl(2,0,1).
-An alias for `QuadraticForm{2,0,1}`.
-"""
-const PGA2D = QF{2,0,1}
-
-"""
-    PGA3D
-
-Projective geometric algebra of 3 dimensions and 1 projective dimension, Cl(3,0,1).
-An alias for `QuadraticForm{3,0,1}`.
-"""
-const PGA3D = QF{3,0,1}
