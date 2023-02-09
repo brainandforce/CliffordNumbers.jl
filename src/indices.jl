@@ -1,12 +1,12 @@
-#---Struct to work with bit indices---------------------------------------------------------------#
+#---Struct to work with bit indices----------------------------------------------------------------#
 
 """
     CliffordNumbers.BitIndex{Cl<:QuadraticForm}
 
 An index corresponding to a signed basis element of a Clifford algebra.
 
-The basis elements of a Clifford number may be described with a binary word with length equal to 
-the dimension of the space. The nth bit corresponds to whether the basis element e_n is used to 
+The basis elements of a Clifford number may be described with a binary word with length equal to the
+dimension of the space. The nth bit corresponds to whether the basis element e_n is used to
 construct the element with the given index.
 
 As an example, in the algebra of physical space, the element e₁ can be represented with the binary
@@ -15,11 +15,11 @@ using the `xor` operation: for example, the basis bivector e₁e₃ can be repre
 `xor(0b001, 0b100) == 0b101`. The scalar element is always represented with `0`.
 
 The sign of the index is stored. A negative sign corresponds to an odd permutation of the basis
-elements, and 
+elements, and a positive sign corresponds to an even permutation.
 
 The `QuadraticForm` is a tag that marks the Clifford algebra associated with the index. All
 operations on such `BitIndex` only depend on the value modulo `elements(Cl)`. If a generic index is
-desired, `QuadraticForm` may be used as the tag.
+desired, `QuadraticForm` (without type parameters) may be used as the tag.
 """
 struct BitIndex{Cl<:QuadraticForm}
     i::Int
@@ -68,7 +68,7 @@ Base.sign(i::BitIndex) = Int8(-1)^signbit(i)
 Base.:-(i::BitIndex{Cl}) where Cl = BitIndex{Cl}(-i.i)
 Base.:abs(i::BitIndex{Cl}) where Cl = BitIndex{Cl}(i.i & typemax(Int))
 
-#---BitIndices represents the valid index range for a Clifford number-----------------------------#
+#---BitIndices represents the valid index range for a Clifford number------------------------------#
 
 """
     BitIndices{Cl<:QuadraticForm}
@@ -90,14 +90,14 @@ function Base.iterate(::BitIndices{Cl}, state::Integer=0) where Cl
     return 0 <= state < elements(Cl) ? (BitIndex{Cl}(state), state + 1) : nothing
 end
 
-#---Extending mathematical operations on Clifford numbers to their indices------------------------#
+#---Extending mathematical operations on Clifford numbers to their indices-------------------------#
 
 """
     CliffordNumbers.sign_of_mult([Cl::Type{QuadraticForm{P,Q,R}}], a::Integer, b::Integer)
 
-Calculates the sign associated with multiplying basis elements indexed with bit indices supplied
-as integers. The sign reverses whenever the order of `a` and `b` are reverse, provided they are not
-the same.
+Calculates the sign associated with multiplying basis elements indexed with bit indices supplied as
+integers. The sign reverses whenever the order of `a` and `b` are reverse, provided they are not the
+same.
 """
 function sign_of_mult(a::Unsigned, b::Unsigned)
     a = a >>> 1

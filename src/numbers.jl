@@ -1,8 +1,8 @@
 """
     CliffordNumber{Q,T,L}
 
-An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Cl`, 
-element type `T`, and length `L` (which depends entirely on `Cl`).
+An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q`, 
+element type `T`, and length `L` (which depends entirely on `Q`).
 
 The coefficients are ordered by taking advantage of the natural binary structure of the basis. The
 grade of an element is given by the Hamming weight of its index. For the algebra of physical space,
@@ -20,7 +20,7 @@ struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: Number
     end
 end
 
-#---Constructors----------------------------------------------------------------------------------#
+#---Constructors-----------------------------------------------------------------------------------#
 
 CliffordNumber{Q,T}(x::NTuple{L,<:Number}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
 CliffordNumber{Q,T}(x::Vararg{<:Number,L}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
@@ -69,7 +69,7 @@ end
 
 CliffordNumber{Q}(x::Number) where Q = CliffordNumber{Q,typeof(x)}(x)
 
-#---Number of elements----------------------------------------------------------------------------#
+#---Number of elements-----------------------------------------------------------------------------#
 
 import Base.length
 # This is equal to the `L` parameter
@@ -97,7 +97,7 @@ end
 
 pseudoscalar(m::CliffordNumber) = pseudoscalar(typeof(m))
 
-#---Constructors using just the quadratic forms---------------------------------------------------#
+#---Constructors using just the quadratic forms----------------------------------------------------#
 
 for fn in (:zero, :one, :oneunit, :pseudoscalar)
     # Default to Bools since they are promoted to any wider type
@@ -105,7 +105,7 @@ for fn in (:zero, :one, :oneunit, :pseudoscalar)
     @eval $fn(Cl::Type{<:QuadraticForm}) = $fn(CliffordNumber{Cl,Bool})
 end
 
-#---Show methods----------------------------------------------------------------------------------#
+#---Show methods-----------------------------------------------------------------------------------#
 import Base: show, summary
 
 function show(io::IO, m::CliffordNumber)

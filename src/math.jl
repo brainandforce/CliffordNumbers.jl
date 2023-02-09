@@ -45,8 +45,8 @@ end
     dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> Number
     m1 · m2 -> CliffordNumber{Q}
 
-Calculates the dot (inner) product of two Clifford numbers with quadratic form `Cl`. The result is
-a `Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
+Calculates the dot (inner) product of two Clifford numbers with quadratic form `Cl`. The result is a
+`Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
 """
 function dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     return sum(m1[i] * m2[i] * sign_of_mult(Q, i) for i in 0:elements(Q)-1)
@@ -110,8 +110,8 @@ end
 """
     *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the geometric product between multivectors/Clifford numbers `m1` and `m2` which share
-the quadratic form `Q`.
+Calculates the geometric product between multivectors/Clifford numbers `m1` and `m2` which share the
+quadratic form `Q`.
 """
 function *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     T = promote_type(eltype(m1), eltype(m2))
