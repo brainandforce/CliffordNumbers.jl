@@ -12,7 +12,7 @@ optimization when calculating the geometric product.
 struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: Number
     data::NTuple{L,T}
     function CliffordNumber{Q,T,L}(x) where {Q,T,L}
-        sz = elements(Cl)
+        sz = elements(Q)
         @assert length(x) == L == sz string(
             "Incorrect number of components: multivectors of ", Q, " have ", sz, " components."
         )
@@ -31,7 +31,7 @@ function CliffordNumber{Q,T,L}(f::Function) where {Q,T,L}
     return CliffordNumber{Q,T,L}(ntuple(i -> f(i-1), Val{L}()))
 end
 
-CliffordNumber{Q,T}(f::Function) where {Q,T} = CliffordNumber{Q,T,elements(Cl)}(f)
+CliffordNumber{Q,T}(f::Function) where {Q,T} = CliffordNumber{Q,T,elements(Q)}(f)
 
 # Promote to a common type first 
 
@@ -46,7 +46,7 @@ function CliffordNumber{Q}(x::Vararg{<:Number,L}) where {Q,L}
 end
 
 function CliffordNumber{Q}(f::Function) where {Q}
-    L = elements(Cl)
+    L = elements(Q)
     data = ntuple(i -> f(i-1), Val{L}())
     return CliffordNumber{Cl,eltype(data),L}(data)
 end
@@ -58,7 +58,7 @@ end
 CliffordNumber{Q,T}(x::Real) where {Q,T} = CliffordNumber{Q,T,elements(Q)}(x)
 
 function CliffordNumber{Q,T1}(x::Complex{T2}) where {Q,T1<:Real,T2<:Real}
-    L = elements(Cl)
+    L = elements(Q)
     T = promote_type(T1,T2)
     data = ntuple(Val{L}()) do i
         i == 1 && return T(real(x))
@@ -91,7 +91,7 @@ oneunit(S::Type{<:CliffordNumber{Q,T}}) where {Q,T} = S(iszero)
 one(S::Type{<:CliffordNumber{Q,T}}) where {Q,T} = oneunit(S)
 
 function pseudoscalar(::Type{<:CliffordNumber{Q,T}}) where {Q,T}
-    L = elements(Cl)
+    L = elements(Q)
     return CliffordNumber{Q,T,L}(ntuple(isequal(L), Val{L}()))
 end
 
@@ -144,13 +144,13 @@ function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
         ffn = true
     end
     # Loop through all the grades
-    for n in 1:dimension(Cl)
+    for n in 1:dimension(Q)
         # Find all numbers with specific Hamming weights
-        inds = findall(x -> hamming_weight(x) == n, 0:(elements(Cl) - 1))
+        inds = findall(x -> hamming_weight(x) == n, 0:(elements(Q) - 1))
         for i in inds .- 1
             if !iszero(m[i])
                 print(io, " "^ffn, sign(m[i]) > 0 ? "+"^ffn : "-")
-                print(io, " "^ffn, abs(m[i]), to_basis_str(Cl, i, pseudoscalar="i"))
+                print(io, " "^ffn, abs(m[i]), to_basis_str(Q, i, pseudoscalar="i"))
                 ffn = true
             end
         end
