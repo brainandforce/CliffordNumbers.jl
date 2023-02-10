@@ -40,7 +40,7 @@ function subscript_string(x::Number)
 end
 
 include("quadratic.jl")
-export QuadraticForm, VGA, PGA, APS, STA
+export QuadraticForm, APS, STA, VGA, PGA, CGA
 export dimension, elements, grades
 include("numbers.jl")
 export CliffordNumber
