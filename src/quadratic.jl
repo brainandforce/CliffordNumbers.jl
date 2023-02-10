@@ -58,4 +58,4 @@ An alias for `QuadraticForm{1,3,0}`.
 The negative signature is used by default to distinguish this algebra from conformal geometric
 algebras, which use a mostly positive signature by convention.
 """
-const STAminus = QF{1,3,0}
+const STA = QF{1,3,0}
