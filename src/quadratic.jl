@@ -69,3 +69,31 @@ Creates the type of a quadratic form associated with a conformal geometric algeb
 dimension `D`.
 """
 CGA(D) = QuadraticForm{D+1,1,0}
+
+#---Show methods for special quadratic forms-------------------------------------------------------#
+
+Base.show(io::IO, ::Type{VGA(D)}) where D = print(io, VGA, "($D)")
+Base.show(io::IO, ::Type{PGA(D)}) where D = print(io, PGA, "($D)")
+Base.show(io::IO, ::Type{QuadraticForm{D,1,0}}) where D = print(io, CGA, "($(D-1))")
+
+# Functionality stolen from Julia base/show.jl around line 927
+function Base.show(io::IO, ::MIME"text/plain", T::Type{VGA(D)}) where D
+    show(IOContext(io, :compact => true), T)
+    if !(get(io, :compact, false)::Bool)
+        printstyled(io, " (alias for $QuadraticForm{$D,0,0})"; color = :light_black)
+    end
+end
+
+function Base.show(io::IO, ::MIME"text/plain", T::Type{PGA(D)}) where D
+    show(IOContext(io, :compact => true), T)
+    if !(get(io, :compact, false)::Bool)
+        printstyled(io, " (alias for $QuadraticForm{$D,0,1})"; color = :light_black)
+    end
+end
+
+function Base.show(io::IO, ::MIME"text/plain", T::Type{QuadraticForm{D,1,0}}) where D
+    show(IOContext(io, :compact => true), T)
+    if !(get(io, :compact, false)::Bool)
+        printstyled(io, " (alias for $QuadraticForm{$D,0,0})"; color = :light_black)
+    end
+end
