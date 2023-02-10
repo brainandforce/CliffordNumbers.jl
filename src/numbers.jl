@@ -48,7 +48,7 @@ end
 function CliffordNumber{Q}(f::Function) where {Q}
     L = elements(Q)
     data = ntuple(i -> f(i-1), Val{L}())
-    return CliffordNumber{Cl,eltype(data),L}(data)
+    return CliffordNumber{Q,eltype(data),L}(data)
 end
 
 function CliffordNumber{Q,T,L}(x::Real) where {Q,T,L}
@@ -118,8 +118,8 @@ ispseudoscalar(m::CliffordNumber) = all(iszero, m.data[1:end-1])
 
 for fn in (:zero, :one, :oneunit, :pseudoscalar)
     # Default to Bools since they are promoted to any wider type
-    @eval $fn(::Type{CliffordNumber{Q}}) where Q = $fn(CliffordNumber{Cl,Bool})
-    @eval $fn(Cl::Type{<:QuadraticForm}) = $fn(CliffordNumber{Cl,Bool})
+    @eval $fn(::Type{CliffordNumber{Q}}) where Q = $fn(CliffordNumber{Q,Bool})
+    @eval $fn(Q::Type{<:QuadraticForm}) = $fn(CliffordNumber{Q,Bool})
 end
 
 #---Show methods-----------------------------------------------------------------------------------#
