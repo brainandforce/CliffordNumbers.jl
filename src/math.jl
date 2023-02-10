@@ -20,7 +20,7 @@ end
 #---Negation and subtraction----------------------------------------------------------------------#
 import Base.:-
 
--(m::CliffordNumber{Q}) where Q = CliffordNumber{Cl}((-).(m.data))
+-(m::CliffordNumber{Q}) where Q = CliffordNumber{Q}((-).(m.data))
 -(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = m1 + (-m2)
 
 # Automatically promote 
