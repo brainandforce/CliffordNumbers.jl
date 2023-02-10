@@ -51,6 +51,8 @@ const STA = QuadraticForm{1,3,0}
 
 Creates the type of a quadratic form associated with a vector/vanilla geometric algebra (VGA) of
 dimension `D`.
+
+For reasons of type stability, avoid calling this function without constant arguments.
 """
 VGA(D) = QuadraticForm{D,0,0}
 
@@ -59,6 +61,8 @@ VGA(D) = QuadraticForm{D,0,0}
 
 Creates the type of a quadratic form associated with a projective geometric algebra (PGA) of
 dimension `D`.
+
+For reasons of type stability, avoid calling this function without constant arguments.
 """
 PGA(D) = QuadraticForm{D,0,1}
 
@@ -67,6 +71,8 @@ PGA(D) = QuadraticForm{D,0,1}
 
 Creates the type of a quadratic form associated with a conformal geometric algebra (CGA) of
 dimension `D`.
+
+For reasons of type stability, avoid calling this function without constant arguments.
 """
 CGA(D) = QuadraticForm{D+1,1,0}
 
