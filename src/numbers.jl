@@ -148,15 +148,6 @@ function summary(io::IO, m::CliffordNumber)
     println(io, "CliffordNumber{", algebra(m), ",", eltype(m), "}:")
 end
 
-# T<:BaseNumber needs to be included to avoid method ambiguities. Why?
-function summary(io::IO, ::CliffordNumber{VGA{D},T}) where {D,T<:BaseNumber}
-    println(io, "CliffordNumber{VGA{$D},$T}:")
-end
-
-function summary(io::IO, ::CliffordNumber{PGA{D},T}) where {D,T<:BaseNumber}
-    println(io, "CliffordNumber{PGA{$D},$T}:")
-end
-
 function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
     summary(io, m)
     # For a zero multivector, just print zero
