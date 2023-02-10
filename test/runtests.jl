@@ -2,5 +2,28 @@ using CliffordNumbers
 using Test
 
 @testset "CliffordNumbers.jl" begin
-    # Write your tests here.
+    @testset "Conversion" begin
+        # Conversion of scalar CliffordNumbers to Real subtypes
+        @test convert(Int, CliffordNumber{APS,Float64}(1)) === Int(1)
+        @test_throws InexactError convert(Int, CliffordNumber{APS}(1.5))
+    end
+    @testset "Equality" begin
+        x = CliffordNumber{APS,Float64}(1, 2, 3, 4, 5, 6, 7, 8)
+        @test x == convert(CliffordNumber{APS,Int}, x)
+        @test x !== convert(CliffordNumber{APS,Int}, x)
+    end
+    @testset "Addition" begin
+        x = CliffordNumber{APS}(1, 2, 3, 4, 5, 6, 7, 8)
+        y = CliffordNumber{APS,Float64}(9, -10, 11, -12, 13, 14, -15, 16)
+        # Type promotion test
+        @test x + y isa CliffordNumber{APS,Float64}
+        # Equality test (mixed types)
+        @test x + y == CliffordNumber{APS}(10, -8, 14, -8, 18, 20, -8, 24)
+    end
+    @testset "Multiplication" begin
+        x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
+        y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
+        @test x * y == CliffordNumber{APS}(6, 0, 0, 8, 0, 0, 0, 0)
+        @test x * y == -(y * x)
+    end
 end
