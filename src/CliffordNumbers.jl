@@ -44,7 +44,7 @@ export QuadraticForm, VGA, PGA, APS, STA
 export dimension, elements, grades
 include("numbers.jl")
 export CliffordNumber
-export pseudoscalar
+export pseudoscalar, isscalar, ispseudoscalar
 include("indices.jl")
 export BitIndex, BitIndices
 export grade

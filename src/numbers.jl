@@ -97,6 +97,23 @@ end
 
 pseudoscalar(m::CliffordNumber) = pseudoscalar(typeof(m))
 
+"""
+    isscalar(m::CliffordNumber)
+
+Determines whether the Clifford number `m` is a scalar, meaning that it has no components with
+grades above zero.
+"""
+isscalar(m::CliffordNumber) = all(iszero, m.data[2:end])
+isscalar(m::CliffordNumber{QuadraticForm{0,0,0}}) = true
+
+"""
+    ispseudoscalar(m::CliffordNumber)
+
+Determines whether the Clifford number `m` is a pseudoscalar, meaning that it has no components with
+grades below the one equal to the dimension of the space.
+"""
+ispseudoscalar(m::CliffordNumber) = all(iszero, m.data[1:end-1])
+
 #---Constructors using just the quadratic forms----------------------------------------------------#
 
 for fn in (:zero, :one, :oneunit, :pseudoscalar)
