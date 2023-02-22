@@ -14,7 +14,7 @@ select_grade(m::CliffordNumber, g::Integer) = typeof(m)(i -> m[i] * (hamming_wei
 Calculate the reverse of a Clifford number. This effectively reverses the products that form the
 basis blades.
 """
-Base.reverse(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(i & 2))
+Base.reverse(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(hamming_weight(i) & 2))
 
 """
     reverse(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
@@ -31,7 +31,7 @@ Base.:~(m::CliffordNumber) = reverse(m)
 Calculates the grade involution of a Clifford number. This effectively multiplies all of the basis
 vectors of the space by -1, which makes elements of odd grade flip sign.
 """
-grade_involution(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(i & 1))
+grade_involution(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iseven(hamming_weight(i)))
 
 """
     conj(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
