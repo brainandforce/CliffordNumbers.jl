@@ -154,6 +154,13 @@ function scalar_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
 end
 
 """
+    abs2(m::CliffordNumber)
+
+Calculates the squared norm of `m`, equal to `scalar_product(m, ~m)`.
+"""
+Base.abs2(m::CliffordNumber) = scalar_product(m, ~m)
+
+"""
     left_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
 
 Calculates the left contraction of `m1` and `m2`.
