@@ -166,8 +166,10 @@ function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
         inds = findall(x -> hamming_weight(x) == n, 0:(elements(Q) - 1))
         for i in inds .- 1
             if !iszero(m[i])
-                print(io, " "^ffn, sign(m[i]) > 0 ? "+"^ffn : "-")
-                print(io, " "^ffn, abs(m[i]), to_basis_str(Q, i, pseudoscalar="i"))
+                print(
+                    io, " "^ffn, (sign(m[i]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(m[i]), 
+                    "*"^(m[i] isa Bool), to_basis_str(Q, i, pseudoscalar="i")
+                )
                 ffn = true
             end
         end
