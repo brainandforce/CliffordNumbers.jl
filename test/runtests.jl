@@ -20,10 +20,9 @@ using Test
         # Equality test (mixed types)
         @test x + y == CliffordNumber{APS}(10, -8, 14, -8, 18, 20, -8, 24)
     end
-    @testset "Multiplication" begin
+    @testset "Geometric product" begin
         x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
         y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
         @test x * y == CliffordNumber{APS}(6, 0, 0, 8, 0, 0, 0, 0)
-        @test x * y == -(y * x)
     end
 end
