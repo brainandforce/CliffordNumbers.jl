@@ -266,6 +266,18 @@ Calculates the Hodge dual of `m`, equivalent to multiplying `m` by its correspon
 """
 ⋆(m::CliffordNumber) = m * pseudoscalar(m)
 
+#---Division---------------------------------------------------------------------------------------#
+"""
+    versor_inverse(m::CliffordNumber)
+
+Calculates the versor inverse of `m`, equal to `m / scalar_product(m, ~m)`, so that
+`m * inv(m) == inv(m) * m == 1`.
+
+The versor inverse may not always be well defined, particularly when the quadratic form is
+degenerate or `m` has null factors.
+"""
+versor_inverse(m::CliffordNumber) = ~m / abs2(m)
+
 #---Exponentials-----------------------------------------------------------------------------------#
 import Base: ^, exp
 
