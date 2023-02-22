@@ -118,8 +118,19 @@ Calculates the wedge (outer) product of two Clifford numbers with quadratic form
 is another `CliffordNumber{Q}`.
 """
 function wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-
+    T = promote_type(eltype(m1), eltype(m2))
+    R = 0:elements(Q) - 1
+    result = zero(CliffordNumber{Q,T})
+    for i1 in R, i2 in R 
+        result += elementwise_product(m1, m2, i1, i2) * iszero(i1 & i2)
+    end
+    return result
 end
+
+wedge(s::Real, m::CliffordNumber{Q}) where Q = CliffordNumber{Q}(s .* m.data)
+wedge(m::CliffordNumber{Q}, s::Real) where Q = CliffordNumber{Q}(s .* m.data)
+
+wedge(x::BaseNumber, y::BaseNumber) = x * y
 
 const ∧ = wedge
 
