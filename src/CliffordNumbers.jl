@@ -51,6 +51,6 @@ export grade
 include("promote.jl")
 include("convert.jl")
 include("math.jl")
-export dot, wedge, ∧, ⋆
+export select_grade, dot, wedge, ∧, ⋆
 
 end

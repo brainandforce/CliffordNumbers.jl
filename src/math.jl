@@ -1,3 +1,11 @@
+#---Grade selection--------------------------------------------------------------------------------#
+"""
+    select_grade(m::CliffordNumber, g::Integer)
+
+Returns a multivectors where all elements not of grade `g` are equal to zero.
+"""
+select_grade(m::CliffordNumber, g::Integer) = typeof(m)(i -> m[i] * (hamming_weight(i) == g)) 
+
 #---Addition---------------------------------------------------------------------------------------#
 import Base.:+
 
