@@ -1,4 +1,4 @@
-#---Addition--------------------------------------------------------------------------------------#
+#---Addition---------------------------------------------------------------------------------------#
 import Base.:+
 
 +(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = CliffordNumber{Q}(m1.data .+ m2.data)
@@ -17,7 +17,7 @@ end
 
 +(n::BaseNumber, m::CliffordNumber) = m + n
 
-#---Negation and subtraction----------------------------------------------------------------------#
+#---Negation and subtraction-----------------------------------------------------------------------#
 import Base.:-
 
 -(m::CliffordNumber{Q}) where Q = CliffordNumber{Q}((-).(m.data))
@@ -25,7 +25,7 @@ import Base.:-
 
 # Automatically promote 
 
-#---Scalar multiplication-------------------------------------------------------------------------#
+#---Scalar multiplication--------------------------------------------------------------------------#
 import Base.:*
 import Base.:/
 import Base.://
@@ -96,7 +96,7 @@ function *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     return result
 end
 
-#---Dot (inner) product---------------------------------------------------------------------------#
+#---Scalar products--------------------------------------------------------------------------------#
 
 """
     dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> Number
@@ -109,7 +109,7 @@ function dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     return sum(m1[i] * m2[i] * sign_of_mult(Q, i) for i in 0:elements(Q)-1)
 end
 
-#---Wedge (outer) product-------------------------------------------------------------------------#
+#---Wedge (outer) product--------------------------------------------------------------------------#
 
 """
     wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
@@ -141,7 +141,7 @@ Calculates the Hodge dual of `m`, equivalent to multiplying `m` by its correspon
 """
 ⋆(m::CliffordNumber) = m * pseudoscalar(m)
 
-#---Exponentials----------------------------------------------------------------------------------#
+#---Exponentials-----------------------------------------------------------------------------------#
 import Base: ^, exp
 
 #=
