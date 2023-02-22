@@ -99,17 +99,17 @@ Calculates the sign associated with multiplying basis elements indexed with bit 
 integers. The sign reverses whenever the order of `a` and `b` are reverse, provided they are not the
 same.
 """
-function sign_of_mult(a::Unsigned, b::Unsigned)
-    a = a >>> 1
+function sign_of_mult(a::Integer, b::Integer)
+    s = signbit(a*b)
+    a = abs(a) >>> 1
     sum = 0
     while !iszero(a)
-        sum += hamming_weight(a & b)
+        sum += hamming_weight(a & abs(b))
         a = a >>> 1
     end
-    return Int8(-1)^!iszero(sum & 1)
+    return Int8(-1)^(!iszero(sum & 1)) * Int8(-1)^s
 end
 
-sign_of_mult(a::Integer, b::Integer) = sign(a) * sign(b) * sign_of_mult(unsigned.(abs.((a,b)))...)
 sign_of_mult(a::Integer) = sign_of_mult(a,a)
 
 """
