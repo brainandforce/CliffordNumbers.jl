@@ -154,11 +154,25 @@ function scalar_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
 end
 
 """
-    abs2(m::CliffordNumber)
+    abs2(m::CliffordNumber{Q}) -> CliffordNumber{Q}
 
 Calculates the squared norm of `m`, equal to `scalar_product(m, ~m)`.
 """
 Base.abs2(m::CliffordNumber) = scalar_product(m, ~m)
+
+"""
+    abs2(m::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Calculates the norm of `m`, equal to `sqrt(scalar_product(m, ~m))`.
+"""
+Base.abs(m::CliffordNumber) = sqrt(abs2(m))
+
+"""
+    normalize(m::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Normalizes `m` so that its magnitude is 1.
+"""
+normalize(m::CliffordNumber) = m / abs(m)
 
 """
     left_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
