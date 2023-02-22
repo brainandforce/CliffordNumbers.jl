@@ -51,7 +51,7 @@ export grade
 include("promote.jl")
 include("convert.jl")
 include("math.jl")
-export select_grade, scalar_product, left_contraction, right_contraction, dot, hestenes_product 
-    wedge, ∧, ⋆
+export select_grade, grade_involution, scalar_product, left_contraction, right_contraction, dot,
+    hestenes_product, wedge, ∧, ⋆
 
 end

@@ -6,6 +6,41 @@ Returns a multivectors where all elements not of grade `g` are equal to zero.
 """
 select_grade(m::CliffordNumber, g::Integer) = typeof(m)(i -> m[i] * (hamming_weight(i) == g))
 
+#---Sign changing operations-----------------------------------------------------------------------#
+"""
+    reverse(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    ~(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+
+Calculate the reverse of a Clifford number. This effectively reverses the products that form the
+basis blades.
+"""
+Base.reverse(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(i & 2))
+
+"""
+    reverse(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    ~(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+
+Calculate the reverse of a Clifford number. This effectively reverses the products that form the
+basis blades, or in other words, reverses the order of the geometric product that resulted in `m`.
+"""
+Base.:~(m::CliffordNumber) = reverse(m)
+
+"""
+    grade_involution(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+
+Calculates the grade involution of a Clifford number. This effectively multiplies all of the basis
+vectors of the space by -1, which makes elements of odd grade flip sign.
+"""
+grade_involution(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(i & 1))
+
+"""
+    conj(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+
+Calculates the Clifford conjugate of a Clifford number. This is equal to
+`grade_involution(reverse(m))`.
+"""
+Base.conj(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(i+1 & 2))
+
 #---Addition---------------------------------------------------------------------------------------#
 import Base.:+
 
