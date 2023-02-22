@@ -293,10 +293,24 @@ degenerate or `m` has null factors.
 versor_inverse(m::CliffordNumber) = ~m / abs2(m)
 
 #---Exponentials-----------------------------------------------------------------------------------#
-import Base: ^, exp
+"""
+    exp(m::CliffordNumber{Q}) -> CliffordNumber{Q,<:AbstractFloat}
 
-#=
-function ^(m::CliffordNumber, x::Number)
+Returns the natural exponential of a Clifford number.
 
+For special cases where m squares to a scalar, the following shortcuts can be used to calculate
+`exp(m)`:
+"""
+function Base.exp(m::CliffordNumber)
+    # Special cases: m^2 is a scalar
+    if isscalar(m^2)
+        iszero(m^2) && return 1 + m
+        m^2 < 0 && return cos(abs(m)) + m * sin(abs(m)) / abs(m)
+        m^2 > 0 && return cosh(abs(m)) + m * sinh(abs(m)) / abs(m)
+    end
+    # General case: Taylor expansion
+    # Divide m by s which is chosen to keep norm(m) reasonably close to unity
+    # But it's also kept as a power of 2 to make the power calculation more efficient
+    s = Int(exp2(round(Int, log2(abs(m)))))
+    return sum((m/s)^n / factorial(n) for n in 0:12)^s
 end
-=#
