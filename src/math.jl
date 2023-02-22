@@ -1,70 +1,70 @@
 #---Grade selection--------------------------------------------------------------------------------#
 """
-    select_grade(m::CliffordNumber, g::Integer)
+    select_grade(x::CliffordNumber, g::Integer)
 
-Returns a multivectors where all elements not of grade `g` are equal to zero.
+Returns a multivector similar to `x` where all elements not of grade `g` are equal to zero.
 """
-select_grade(m::CliffordNumber, g::Integer) = typeof(m)(i -> m[i] * (hamming_weight(i) == g))
+select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (hamming_weight(i) == g))
 
 #---Sign changing operations-----------------------------------------------------------------------#
 """
-    reverse(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-    ~(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    reverse(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    ~(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+
+Calculate the reverse of Clifford number `x`. This effectively reverses the products that form the
+basis blades, or in other words, reverses the order of the geometric product that resulted in `x`.
+"""
+Base.reverse(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iszero(hamming_weight(i) & 2))
+
+"""
+    reverse(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    ~(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
 
 Calculate the reverse of a Clifford number. This effectively reverses the products that form the
-basis blades.
+basis blades, or in other words, reverses the order of the geometric product that resulted in `x`.
 """
-Base.reverse(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(hamming_weight(i) & 2))
+Base.:~(x::CliffordNumber) = reverse(x)
 
 """
-    reverse(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-    ~(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    grade_involution(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
 
-Calculate the reverse of a Clifford number. This effectively reverses the products that form the
-basis blades, or in other words, reverses the order of the geometric product that resulted in `m`.
-"""
-Base.:~(m::CliffordNumber) = reverse(m)
-
-"""
-    grade_involution(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-
-Calculates the grade involution of a Clifford number. This effectively multiplies all of the basis
+Calculates the grade involution of Clifford number `x`. This effectively multiplies all of the basis
 vectors of the space by -1, which makes elements of odd grade flip sign.
 """
-grade_involution(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iseven(hamming_weight(i)))
+grade_involution(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iseven(hamming_weight(i)))
 
 """
-    conj(m::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
+    conj(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
 
-Calculates the Clifford conjugate of a Clifford number. This is equal to
-`grade_involution(reverse(m))`.
+Calculates the Clifford conjugate of a Clifford number `x`. This is equal to
+`grade_involution(reverse(x))`.
 """
-Base.conj(m::CliffordNumber) = typeof(m)(i -> m[i] * Int8(-1)^!iszero(i+1 & 2))
+Base.conj(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iszero(i+1 & 2))
 
 #---Addition---------------------------------------------------------------------------------------#
 import Base.:+
 
-+(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = CliffordNumber{Q}(m1.data .+ m2.data)
++(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q = CliffordNumber{Q}(x.data .+ y.data)
 
-function +(m::CliffordNumber{Q}, n::BaseNumber) where Q
-    return CliffordNumber{Q}(ntuple(i -> m.data[i] + (isone(i) * n), Val{length(m)}()))
+function +(x::CliffordNumber{Q}, y::BaseNumber) where Q
+    return CliffordNumber{Q}(ntuple(i -> x.data[i] + (isone(i) * y), Val{length(x)}()))
 end
 
 # Adding imaginary numbers to elements of real Clifford algebras (geometric algebras) should add
 # the real part to the scalar and the imaginary part to the pseudoscalar
-function +(m::CliffordNumber{<:QuadraticForm,<:Real}, n::Complex)
-    L = length(m)
-    data = ntuple(i -> m.data[i] + (isone(i) * real(n)) + ((i == L) * imag(n)), Val{L}())
-    return typeof(m)(data)
+function +(x::CliffordNumber{<:QuadraticForm,<:Real}, y::Complex)
+    L = length(x)
+    data = ntuple(i -> x.data[i] + (isone(i) * real(y)) + ((i == L) * imag(y)), Val{L}())
+    return typeof(x)(data)
 end
 
-+(n::BaseNumber, m::CliffordNumber) = m + n
++(x::BaseNumber, y::CliffordNumber) = y + x
 
 #---Negation and subtraction-----------------------------------------------------------------------#
 import Base.:-
 
--(m::CliffordNumber{Q}) where Q = CliffordNumber{Q}((-).(m.data))
--(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = m1 + (-m2)
+-(x::CliffordNumber{Q}) where Q = CliffordNumber{Q}((-).(x.data))
+-(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q = x + (-y)
 
 # Automatically promote 
 
@@ -77,8 +77,8 @@ import Base.://
 
 for op in (:*, :/, ://)
     @eval begin
-        $op(m::CliffordNumber{Q}, n::BaseNumber) where Q = CliffordNumber{Q}($op.(m.data, n))
-        $op(n::BaseNumber, m::CliffordNumber{Q}) where Q = CliffordNumber{Q}($op.(n, m.data))
+        $op(x::CliffordNumber{Q}, y::BaseNumber) where Q = CliffordNumber{Q}($op.(x.data, y))
+        $op(x::BaseNumber, y::CliffordNumber{Q}) where Q = CliffordNumber{Q}($op.(x, y.data))
     end
 end
 
@@ -104,37 +104,37 @@ metric_sign(i::BitIndex{Q}) where Q = metric_sign(Q, i.i, i.i)
 
 """
     CliffordAlgebra.elementwise_product(
-        m1::CliffordNumber{Q},
-        m2::CliffordNumber{Q},
-        i1::Integer,
-        i2::Integer
+        x::CliffordNumber{Q},
+        y::CliffordNumber{Q},
+        a::Integer,
+        b::Integer
     )
 
 Calculates the geometric product between element `i1` of Clifford number `m1` and element `i2` of
 Clifford number `m2`.
 """
 @inline function elementwise_product(
-    m1::CliffordNumber{Q},
-    m2::CliffordNumber{Q},
-    i1::Integer,
-    i2::Integer
+    x::CliffordNumber{Q},
+    y::CliffordNumber{Q},
+    a::Integer,
+    b::Integer
 ) where {Q}
-    coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
-    return CliffordNumber{Q}(i -> coeff * (i == xor(i1, i2)))
+    coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
+    return CliffordNumber{Q}(i -> coeff * (i == xor(a, b)))
 end
 
 """
-    *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+    *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the geometric product between multivectors/Clifford numbers `m1` and `m2` which share the
+Calculates the geometric product between multivectors/Clifford numbers `x` and `y` which share the
 quadratic form `Q`.
 """
-function *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(m1), eltype(m2))
+function *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(x), eltype(y))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R
-        result += elementwise_product(m1, m2, i1, i2)
+    for a in R, b in R
+        result += elementwise_product(x, y, a, b)
     end
     return result
 end
@@ -142,55 +142,55 @@ end
 #---Scalar products--------------------------------------------------------------------------------#
 
 """
-    scalar_product(m1::CliffordNumber{Q,T1}, m2::CliffordNumber{Q,T2}) -> promote_type(T1,T2)
+    scalar_product(x::CliffordNumber{Q,T1}, y::CliffordNumber{Q,T2}) -> promote_type(T1,T2)
 
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
 
 This is equal to `grade_select(m1*m2, 0)` but is significantly more efficient.
 """
-function scalar_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    return sum(m1[i] * m2[i] * sign_of_mult(i) * metric_sign(Q,i) for i in 0:elements(Q)-1)
+function scalar_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    return sum(x[i] * y[i] * sign_of_mult(i) * metric_sign(Q,i) for i in 0:elements(Q)-1)
 end
 
 """
-    abs2(m::CliffordNumber{Q}) -> CliffordNumber{Q}
+    abs2(x::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the squared norm of `m`, equal to `scalar_product(m, ~m)`.
+Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
 """
-Base.abs2(m::CliffordNumber) = scalar_product(m, ~m)
-
-"""
-    abs2(m::CliffordNumber{Q}) -> CliffordNumber{Q}
-
-Calculates the norm of `m`, equal to `sqrt(scalar_product(m, ~m))`.
-"""
-Base.abs(m::CliffordNumber) = sqrt(abs2(m))
+Base.abs2(x::CliffordNumber) = scalar_product(x, ~x)
 
 """
-    normalize(m::CliffordNumber{Q}) -> CliffordNumber{Q}
+    abs2(x::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Normalizes `m` so that its magnitude is 1.
+Calculates the norm of `x`, equal to `sqrt(scalar_product(x, ~x))`.
 """
-normalize(m::CliffordNumber) = m / abs(m)
+Base.abs(x::CliffordNumber) = sqrt(abs2(x))
 
 """
-    left_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+    normalize(x::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the left contraction of `m1` and `m2`.
-
-For basis blades `A` of grade `a` and `B` of grade `b`, the left contraction is zero if `b < a`,
-otherwise it is `grade_select(A*B, b-a)`.
+Normalizes `x` so that its magnitude is 1.
 """
-function left_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(m1), eltype(m2))
+normalize(x::CliffordNumber) = x / abs(x)
+
+"""
+    left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Calculates the left contraction of `x` and `y`.
+
+For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
+otherwise it is `grade_select(A*B, n-m)`.
+"""
+function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(x), eltype(y))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R
-        coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+    for a in R, b in R
+        coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (hamming_weight(i2) - hamming_weight(i1) == hamming_weight(xor(i1,i2)))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(i1,i2)))
+        coeff *= (hamming_weight(b) - hamming_weight(a) == hamming_weight(xor(a,b)))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(a,b)))
     end
     return result
 end
@@ -200,18 +200,18 @@ end
 
 Calculates the right contraction of `m1` and `m2`.
 
-For basis blades `A` of grade `a` and `B` of grade `b`, the right contraction is zero if `a < b`,
-otherwise it is `grade_select(A*B, a-b)`.
+For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
+otherwise it is `grade_select(A*B, m-n)`.
 """
-function right_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(m1), eltype(m2))
+function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(x), eltype(y))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R
-        coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+    for a in R, b in R
+        coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (hamming_weight(i1) - hamming_weight(i2) == hamming_weight(xor(i1,i2)))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(i1,i2)))
+        coeff *= (hamming_weight(a) - hamming_weight(b) == hamming_weight(xor(a,b)))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(a,b)))
     end
     return result
 end
@@ -221,96 +221,96 @@ end
 
 Calculates the dot product of `m1` and `m2`.
 
-For basis blades `A` of grade `a` and `B` of grade `b`, the dot product is equal to the left
-contraction when `a >= b` and is equal to the right contraction when `b >= a`.
+For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal to the left
+contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 """
-function dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(m1), eltype(m2))
+function dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(x), eltype(y))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R
-        coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+    for a in R, b in R
+        coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (abs(hamming_weight(i2) - hamming_weight(i1)) == hamming_weight(xor(i1,i2)))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(i1,i2)))
+        coeff *= (abs(hamming_weight(b) - hamming_weight(a)) == hamming_weight(xor(a,b)))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(a,b)))
     end
     return result
 end
 
 """
-    hestenes_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+    hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
 Returns the Hestenes product: this is equal to the dot product given by `dot(m1, m2)` but is equal
 to zero when either `m1` or `m2` is a scalar.
 """
-function hestenes_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(m1), eltype(m2))
-    return isscalar(m1) || isscalar(m2) ? zero(CliffordNumber{Q,T}) : dot(m1, m2)
+function hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(x), eltype(y))
+    return isscalar(x) || isscalar(y) ? zero(CliffordNumber{Q,T}) : dot(x, y)
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
 
 """
-    wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+    wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the wedge (outer) product of two Clifford numbers with quadratic form `Q`. The result
-is another `CliffordNumber{Q}`.
+Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with quadratic form `Q`.
 """
-function wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(m1), eltype(m2))
+function wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(x), eltype(y))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R
-        result += elementwise_product(m1, m2, i1, i2) * iszero(i1 & i2)
+    for a in R, b in R
+        result += elementwise_product(x, y, a, b) * iszero(a & b)
     end
     return result
 end
 
-wedge(s::Real, m::CliffordNumber{Q}) where Q = CliffordNumber{Q}(s .* m.data)
-wedge(m::CliffordNumber{Q}, s::Real) where Q = CliffordNumber{Q}(s .* m.data)
+wedge(x::Real, y::CliffordNumber{Q}) where Q = CliffordNumber{Q}(x .* y.data)
+wedge(x::CliffordNumber{Q}, y::Real) where Q = CliffordNumber{Q}(y .* x.data)
 
 wedge(x::BaseNumber, y::BaseNumber) = x * y
 
 const ∧ = wedge
 
 """
-    ⋆(m::CliffordNumber) -> CliffordNumber
+    ⋆(x::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the Hodge dual of `m`, equivalent to multiplying `m` by its corresponding pseudoscalar.
+Calculates the Hodge dual of `x`, equivalent to multiplying `x` by its corresponding pseudoscalar.
 """
-⋆(m::CliffordNumber) = m * pseudoscalar(m)
+⋆(x::CliffordNumber) = x * pseudoscalar(x)
 
 #---Division---------------------------------------------------------------------------------------#
 """
-    versor_inverse(m::CliffordNumber)
+    versor_inverse(x::CliffordNumber)
 
-Calculates the versor inverse of `m`, equal to `m / scalar_product(m, ~m)`, so that
-`m * inv(m) == inv(m) * m == 1`.
+Calculates the versor inverse of `x`, equal to `x / scalar_product(x, ~x)`, so that
+`x * inv(x) == inv(x) * x == 1`.
 
-The versor inverse may not always be well defined, particularly when the quadratic form is
-degenerate or `m` has null factors.
+The versor inverse is only guaranteed to be an inverse for blades and versors. Not all Clifford
+numbers have a well-defined inverse, since Clifford numbers have zero divisors (for instance, in the
+algebra of physical space, 1 + e₁ has a zero divisor).
 """
-versor_inverse(m::CliffordNumber) = ~m / abs2(m)
+versor_inverse(x::CliffordNumber) = ~x / abs2(x)
 
 #---Exponentials-----------------------------------------------------------------------------------#
 """
-    exp(m::CliffordNumber{Q}) -> CliffordNumber{Q,<:AbstractFloat}
+    exp(x::CliffordNumber{Q}) -> CliffordNumber{Q,<:AbstractFloat}
 
 Returns the natural exponential of a Clifford number.
 
 For special cases where m squares to a scalar, the following shortcuts can be used to calculate
-`exp(m)`:
+`exp(x)`:
 """
-function Base.exp(m::CliffordNumber)
+function Base.exp(x::CliffordNumber)
     # Special cases: m^2 is a scalar
-    if isscalar(m^2)
-        iszero(m^2) && return 1 + m
-        m^2 < 0 && return cos(abs(m)) + m * sin(abs(m)) / abs(m)
-        m^2 > 0 && return cosh(abs(m)) + m * sinh(abs(m)) / abs(m)
+    if isscalar(x^2)
+        iszero(x^2) && return 1 + x
+        x^2 < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
+        x^2 > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
     end
     # General case: Taylor expansion
     # Divide m by s which is chosen to keep norm(m) reasonably close to unity
     # But it's also kept as a power of 2 to make the power calculation more efficient
-    s = Int(exp2(round(Int, log2(abs(m)))))
-    return sum((m/s)^n / factorial(n) for n in 0:12)^s
+    s = Int(exp2(round(Int, log2(abs(x)))))
+    return sum((x/s)^n / factorial(n) for n in 0:12)^s
 end
