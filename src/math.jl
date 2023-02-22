@@ -4,7 +4,7 @@
 
 Returns a multivectors where all elements not of grade `g` are equal to zero.
 """
-select_grade(m::CliffordNumber, g::Integer) = typeof(m)(i -> m[i] * (hamming_weight(i) == g)) 
+select_grade(m::CliffordNumber, g::Integer) = typeof(m)(i -> m[i] * (hamming_weight(i) == g))
 
 #---Addition---------------------------------------------------------------------------------------#
 import Base.:+
@@ -98,7 +98,7 @@ function *(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     T = promote_type(eltype(m1), eltype(m2))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R 
+    for i1 in R, i2 in R
         result += elementwise_product(m1, m2, i1, i2)
     end
     return result
@@ -107,14 +107,89 @@ end
 #---Scalar products--------------------------------------------------------------------------------#
 
 """
-    dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> Number
-    m1 · m2 -> CliffordNumber{Q}
+    scalar_product(m1::CliffordNumber{Q,T1}, m2::CliffordNumber{Q,T2}) -> promote_type(T1,T2)
 
-Calculates the dot (inner) product of two Clifford numbers with quadratic form `Cl`. The result is a
+Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
+
+This is equal to `grade_select(m1*m2, 0)` but is significantly more efficient.
+"""
+function scalar_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
+    return sum(m1[i] * m2[i] * sign_of_mult(i) * metric_sign(Q,i) for i in 0:elements(Q)-1)
+end
+
+"""
+    left_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Calculates the left contraction of `m1` and `m2`.
+
+For basis blades `A` of grade `a` and `B` of grade `b`, the left contraction is zero if `b < a`,
+otherwise it is `grade_select(A*B, b-a)`.
+"""
+function left_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(m1), eltype(m2))
+    R = 0:elements(Q) - 1
+    result = zero(CliffordNumber{Q,T})
+    for i1 in R, i2 in R
+        coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+        # Set to zero if the grade difference of b and a is not equal the grade of the new index
+        coeff *= (hamming_weight(i2) - hamming_weight(i1) == hamming_weight(xor(i1,i2)))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(i1,i2)))
+    end
+    return result
+end
+
+"""
+    right_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Calculates the right contraction of `m1` and `m2`.
+
+For basis blades `A` of grade `a` and `B` of grade `b`, the right contraction is zero if `a < b`,
+otherwise it is `grade_select(A*B, a-b)`.
+"""
+function right_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(m1), eltype(m2))
+    R = 0:elements(Q) - 1
+    result = zero(CliffordNumber{Q,T})
+    for i1 in R, i2 in R
+        coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+        # Set to zero if the grade difference of b and a is not equal the grade of the new index
+        coeff *= (hamming_weight(i1) - hamming_weight(i2) == hamming_weight(xor(i1,i2)))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(i1,i2)))
+    end
+    return result
+end
+
+"""
+    dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Calculates the dot product of `m1` and `m2`.
+
+For basis blades `A` of grade `a` and `B` of grade `b`, the dot product is equal to the left
+contraction when `a >= b` and is equal to the right contraction when `b >= a`.
 """
 function dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
-    return sum(m1[i] * m2[i] * sign_of_mult(Q, i) for i in 0:elements(Q)-1)
+    T = promote_type(eltype(m1), eltype(m2))
+    R = 0:elements(Q) - 1
+    result = zero(CliffordNumber{Q,T})
+    for i1 in R, i2 in R
+        coeff = m1[i1] * m2[i2] * sign_of_mult(i1, i2) * metric_sign(Q, i1, i2)
+        # Set to zero if the grade difference of b and a is not equal the grade of the new index
+        coeff *= (abs(hamming_weight(i2) - hamming_weight(i1)) == hamming_weight(xor(i1,i2)))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(i1,i2)))
+    end
+    return result
+end
+
+"""
+    hestenes_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+
+Returns the Hestenes product: this is equal to the dot product given by `dot(m1, m2)` but is equal
+to zero when either `m1` or `m2` is a scalar.
+"""
+function hestenes_product(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
+    T = promote_type(eltype(m1), eltype(m2))
+    return isscalar(m1) || isscalar(m2) ? zero(CliffordNumber{Q,T}) : dot(m1, m2)
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
@@ -129,7 +204,7 @@ function wedge(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q
     T = promote_type(eltype(m1), eltype(m2))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for i1 in R, i2 in R 
+    for i1 in R, i2 in R
         result += elementwise_product(m1, m2, i1, i2) * iszero(i1 & i2)
     end
     return result
