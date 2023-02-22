@@ -3,7 +3,7 @@ import Base.:+
 
 +(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) where Q = CliffordNumber{Q}(m1.data .+ m2.data)
 
-function +(m::CliffordNumber{Q}, n::Union{Real,Complex}) where Q
+function +(m::CliffordNumber{Q}, n::BaseNumber) where Q
     return CliffordNumber{Q}(ntuple(i -> m.data[i] + (isone(i) * n), Val{length(m)}()))
 end
 
