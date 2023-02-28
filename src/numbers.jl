@@ -31,8 +31,8 @@ end
 
 #---Constructors-----------------------------------------------------------------------------------#
 
-CliffordNumber{Q,T}(x::NTuple{L,<:Number}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
-CliffordNumber{Q,T}(x::Vararg{<:Number,L}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q,T}(x::NTuple{L,<:BaseNumber}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q,T}(x::Vararg{<:BaseNumber,L}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
 
 # Constructors similar to `ntuple(::Function)`
 # However, it deals with the offset indexing
@@ -44,12 +44,12 @@ CliffordNumber{Q,T}(f::Function) where {Q,T} = CliffordNumber{Q,T,elements(Q)}(f
 
 # Promote to a common type first 
 
-function CliffordNumber{Q}(x::NTuple{L,<:Number}) where {Q,L}
+function CliffordNumber{Q}(x::NTuple{L,<:BaseNumber}) where {Q,L}
     T = promote_type(typeof.(x)...)
     return CliffordNumber{Q,T,L}(promote(x...))
 end
 
-function CliffordNumber{Q}(x::Vararg{<:Number,L}) where {Q,L}
+function CliffordNumber{Q}(x::Vararg{<:BaseNumber,L}) where {Q,L}
     T = promote_type(typeof.(x)...)
     return CliffordNumber{Q,T,L}(promote(x...))
 end
@@ -76,7 +76,7 @@ function CliffordNumber{Q,T1}(x::Complex{T2}) where {Q,T1<:Real,T2<:Real}
     return CliffordNumber{Q,T,L}(data)
 end
 
-CliffordNumber{Q}(x::Number) where Q = CliffordNumber{Q,typeof(x)}(x)
+CliffordNumber{Q}(x::BaseNumber) where Q = CliffordNumber{Q,typeof(x)}(x)
 
 #---Number of elements-----------------------------------------------------------------------------#
 
