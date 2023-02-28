@@ -143,3 +143,7 @@ end
 
 Base.keys(::Type{<:CliffordNumber{Cl}}) where Cl = BitIndices{Cl}()
 Base.keys(m::CliffordNumber{Cl}) where Cl = keys(typeof(m))
+
+#---Internal indexing function---------------------------------------------------------------------#
+
+_indices(::CliffordNumber{Cl}) where Cl = 0:(dimension(Cl) - 1)
