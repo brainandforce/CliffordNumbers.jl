@@ -1,15 +1,24 @@
 """
+    AbstractCliffordNumber{Q,T}
+
+An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q` and
+element type `T`.
+"""
+abstract type AbstractCliffordNumber{Q<:QuadraticForm,T<:BaseNumber} <: Number
+end
+
+"""
     CliffordNumber{Q,T,L}
 
-An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q`, 
-element type `T`, and length `L` (which depends entirely on `Q`).
+A dense multivector (or Clifford number), with quadratic form `Q`, element type `T`, and length `L`
+(which depends entirely on `Q`).
 
 The coefficients are ordered by taking advantage of the natural binary structure of the basis. The
 grade of an element is given by the Hamming weight of its index. For the algebra of physical space,
 the order is: 1, e₁, e₂, e₁₂, e₃, e₁₃, e₂₃, e₁₂₃ = i. This order allows for more aggressive SIMD
 optimization when calculating the geometric product.
 """
-struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: Number
+struct CliffordNumber{Q,T,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function CliffordNumber{Q,T,L}(x) where {Q,T,L}
         sz = elements(Q)
