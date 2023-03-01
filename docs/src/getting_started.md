@@ -13,9 +13,9 @@ container of `CliffordNumber` elements.
 ### Internals
 
 A `CliffordNumber{Q,T,L}` is backed by an `NTuple{L,T} where T<:Union{Real,Complex}`. The
-coefficients, however, are not indexed by grade as is done canonically in most resources.
+coefficients, however, are not indexed in grade order as is done canonically in most resources.
 
-!!! danger Read that again: `CliffordNumber` indexing is not done by grade.
+!!! danger Read that again: `CliffordNumber` indexing is not done in grade order.
 
 Instead, the coefficients are arranged in a binary counted fashion, which allows for better SIMD
 optimization.
