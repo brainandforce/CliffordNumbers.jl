@@ -83,13 +83,13 @@ CliffordNumber{Q}(x::BaseNumber) where Q = CliffordNumber{Q,typeof(x)}(x)
 import Base.length
 # This is equal to the `L` parameter
 length(::Type{<:CliffordNumber{Q}}) where Q = elements(Q)
-length(m::CliffordNumber{Q}) where Q = length(typeof(m))
+length(m::CliffordNumber) = length(typeof(m))
 
 #---Get type parameters---------------------------------------------------------------------------#
 
-Base.eltype(::Type{<:CliffordNumber{Q,T}}) where {Q,T} = T
-algebra(::Type{<:CliffordNumber{Q}}) where Q = Q
-algebra(::CliffordNumber{Q}) where Q = Q
+Base.eltype(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
+algebra(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
+algebra(::AbstractCliffordNumber{Q}) where Q = Q
 
 #---Generate zero and identity elements-----------------------------------------------------------#
 
