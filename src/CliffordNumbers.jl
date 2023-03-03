@@ -54,4 +54,7 @@ include("math.jl")
 export select_grade, grade_involution, scalar_product, normalize, left_contraction,
     right_contraction, dot, hestenes_product, wedge, ∧, ⋆, versor_inverse
 
+include("sparse/kvectors.jl")
+export KVector
+
 end
