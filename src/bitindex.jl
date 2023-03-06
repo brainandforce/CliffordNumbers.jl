@@ -216,6 +216,7 @@ Constructs a `BitIndices` object associated with a Clifford number or its type.
 """
 BitIndices(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndices{Q}()
 BitIndices(::AbstractCliffordNumber{Q}) where Q = BitIndices{Q}()
+BitIndices(::Type{Q}) where Q = BitIndices{Q}()
 
 Base.length(::BitIndices{Q}) where Q = elements(Q)
 Base.first(::BitIndices{Q}) where Q = BitIndex{Q}(false, UInt(0))
