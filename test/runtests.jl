@@ -24,5 +24,21 @@ using Test
         x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
         y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
         @test x * y == CliffordNumber{APS}(6, 0, 0, 8, 0, 0, 0, 0)
+        # When multiplying vectors, the reverse should have a negative bivector
+        @test y * x == CliffordNumber{APS}(6, 0, 0, -8, 0, 0, 0, 0)
+    end
+    @testset "Wedge product" begin
+        x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
+        y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
+        five = 5 * one(CliffordNumber{APS})
+        # Self wedges should be zero
+        @test iszero(x ∧ x)
+        @test iszero(y ∧ y)
+        # Reversing the order should flip the sign for vectors
+        @test x ∧ y == -(y ∧ x)
+        # Ensure the behavior of scalars (both CliffordNumber and normal) are correct
+        @test 5 ∧ x == 5 * x
+        @test five ∧ x == x ∧ five
+        @test 5 ∧ 5 == 25
     end
 end
