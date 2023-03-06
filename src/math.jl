@@ -169,7 +169,7 @@ otherwise it is `grade_select(A*B, n-m)`.
 function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
     result = zero(CliffordNumber{Q,T})
-    for a in eachindex(a), b in eachindex(b)
+    for a in eachindex(x), b in eachindex(y)
         coeff = x[a] * y[b] * sign_of_mult(a,b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
         coeff *= (grade(b) - grade(a) == grade(a*b))
@@ -189,7 +189,7 @@ otherwise it is `grade_select(A*B, m-n)`.
 function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
     result = zero(CliffordNumber{Q,T})
-    for a in eachindex(a), b in eachindex(b)
+    for a in eachindex(x), b in eachindex(y)
         coeff = x[a] * y[b] * sign_of_mult(a,b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
         coeff *= (grade(a) - grade(b) == grade(a*b))
@@ -209,7 +209,7 @@ contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 function dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
     result = zero(CliffordNumber{Q,T})
-    for a in eachindex(a), b in eachindex(b)
+    for a in eachindex(x), b in eachindex(y)
         coeff = x[a] * y[b] * sign_of_mult(a,b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
         coeff *= (abs(grade(b) - grade(a)) == grade(a*b))
@@ -238,7 +238,7 @@ Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with qu
 function wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
     result = zero(CliffordNumber{Q,T})
-    for a in eachindex(a), b in eachindex(b)
+    for a in eachindex(x), b in eachindex(y)
         result += elementwise_product(x, y, a, b) * iszero(a.blade & b.blade)
     end
     return result
