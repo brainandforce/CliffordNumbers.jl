@@ -43,7 +43,7 @@ include("quadratic.jl")
 export QuadraticForm, APS, STA, VGA, PGA, CGA
 export dimension, elements, grades
 include("numbers.jl")
-export CliffordNumber
+export AbstractCliffordNumber, CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
 include("bitindex.jl")
 export BitIndex, BitIndices
