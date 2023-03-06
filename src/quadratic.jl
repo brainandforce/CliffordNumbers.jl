@@ -9,9 +9,10 @@ By convention, this type is used as a tag, and is never instantiated.
 struct QuadraticForm{P,Q,R}
 end
 
-const QF = QuadraticForm
-
 dimension(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (P + Q + R)
+isdegenerate(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = !iszero(R)
+iseuclidean(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (iszero(P) && iszero(Q))
+
 elements(Q::Type{<:QuadraticForm}) = 2^dimension(Q)
 grades(Q::Type{<:QuadraticForm}) = 0:dimension(Q)
 
