@@ -31,7 +31,7 @@ function Base.propertynames(::BitIndex; private=false)
 end
 
 function Base.getproperty(b::BitIndex, s::Symbol)
-    s === :signbit && return iszero(getfield(b, :i) & signmask(UInt))
+    s === :signbit && return !iszero(getfield(b, :i) & signmask(UInt))
     s === :blade && return getfield(b, :i) & ~signmask(UInt)
     return getfield(b, s)
 end
@@ -66,17 +66,17 @@ function _sort_with_parity!(v::AbstractVector{<:Real})
         # Complete the swap of x and y values
         v[j] = x
     end
-    return (v, iseven(swaps))
+    return (v, !iseven(swaps))
 end
 
 function _bitindex!(Q::Type{<:QuadraticForm}, v::AbstractVector{<:Integer})
-    (v, swaps) = _sort_with_parity!(v)
+    (v, parity) = _sort_with_parity!(v)
     # Remove pairs of identical elements in v
     for n in axes(v,1)[2:end]
         # If we find a pair, set both elements to zero
-        v[n] == v[n-1] && v[[n,n-1]] .= 0
+        v[n] == v[n-1] && (v[[n,n-1]] .= 0)
     end
-    return BitIndex{Q}(swaps, sum(UInt(2)^(x-1) for x in filter!(!iszero, v)))
+    return BitIndex{Q}(parity, sum(UInt(2)^(x-1) for x in filter!(!iszero, v); init=UInt(0)))
 end
 
 """
@@ -212,11 +212,11 @@ Base.length(::BitIndices{Q}) where Q = elements(Q)
 Base.first(::BitIndices{Q}) where Q = BitIndex{Q}(false, UInt(0))
 Base.last(::BitIndices{Q}) where Q = BitIndex{Q}(false, typemax(UInt) % elements(Q))
 
-function Base.iterate(::BitIndices{Q}, i::Integer = 0)
+function Base.iterate(::BitIndices{Q}, i::Integer = 0) where Q
     return 0 <= i < elements(Q) ? (BitIndex{Q}(false, UInt(i)), i+1) : nothing
 end
 
 #---Range of valid indices for CliffordNumber------------------------------------------------------#
 
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
-Base.keys(::Type{CliffordNumber{Q}}) = BitIndices{Q}()  # also specifies Base.eachindex()
+Base.keys(::Type{<:CliffordNumber{Q}}) where Q = BitIndices{Q}()
