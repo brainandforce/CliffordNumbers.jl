@@ -1,30 +1,29 @@
 import Base.promote_rule
 
+# This set of functions is defined in Julia Base (abstractarray.jl), but rather than importing it
+# we're duplicating it (this part of the Julia API may be unstable...)
+promote_eltype() = Base.Bottom
+promote_eltype(x, y...) = promote_type(eltype(x), promote_eltype(y...))
+
+eltypeof(x) = typeof(x)
+eltypeof(x::AbstractCliffordNumber) = eltype(x)
+
+promote_eltypeof() = Base.Bottom
+promote_eltypeof(x, y...) = promote_type(eltypeof(x), promote_eltypeof(y...))
+
 # Generic promote rule for Clifford numbers with different element types
-function promote_rule(
-    ::Type{<:CliffordNumber{Q,T1}},
-    ::Type{<:CliffordNumber{Q,T2}}
-) where {Q,T1,T2}
-    T = promote_type(T1,T2)
-    return CliffordNumber{Q,T,elements(Q)}
+function promote_rule(S::Type{<:CliffordNumber{Q}}, T::Type{<:CliffordNumber{Q}}) where Q
+    return CliffordNumber{Q,promote_eltypeof(S,T),elements(Q)}
 end
 
 # Promote rule when using real numbers
-function promote_rule(
-    ::Type{<:CliffordNumber{Q,T1}},
-    T2::Type{<:Real}
-) where {Q,T1}
-    T = promote_type(T1,T2)
-    return CliffordNumber{Q,T,elements(Q)}
+function promote_rule(S::Type{<:CliffordNumber{Q,<:Real}}, T::Type{<:Real}) where Q
+    return CliffordNumber{Q,promote_eltypeof(S,T),elements(Q)}
 end
 
 # Promote rule for complex numbers with real Clifford numbers
-function promote_rule(
-    ::Type{<:CliffordNumber{Q,T1}},
-    ::Type{<:Complex{T2}}
-) where {Q,T1<:Real,T2}
-    T = promote_type(T1,T2)
-    return CliffordNumber{Q,T,elements(Q)}
+function promote_rule(S::Type{<:CliffordNumber{Q,<:Real}}, T::Type{<:Complex{R}}) where {Q,R}
+    return CliffordNumber{Q,promote_eltypeof(S,R),elements(Q)}
 end
 
 # For abstract types where no element type of a Clifford number is specified
