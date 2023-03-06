@@ -17,8 +17,8 @@ struct BitIndex{Q<:QuadraticForm}
     i::UInt
     # Construct with the sign bit separately
     function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
-        x = ifelse(Q === QuadraticForm, elements(Q), signmask(blade))
-        return new((blade & ~x) | signmask(blade, signbit))
+        x = ifelse(Q === QuadraticForm, signmask(blade), elements(Q))
+        return new((blade % x) | signmask(blade, signbit))
     end
 end
 
@@ -179,6 +179,8 @@ end
 
 sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(a,b)
 sign_of_mult(i) = sign_of_mult(i,i)
+
+#---Multiplication and duals-----------------------------------------------------------------------#
 
 function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     return BitIndex{Q}(signbit_of_mult(a,b), xor(a.blade, b.blade))
