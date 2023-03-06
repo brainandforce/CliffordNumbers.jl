@@ -45,7 +45,7 @@ export dimension, elements, grades
 include("numbers.jl")
 export CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
-include("indices.jl")
+include("bitindex.jl")
 export BitIndex, BitIndices
 export grade
 include("promote.jl")
