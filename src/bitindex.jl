@@ -216,6 +216,7 @@ BitIndices(::AbstractCliffordNumber{Q}) where Q = BitIndices{Q}()
 Base.length(::BitIndices{Q}) where Q = elements(Q)
 Base.first(::BitIndices{Q}) where Q = BitIndex{Q}(false, UInt(0))
 Base.last(::BitIndices{Q}) where Q = BitIndex{Q}(false, typemax(UInt) % elements(Q))
+Base.eltype(::Type{BitIndices{Q}}) where Q = BitIndex{Q}
 
 function Base.iterate(::BitIndices{Q}, i::Integer = 0) where Q
     return 0 <= i < elements(Q) ? (BitIndex{Q}(false, UInt(i)), i+1) : nothing
