@@ -118,6 +118,10 @@ Base.sign(b::BitIndex) = Int8(-1)^b.signbit
 Base.:-(b::BitIndex) = typeof(b)(!b.signbit, b.blade)
 Base.abs(b::BitIndex) = typeof(b)(false, b.blade)
 
+function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+    return BitIndex{Q}(xor(a.signbit, b.signbit), xor(a.blade, b.blade))
+end
+
 grade(b::BitIndex) = hamming_weight(b.blade)
 
 #---Multiplication tools---------------------------------------------------------------------------#
