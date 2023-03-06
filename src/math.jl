@@ -114,7 +114,6 @@ quadratic form `Q`.
 """
 function *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
-    R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
     for a in eachindex(x), b in eachindex(y)
         result += elementwise_product(x, y, a, b)
