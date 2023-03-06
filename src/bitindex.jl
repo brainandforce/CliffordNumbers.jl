@@ -173,8 +173,8 @@ function sign_of_mult(
     # For Euclidean spaces no further processing is needed
     iszero(R) && return Int8(-1)^base_signbit
     # If any dimension squares to zero, just return zero
-    r = sum(UInt(2)^(n-1) for n in (P + Q) .+ 1:R; init=0)
-    iszero(xor(a.blade, b.blade) & r) || return Int8(0)
+    r = sum(UInt(2)^(n-1) for n in (P + Q) .+ (1:R); init=0)
+    return iszero(a.blade & b.blade & r) ? Int8(-1)^base_signbit : Int8(0)
 end
 
 sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(a,b)
