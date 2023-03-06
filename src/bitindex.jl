@@ -99,8 +99,13 @@ BitIndex(x) = GenericBitIndex(x)
 function Base.show(io::IO, b::BitIndex{Q}) where Q
     print(io, typeof(b), "(")
     rng = 1:min(dimension(Q), 8*sizeof(b.i) - 1)
+    found_first_vector = false
     for a in (b.signbit ? reverse(rng) : rng)
-        iszero(i & 2^(a-1)) || print(io, a, ", ")
+        if !iszero(b.i & 2^(a-1))
+            found_first_vector && print(io, ", ")
+            print(io, a)
+            found_first_vector = true
+        end
     end
     print(io, ")")
 end
