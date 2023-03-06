@@ -97,10 +97,9 @@ BitIndex(x) = GenericBitIndex(x)
 #---Show method------------------------------------------------------------------------------------#
 
 function Base.show(io::IO, b::BitIndex{Q}) where Q
-    print(io, typeof(b), "(")
-    rng = 1:min(dimension(Q), 8*sizeof(b.i) - 1)
+    print(io, "-"^b.signbit, typeof(b), "(")
     found_first_vector = false
-    for a in (b.signbit ? reverse(rng) : rng)
+    for a in 1:min(dimension(Q), 8*sizeof(b.i) - 1)
         if !iszero(b.i & 2^(a-1))
             found_first_vector && print(io, ", ")
             print(io, a)
@@ -117,10 +116,6 @@ Base.sign(b::BitIndex) = Int8(-1)^b.signbit
 
 Base.:-(b::BitIndex) = typeof(b)(!b.signbit, b.blade)
 Base.abs(b::BitIndex) = typeof(b)(false, b.blade)
-
-function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
-    return BitIndex{Q}(xor(a.signbit, b.signbit), xor(a.blade, b.blade))
-end
 
 grade(b::BitIndex) = hamming_weight(b.blade)
 
@@ -185,6 +180,9 @@ end
 sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(a,b)
 sign_of_mult(i) = sign_of_mult(i,i)
 
+function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+    return BitIndex{Q}(signbit_of_mult(a,b), xor(a.blade, b.blade))
+end
 
 #---Clifford number indexing-----------------------------------------------------------------------#
 
