@@ -150,7 +150,7 @@ function signbit_of_mult(
     a::BitIndex{QuadraticForm{P,Q,R}},
     b::BitIndex{QuadraticForm{P,Q,R}}
 ) where {P,Q,R}
-    base_signbit = signbit_of_mult(a.blade, b.blade)
+    base_signbit = xor(signbit_of_mult(a.blade, b.blade), a.signbit, b.signbit)
     iszero(Q) && return base_signbit
     # Only perform this test for pseudo-Riemannian metrics
     q = sum(UInt(2)^(n-1) for n in P .+ (1:Q); init=0)
@@ -174,7 +174,7 @@ function sign_of_mult(
     iszero(R) && return Int8(-1)^base_signbit
     # If any dimension squares to zero, just return zero
     r = sum(UInt(2)^(n-1) for n in (P + Q) .+ 1:R; init=0)
-    iszero(xor(a.blade, b.blade) & r) || return Int8(0)W
+    iszero(xor(a.blade, b.blade) & r) || return Int8(0)
 end
 
 sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(a,b)
