@@ -47,12 +47,12 @@ export AbstractCliffordNumber, CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
 include("bitindex.jl")
 export BitIndex, BitIndices
-export grade
+export grade, dual, undual
 include("promote.jl")
 include("convert.jl")
 include("math.jl")
 export select_grade, grade_involution, scalar_product, normalize, left_contraction,
-    right_contraction, dot, hestenes_product, wedge, ∧, ⋆, versor_inverse
+    right_contraction, dot, hestenes_product, wedge, ∧, versor_inverse
 
 include("sparse/kvectors.jl")
 export KVector

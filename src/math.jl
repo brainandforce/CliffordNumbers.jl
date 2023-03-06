@@ -250,12 +250,31 @@ wedge(x::BaseNumber, y::BaseNumber) = x * y
 
 const ∧ = wedge
 
+#---Duals------------------------------------------------------------------------------------------#
 """
-    ⋆(x::CliffordNumber{Q}) -> CliffordNumber{Q}
+    dual(x::CliffordNumber) -> CliffordNumber
 
-Calculates the Hodge dual of `x`, equivalent to multiplying `x` by its corresponding pseudoscalar.
+Calculates the dual of `x`, which is equal to the left contraction of `x` with the inverse of the
+pseudoscalar. However, 
+
+Note that the dual has some properties that depend on the dimension and quadratic form:
+  * The inverse of the unit pseudoscalar depends on the dimension of the space. Therefore, the
+periodicity of 
+  * If the metric is degenerate, the dual is not unique.
 """
-⋆(x::CliffordNumber) = x * pseudoscalar(x)
+function dual(x::CliffordNumber{Q}) where Q
+    isdegenerate(Q) || return CliffordNumber{Q}(i -> x[undual(BitIndices(Q)[i])])
+end
+
+"""
+    undual(x::CliffordNumber) -> CliffordNumber
+
+Calculates the undual of `x`, which is equal to the left contraction of `x` with the pseudoscalar.
+This function can be used to reverse the behavior of `dual()`.
+"""
+function undual(x::CliffordNumber{Q}) where Q
+    isdegenerate(Q) || return CliffordNumber{Q}(i -> x[undual(BitIndices(Q)[i])])
+end
 
 #---Division---------------------------------------------------------------------------------------#
 """

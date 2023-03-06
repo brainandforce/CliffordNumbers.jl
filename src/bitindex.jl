@@ -154,7 +154,7 @@ function signbit_of_mult(
     iszero(Q) && return base_signbit
     # Only perform this test for pseudo-Riemannian metrics
     q = sum(UInt(2)^(n-1) for n in P .+ (1:Q); init=0)
-    return Int8(-1)^(base_signbit * !isevil(a.blade & b.blade & q))
+    return xor(base_signbit, !isevil(a.blade & b.blade & q))
 end
 
 signbit_of_mult(i) = signbit_of_mult(i,i)
@@ -185,6 +185,9 @@ sign_of_mult(i) = sign_of_mult(i,i)
 function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     return BitIndex{Q}(signbit_of_mult(a,b), xor(a.blade, b.blade))
 end
+
+dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
+undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
 
 #---Clifford number indexing-----------------------------------------------------------------------#
 
