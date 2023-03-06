@@ -227,6 +227,8 @@ function Base.iterate(::BitIndices{Q}, i::Integer = 0) where Q
     return 0 <= i < elements(Q) ? (BitIndex{Q}(false, UInt(i)), i+1) : nothing
 end
 
+Base.getindex(::BitIndices{Q}, i::Integer) where Q = BitIndex{Q}(signbit(i), unsigned(i))
+
 #---Range of valid indices for CliffordNumber------------------------------------------------------#
 
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
