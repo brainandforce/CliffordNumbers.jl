@@ -86,41 +86,24 @@ end
 
 import Base.:*
 
-function metric_sign(::Type{QuadraticForm{P,Q,R}}, i1::Integer, i2::Integer) where {P,Q,R}
-    # For positive-definite metrics, just return 1
-    iszero(Q) && iszero(R) && return Int8(1)
-    # Get integers with binary 1s representing dimensions which square to negative or zero values
-    q = sum(2^n for n in P .+ (1:Q); init=0)
-    r = sum(2^n for n in (P + Q) .+ 1:R; init=0)
-    # If any of the dimensions square to zero, return zero
-    !iszero(xor(i1, i2) & r) && return Int8(0)
-    # Otherwise check the number of dimensions that square to -1
-    return Int8(-1)^!isevil(xor(i1, i2))
-end
-
-metric_sign(i1::BitIndex{Q}, i2::BitIndex{Q}) where Q = metric_sign(Cl, i1.i, i2.i)
-metric_sign(Q::Type{<:QuadraticForm}, i::Integer) = metric_sign(Q, i, i)
-metric_sign(i::BitIndex{Q}) where Q = metric_sign(Q, i.i, i.i)
-
 """
     CliffordAlgebra.elementwise_product(
         x::CliffordNumber{Q},
         y::CliffordNumber{Q},
-        a::Integer,
-        b::Integer
+        a::BitIndex{Q},
+        b::BitIndex{Q}
     )
 
-Calculates the geometric product between element `i1` of Clifford number `m1` and element `i2` of
-Clifford number `m2`.
+Calculates the geometric product between the element of `x` indexed by `a` and the element of `y`
+indexed by `b`.
 """
 @inline function elementwise_product(
     x::CliffordNumber{Q},
     y::CliffordNumber{Q},
-    a::Integer,
-    b::Integer
+    a::BitIndex{Q},
+    b::BitIndex{Q}
 ) where {Q}
-    coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
-    return CliffordNumber{Q}(i -> coeff * (i == xor(a, b)))
+    return CliffordNumber{Q}(i -> x[a] * y[b] * sign_of_mult(a,b) * (i == (a*b).blade))
 end
 
 """
@@ -133,7 +116,7 @@ function *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
     R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for a in R, b in R
+    for a in eachindex(x), b in eachindex(y)
         result += elementwise_product(x, y, a, b)
     end
     return result
@@ -150,7 +133,7 @@ Calculates the scalar product of two Clifford numbers with quadratic form `Q`. T
 This is equal to `grade_select(m1*m2, 0)` but is significantly more efficient.
 """
 function scalar_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    return sum(x[i] * y[i] * sign_of_mult(i) * metric_sign(Q,i) for i in 0:elements(Q)-1)
+    return sum(x[i] * y[i] * sign_of_mult(i) for i in eachindex(CliffordNumber{Q}))
 end
 
 """
@@ -174,6 +157,7 @@ Normalizes `x` so that its magnitude is 1.
 """
 normalize(x::CliffordNumber) = x / abs(x)
 
+#---Contractions-----------------------------------------------------------------------------------#
 """
     left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
@@ -184,13 +168,12 @@ otherwise it is `grade_select(A*B, n-m)`.
 """
 function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
-    R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for a in R, b in R
-        coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
+    for a in eachindex(a), b in eachindex(b)
+        coeff = x[a] * y[b] * sign_of_mult(a,b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (hamming_weight(b) - hamming_weight(a) == hamming_weight(xor(a,b)))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(a,b)))
+        coeff *= (grade(b) - grade(a) == grade(a*b))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == (a*b).blade))
     end
     return result
 end
@@ -205,13 +188,12 @@ otherwise it is `grade_select(A*B, m-n)`.
 """
 function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
-    R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for a in R, b in R
-        coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
+    for a in eachindex(a), b in eachindex(b)
+        coeff = x[a] * y[b] * sign_of_mult(a,b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (hamming_weight(a) - hamming_weight(b) == hamming_weight(xor(a,b)))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(a,b)))
+        coeff *= (grade(a) - grade(b) == grade(a*b))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == (a*b).blade))
     end
     return result
 end
@@ -226,13 +208,12 @@ contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 """
 function dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
-    R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for a in R, b in R
-        coeff = x[a] * y[b] * sign_of_mult(a, b) * metric_sign(Q, a, b)
+    for a in eachindex(a), b in eachindex(b)
+        coeff = x[a] * y[b] * sign_of_mult(a,b)
         # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (abs(hamming_weight(b) - hamming_weight(a)) == hamming_weight(xor(a,b)))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == xor(a,b)))
+        coeff *= (abs(grade(b) - grade(a)) == grade(a*b))
+        result += CliffordNumber{Q,T}(i -> coeff * (i == (a*b).blade))
     end
     return result
 end
@@ -245,11 +226,10 @@ to zero when either `m1` or `m2` is a scalar.
 """
 function hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
-    return isscalar(x) || isscalar(y) ? zero(CliffordNumber{Q,T}) : dot(x, y)
+    return isscalar(x) || isscalar(y) ? zero(CliffordNumber{Q,T}) : dot(x,y)
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
-
 """
     wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
@@ -257,10 +237,9 @@ Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with qu
 """
 function wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
-    R = 0:elements(Q) - 1
     result = zero(CliffordNumber{Q,T})
-    for a in R, b in R
-        result += elementwise_product(x, y, a, b) * iszero(a & b)
+    for a in eachindex(a), b in eachindex(b)
+        result += elementwise_product(x, y, a, b) * iszero(a.blade & b.blade)
     end
     return result
 end
