@@ -6,6 +6,13 @@ Returns a multivector similar to `x` where all elements not of grade `g` are equ
 """
 select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (hamming_weight(i) == g))
 
+"""
+    real(x::CliffordNumber{Q,T<:Real}) = T
+
+Return the real (scalar) portion of a real Clifford number. 
+"""
+Base.real(x::CliffordNumber{<:QuadraticForm,<:Real}) = first(x.data)
+
 #---Sign changing operations-----------------------------------------------------------------------#
 """
     reverse(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
