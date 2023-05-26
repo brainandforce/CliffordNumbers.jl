@@ -35,3 +35,11 @@ end
     @test five ∧ x == x ∧ five
     @test 5 ∧ 5 == 25
 end
+
+@testset "Exponentiation" begin
+    e12 = CliffordNumber{APS}(0, 0, 0, 1, 0, 0, 0, 0)
+    @test exppi(e12/2) == e12
+    @test exptau(e12) == 1
+    @test exppi(e12) ≈ exp(pi*e12)
+    @test exptau(e12) ≈ exp(2*pi*e12)
+end
