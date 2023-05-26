@@ -32,7 +32,7 @@ end
 #---Constructors-----------------------------------------------------------------------------------#
 
 CliffordNumber{Q,T}(x::NTuple{L,<:BaseNumber}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
-CliffordNumber{Q,T}(x::Vararg{<:BaseNumber,L}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q,T}(x::Vararg{BaseNumber,L}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
 
 # Constructors similar to `ntuple(::Function)`
 # However, it deals with the offset indexing
@@ -49,7 +49,7 @@ function CliffordNumber{Q}(x::NTuple{L,<:BaseNumber}) where {Q,L}
     return CliffordNumber{Q,T,L}(promote(x...))
 end
 
-function CliffordNumber{Q}(x::Vararg{<:BaseNumber,L}) where {Q,L}
+function CliffordNumber{Q}(x::Vararg{BaseNumber,L}) where {Q,L}
     T = promote_type(typeof.(x)...)
     return CliffordNumber{Q,T,L}(promote(x...))
 end

@@ -18,7 +18,7 @@ struct KVector{K,Q,T,L} <: AbstractCliffordNumber{Q,T}
 end
 
 KVector{K,Q,T}(x::NTuple{L,<:BaseNumber}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
-KVector{K,Q,T}(x::Vararg{<:BaseNumber,L}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
+KVector{K,Q,T}(x::Vararg{BaseNumber,L}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
 
 KVector{K,Q}(x::NTuple{L,T}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
 KVector{K,Q}(x::Vararg{T,L}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
