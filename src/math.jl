@@ -320,14 +320,17 @@ Returns the natural exponential of a Clifford number.
 
 For special cases where m squares to a scalar, the following shortcuts can be used to calculate
 `exp(x)`:
+  * When x^2 < 0: `exp(x) === cos(abs(x)) + x * sin(abs(x)) / abs(x)`
+  * When x^2 > 0: `exp(x) === cosh(abs(x)) + x * sinh(abs(x)) / abs(x)`
+  * When x^2 === 0: `exp(x) == 1 + x`
+
+See also: [`exppi`](@ref), [`exptau`](@ref).
 """
 function Base.exp(x::CliffordNumber)
-    # Special cases: x^2 is a scalar
     sq = x^2
     if isscalar(sq)
         scalar(sq) < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
         scalar(sq) > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
-        # Degenerate case
         return 1 + x
     end
     # General case: Taylor expansion
@@ -336,3 +339,36 @@ function Base.exp(x::CliffordNumber)
     s = 2^intlog2(abs(x))
     return sum((x/s)^n / factorial(n) for n in 0:12)^s
 end
+
+"""
+    exppi(x::CliffordNumber)
+
+Returns the natural exponential of `π * x` with greater accuracy than `exp(π * x)` in the case where
+`x^2` is a negative scalar.
+
+See also: [`exp`](@ref), [`exptau`](@ref).
+"""
+function exppi(x::CliffordNumber)
+    sq = x^2
+    if isscalar(sq)
+        scalar(sq) < 0 && return cospi(abs(x)) + x * sinpi(abs(x)) / abs(x)
+        # TODO: is this really more accurate?
+        scalar(sq) > 0 && return cosh(π*abs(x)) + x * sinh(π*abs(x)) / abs(x)
+        return 1 + x
+    end
+    # General case: Taylor expansion
+    # Divide x by s which is chosen to keep its norm reasonably close to unity
+    # But it's also kept as a power of 2 to make the power calculation more efficient
+    s = 2^intlog2(π*abs(x))
+    return sum((x/s)^n * pi^n / factorial(n) for n in 0:20)^s
+end
+
+"""
+    exptau(x::CliffordNumber)
+
+Returns the natural exponential of `2π * x` with greater accuracy than `exp(2π * x)` in the case
+where `x^2` is a negative scalar.
+
+See also: [`exp`](@ref), [`exppi`](@ref).
+"""
+exptau(x::CliffordNumber) = exppi(2*x)
