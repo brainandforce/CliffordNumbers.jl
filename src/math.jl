@@ -6,6 +6,8 @@ Returns a multivector similar to `x` where all elements not of grade `g` are equ
 """
 select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (hamming_weight(i) == g))
 
+scalar(x::CliffordNumber) = first(x.data)
+
 """
     real(x::CliffordNumber{Q,T<:Real}) = T
 
