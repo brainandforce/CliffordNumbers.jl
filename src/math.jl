@@ -298,6 +298,21 @@ algebra of physical space, 1 + e₁ has a zero divisor).
 """
 versor_inverse(x::CliffordNumber) = ~x / abs2(x)
 
+#---Sandwich product-------------------------------------------------------------------------------#
+"""
+    sandwich(x::CliffordNumber{Q}, y::CliffordNumber{Q})
+
+Calculates the sandwich product of `x` with `y`: `~y * x * y`, but with corrections for numerical
+stability. 
+"""
+function sandwich(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
+    meat = normalize(x)
+    bread = normalize(y)
+    return abs(x) * ~bread * meat * bread
+end
+
+sandwich(x::BaseNumber, ::CliffordNumber) = x
+
 #---Exponentials-----------------------------------------------------------------------------------#
 """
     CliffordNumbers.intlog2(x::Real) -> Int

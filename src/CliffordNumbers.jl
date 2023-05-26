@@ -52,7 +52,7 @@ include("promote.jl")
 include("convert.jl")
 include("math.jl")
 export select_grade, grade_involution, scalar_product, normalize, left_contraction,
-    right_contraction, dot, hestenes_product, wedge, ∧, versor_inverse, exppi, exptau
+    right_contraction, dot, hestenes_product, wedge, ∧, versor_inverse, sandwich, exppi, exptau
 
 include("sparse/kvectors.jl")
 export KVector
