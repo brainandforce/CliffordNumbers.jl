@@ -300,6 +300,20 @@ versor_inverse(x::CliffordNumber) = ~x / abs2(x)
 
 #---Exponentials-----------------------------------------------------------------------------------#
 """
+    CliffordNumbers.intlog2(x::Real) -> Int
+
+Efficiently approximates the integer portion of the base-2 logarithm of `abs(x)` for calculating the
+multivector exponential.
+
+Note that this function returns `0` when `x == 0`.
+"""
+# log2(sqrt(2)) ≈ 0.5, so use that as a natural cutoff
+intlog2(x::AbstractFloat) = last(Base.Math.frexp(sqrt(2) * x)) - !iszero(x)
+intlog2(x::Real) = intlog2(Float64(x))
+# It's likely not worth specializing on integers when considering the sqrt(2) factor
+# intlog2(x::Integer) = 8*sizeof(x) - leading_zeros(abs(x) >>> 1)
+
+"""
     exp(x::CliffordNumber{Q}) -> CliffordNumber{Q,<:AbstractFloat}
 
 Returns the natural exponential of a Clifford number.
@@ -317,8 +331,8 @@ function Base.exp(x::CliffordNumber)
         return 1 + x
     end
     # General case: Taylor expansion
-    # Divide m by s which is chosen to keep norm(m) reasonably close to unity
+    # Divide x by s which is chosen to keep its norm reasonably close to unity
     # But it's also kept as a power of 2 to make the power calculation more efficient
-    s = Int(exp2(round(Int, log2(abs(x)))))
+    s = 2^intlog2(abs(x))
     return sum((x/s)^n / factorial(n) for n in 0:12)^s
 end
