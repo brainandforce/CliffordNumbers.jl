@@ -16,12 +16,12 @@ function promote_rule(
     S::Type{<:AbstractCliffordNumber{Q}},
     T::Type{<:AbstractCliffordNumber{Q}}
 ) where Q
-    return CliffordNumber{Q,promote_eltypeof(S,T),elements(Q)}
+    return CliffordNumber{Q,promote_eltype(S,T),elements(Q)}
 end
 
 # Promote rule for BaseNumber types (real, complex)
 # Note that complex numbers aren't automatically treated as pseudoscalars
 # (this only works in some dimensions...)
 function promote_rule(S::Type{<:AbstractCliffordNumber{Q}}, T::Type{<:BaseNumber}) where Q
-    return CliffordNumber{Q,promote_eltypeof(S,T),elements(Q)}
+    return CliffordNumber{Q,promote_type(eltype(S),T),elements(Q)}
 end
