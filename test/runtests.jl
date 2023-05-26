@@ -2,6 +2,7 @@ using CliffordNumbers
 using Test
 
 @testset "CliffordNumbers.jl" begin
+    include("internals.jl")
     @testset "Conversion" begin
         # Conversion of scalar CliffordNumbers to Real subtypes
         @test convert(Int, CliffordNumber{APS,Float64}(1)) === Int(1)
