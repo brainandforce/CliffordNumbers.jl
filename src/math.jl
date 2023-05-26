@@ -311,8 +311,9 @@ function Base.exp(x::CliffordNumber)
     # Special cases: x^2 is a scalar
     sq = x^2
     if isscalar(sq)
-        real(sq) < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
-        real(sq) > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
+        scalar(sq) < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
+        scalar(sq) > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
+        # Degenerate case
         return 1 + x
     end
     # General case: Taylor expansion
