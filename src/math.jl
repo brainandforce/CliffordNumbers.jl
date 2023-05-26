@@ -306,11 +306,12 @@ For special cases where m squares to a scalar, the following shortcuts can be us
 `exp(x)`:
 """
 function Base.exp(x::CliffordNumber)
-    # Special cases: m^2 is a scalar
-    if isscalar(x^2)
-        iszero(x^2) && return 1 + x
-        x^2 < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
-        x^2 > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
+    # Special cases: x^2 is a scalar
+    sq = x^2
+    if isscalar(sq)
+        real(sq) < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
+        real(sq) > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
+        return 1 + x
     end
     # General case: Taylor expansion
     # Divide m by s which is chosen to keep norm(m) reasonably close to unity
