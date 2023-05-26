@@ -129,7 +129,7 @@ end
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
 
-This is equal to `grade_select(m1*m2, 0)` but is significantly more efficient.
+This is equal to `grade_select(x*y, 0)` but is significantly more efficient.
 """
 function scalar_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     return sum(x[i] * y[i] * sign_of_mult(i) for i in eachindex(CliffordNumber{Q}))
@@ -152,7 +152,7 @@ Base.abs(x::CliffordNumber) = sqrt(abs2(x))
 """
     normalize(x::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Normalizes `x` so that its magnitude is 1.
+Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 """
 normalize(x::CliffordNumber) = x / abs(x)
 
@@ -178,9 +178,9 @@ function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
 end
 
 """
-    right_contraction(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+    right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the right contraction of `m1` and `m2`.
+Calculates the right contraction of `x` and `y`.
 
 For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
 otherwise it is `grade_select(A*B, m-n)`.
@@ -198,9 +198,9 @@ function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
 end
 
 """
-    dot(m1::CliffordNumber{Q}, m2::CliffordNumber{Q}) -> CliffordNumber{Q}
+    dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Calculates the dot product of `m1` and `m2`.
+Calculates the dot product of `x` and `y`.
 
 For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal to the left
 contraction when `m >= n` and is equal to the right contraction when `n >= m`.
@@ -220,8 +220,8 @@ end
 """
     hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
-Returns the Hestenes product: this is equal to the dot product given by `dot(m1, m2)` but is equal
-to zero when either `m1` or `m2` is a scalar.
+Returns the Hestenes product: this is equal to the dot product given by `dot(x, y)` but is equal to
+to zero when either `x` or `y` is a scalar.
 """
 function hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(eltype(x), eltype(y))
