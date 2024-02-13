@@ -201,38 +201,55 @@ end
 
 #---Clifford number iteration----------------------------------------------------------------------#
 """
-    BitIndices{Q<:QuadraticForm}
+    BitIndices{Q<:QuadraticForm,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
 
-Represents a range of valid `BitIndex` objects for a given quadratic form.
+Represents a range of valid `BitIndex` objects for the nonzero components of a given multivector 
+with quadratic form `Q`.
 
-For sparse representations, such as `KVector{K...}`, this is not the most efficient way to iterate
-through all elements, as it includes indices that are known to be zero.
+For a generic `AbstractCliffordNumber{Q}`, this returns `BitIndices{CliffordNumber{Q}}`, which
+contains all possible indices for a multivector associated with the quadratic form `Q`. This may 
+also be constructed with `BitIndices(Q)`.
+
+For sparse representations, such as `KVector{K,Q}`, the object only contains the indices of the
+nonzero elements of the multivector.
+
+# Construction
+
+`BitIndices` can be constructed by calling the type constructor with either the multivector or its
+type.
+
+# Indexing
+
+`BitIndices` always uses one-based indexing like most Julia arrays. Although it is more natural in
+the dense case to use zero-based indexing, as the basis blades are naturally encoded in the indices
+for the dense representation of `CliffordNumber`, one-based indexing is used by the tuples which
+contain the data associated with this package's implementations of Clifford numbers.
+
+# Interfaces for new subtypes of `AbstractCliffordNumber`
+
+When defining the behavior of `BitIndices` for new subtypes `T` of `AbstractCliffordNumber`, 
+`Base.getindex(::BitIndices{Q,T}, i::Integer)` should be defined so that all indices of T that are
+not constrained to be zero are returned.
 """
-struct BitIndices{Q<:QuadraticForm}
+struct BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
 end
 
-"""
-    BitIndices(x::AbstractCliffordNumber{Q}) -> BitIndices{Q}()
-    BitIndices(T::Type{<:AbstractCliffordNumber{Q}}) -> BitIndices{Q}()
+BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
+BitIndices{Q}(::Type{T}) where {Q,T<:AbstractCliffordNumber} = BitIndices{Q,T}()
 
-Constructs a `BitIndices` object associated with a Clifford number or its type.
-"""
-BitIndices(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndices{Q}()
-BitIndices(::AbstractCliffordNumber{Q}) where Q = BitIndices{Q}()
-BitIndices(::Type{Q}) where Q = BitIndices{Q}()
+BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
+BitIndices(T::Type{<:AbstractCliffordNumber{Q,<:Any}}) where Q = BitIndices{Q,T}()
 
-Base.length(::BitIndices{Q}) where Q = elements(Q)
-Base.first(::BitIndices{Q}) where Q = BitIndex{Q}(false, UInt(0))
-Base.last(::BitIndices{Q}) where Q = BitIndex{Q}(false, typemax(UInt) % elements(Q))
-Base.eltype(::Type{BitIndices{Q}}) where Q = BitIndex{Q}
+BitIndices(x::AbstractCliffordNumber{Q,<:Any}) where Q = BitIndices{Q,typeof(x)}()
 
-function Base.iterate(::BitIndices{Q}, i::Integer = 0) where Q
-    return 0 <= i < elements(Q) ? (BitIndex{Q}(false, UInt(i)), i+1) : nothing
+Base.size(::BitIndices{Q,T}) where {Q,T} = tuple(length(T))
+
+function Base.getindex(b::BitIndices{Q}, i::Integer) where Q
+    @boundscheck checkbounds(b, i)
+    return BitIndex{Q}(signbit(i-1), unsigned(i-1))
 end
-
-Base.getindex(::BitIndices{Q}, i::Integer) where Q = BitIndex{Q}(signbit(i), unsigned(i))
 
 #---Range of valid indices for CliffordNumber------------------------------------------------------#
 
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
-Base.keys(::Type{<:CliffordNumber{Q}}) where Q = BitIndices{Q}()
+Base.keys(::Type{T}) where T<:AbstractCliffordNumber{<:Any,<:Any} = BitIndices(T)
