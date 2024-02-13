@@ -4,7 +4,7 @@
 
 Returns a multivector similar to `x` where all elements not of grade `g` are equal to zero.
 """
-select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (hamming_weight(i) == g))
+select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (count_ones(i) == g))
 
 scalar(x::CliffordNumber) = first(x.data)
 
@@ -23,7 +23,7 @@ Base.real(x::CliffordNumber{<:QuadraticForm,<:Real}) = first(x.data)
 Calculate the reverse of Clifford number `x`. This effectively reverses the products that form the
 basis blades, or in other words, reverses the order of the geometric product that resulted in `x`.
 """
-Base.reverse(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iszero(hamming_weight(i) & 2))
+Base.reverse(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iszero(count_ones(i) & 2))
 
 """
     reverse(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
@@ -40,7 +40,7 @@ Base.:~(x::CliffordNumber) = reverse(x)
 Calculates the grade involution of Clifford number `x`. This effectively multiplies all of the basis
 vectors of the space by -1, which makes elements of odd grade flip sign.
 """
-grade_involution(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iseven(hamming_weight(i)))
+grade_involution(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iseven(count_ones(i)))
 
 """
     conj(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}

@@ -117,7 +117,7 @@ Base.sign(b::BitIndex) = Int8(-1)^b.signbit
 Base.:-(b::BitIndex) = typeof(b)(!b.signbit, b.blade)
 Base.abs(b::BitIndex) = typeof(b)(false, b.blade)
 
-grade(b::BitIndex) = hamming_weight(b.blade)
+grade(b::BitIndex) = count_ones(b.blade)
 
 #---Multiplication tools---------------------------------------------------------------------------#
 """
@@ -136,7 +136,7 @@ function signbit_of_mult(a::Unsigned, b::Unsigned)
     a = abs(a) >>> 1
     sum = 0
     while !iszero(a)
-        sum += hamming_weight(a & abs(b))
+        sum += count_ones(a & abs(b))
         a = a >>> 1
     end
     return !iszero(sum & 1)

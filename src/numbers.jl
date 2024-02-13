@@ -172,7 +172,7 @@ function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
     # Loop through all the grades
     for n in 1:dimension(Q)
         # Find all numbers with specific Hamming weights
-        inds = findall(x -> hamming_weight(x) == n, 0:(elements(Q) - 1))
+        inds = findall(x -> count_ones(x) == n, 0:(elements(Q) - 1))
         for i in inds .- 1
             if !iszero(m[i])
                 print(
