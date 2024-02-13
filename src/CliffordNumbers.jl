@@ -22,7 +22,33 @@ hamming_weight(i::Integer) = sum(!iszero(i & typeof(i)(2)^n) for n in 0:8*sizeof
 Determines whether a number is evil, meaning that its Hamming weight (sum of its binary digits) is
 even.
 """
-isevil(i::Integer) = iseven(hamming_weight(i))
+isevil(i::Integer) = iseven(count_ones(i))
+
+"""
+    CliffordNumbers.isodious(i::Integer) -> Bool
+
+Determines whether a number is odious, meaning that its Hamming weight (sum of its binary digits) is
+odd.
+"""
+isodious(i::Integer) = !isevil(i)
+
+"""
+    CliffordNumbers.evil_number(n::Integer)
+
+Returns the nth evil number, with the first evil number (`n == 1`) defined to be 0.
+
+Evil numbers are numbers which have an even Hamming weight (sum of its binary digits).
+"""
+evil_number(n::Integer) = (x = 2*(n-1); return x + !isevil(x))
+
+"""
+    CliffordNumbers.odious_number(n::Integer)
+
+Returns the nth odious number, with the first odious number (`n == 1`) defined to be 1.
+
+Odious numbers are numbers which have an odd Hamming weight (sum of its binary digits).
+"""
+odious_number(n::Integer) = (x = 2*(n-1); return x + !isodious(x))
 
 """
     CliffordNumbers.subscript_string(x::Number) -> String
