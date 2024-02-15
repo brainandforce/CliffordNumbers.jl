@@ -1,5 +1,5 @@
 """
-    KVector{K,Q,T,L}
+    KVector{K,Q,T,L} <: AbstractCliffordNumber{Q,T}
 
 A multivector consisting only linear combinations of basis blades of grade `K` - in other words,
 a k-vector.
@@ -30,6 +30,21 @@ length(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L} = L
 length(::Type{<:KVector{K,Q}}) where {K,Q} = binomial(dimension(Q), K)
 length(x::KVector) = length(typeof(x))
 
+#---Indexing---------------------------------------------------------------------------------------#
+
+Base.size(::BitIndices{Q,<:KVector{K}}) where {Q,K} = tuple(length(KVector{K,Q}))
+
+function Base.getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
+    @boundscheck checkbounds(b, i)
+    return BitIndex{Q}(signbit(i-1), unsigned(hamming_number(K, i)))
+end
+
+function Base.getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
+    # Indices with mismatched grades are always zero
+    grade(b) === K || return zero(eltype(k))
+    return k.data[findfirst(isequal(abs(b)), BitIndices(typeof(k)))] * sign(b)
+end
+
 #---Zero elements----------------------------------------------------------------------------------#
 import Base: zero
 
@@ -41,10 +56,10 @@ zero(x::KVector) = zero(typeof(x))
 #---Show methods-----------------------------------------------------------------------------------#
 import Base: show, summary
 
-function show(io::IO, x::KVector{K}) where K
-    print(io, "KVector{", K, ",", algebra(x), ",", eltype(x), "}", x.data)
+function show(io::IO, k::KVector{K}) where K
+    print(io, "KVector{", K, ",", algebra(k), ",", eltype(k), "}", k.data)
 end
 
-function summary(io::IO, x::KVector{K}) where K
-    println(io, "KVector{", K, ",", algebra(x), ",", eltype(x), "}:")
+function summary(io::IO, k::KVector{K}) where K
+    println(io, "KVector{", K, ",", algebra(k), ",", eltype(k), "}:")
 end
