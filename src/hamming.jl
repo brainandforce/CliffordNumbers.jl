@@ -32,6 +32,17 @@ Odious numbers are numbers which have an odd Hamming weight (sum of its binary d
 """
 odious_number(n::Integer) = (x = 2*(n-1); return x + !isodious(x))
 
+"""
+    CliffordNumbers.next_of_hamming_weight(n::Integer)
+
+Returns the next integer with the same Hamming weight as `n`.
+"""
+function next_of_hamming_weight(n::Integer)
+    c = n & -n
+    r = n + c
+    return div(xor(r, n) >>> 2, c) | r
+end
+
 # TODO: can this be done in a time under O(n) with constant space?
 """
     CliffordNumbers.hamming_number(w::Integer, n::Integer)
@@ -48,11 +59,9 @@ julia> CliffordNumbers.hamming_number(3, 2)
 """
 function hamming_number(w::Integer, n::Integer)
     isone(w) && return 2^(w-1)
-    val = 2^w - 1
+    result = 2^w - 1
     for _ in 1:(n-1)
-        c = val & -val
-        r = val + c
-        val = div(xor(r, val) >>> 2, c) | r
+        result = next_of_hamming_weight(result)
     end
-    return val
+    return result
 end

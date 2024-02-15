@@ -11,7 +11,8 @@
 end
 
 @testset "Hamming weight tools" begin
-    import CliffordNumbers: isevil, isodious, evil_number, odious_number, hamming_number
+    import CliffordNumbers:
+        isevil, isodious, evil_number, odious_number, next_of_hamming_weight, hamming_number
     # Sequences pulled from OEIS
     first_16_evil = [0, 3, 5, 6, 9, 10, 12, 15, 17, 18, 20, 23, 24, 27, 29, 30]
     first_16_odious = [1, 2, 4, 7, 8, 11, 13, 14, 16, 19, 21, 22, 25, 26, 28, 31]
@@ -20,6 +21,7 @@ end
     @test all(isodious, first_16_odious)
     @test evil_number.(1:16) == first_16_evil
     @test odious_number.(1:16) == first_16_odious
+    @test all(x -> next_of_hamming_weight(hamming_weight_3[x]) == hamming_weight_3[x+1], 1:15)
     @test all(x -> count_ones(x) == 3, hamming_weight_3)
     @test hamming_number.(3, 1:16) == hamming_weight_3
 end
