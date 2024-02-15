@@ -253,3 +253,10 @@ end
 
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
 Base.keys(::Type{T}) where T<:AbstractCliffordNumber{<:Any,<:Any} = BitIndices(T)
+
+#---Indexing an AbastractCliffordNumber with BitIndices of a type----------------------------------#
+
+function Base.getindex(x::AbstractCliffordNumber{Q}, b::BitIndices{Q,T}) where {Q,T}
+    data = ntuple(i -> x[b[i]], Val(length(T)))
+    return T(data)
+end
