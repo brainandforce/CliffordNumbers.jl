@@ -43,6 +43,29 @@ Odious numbers are numbers which have an odd Hamming weight (sum of its binary d
 odious_number(n::Integer) = (x = 2*(n-1); return x + !isodious(x))
 
 """
+    hamming_number(w::Integer, n::Integer)
+
+Gets the `n`th number with Hamming weight `w`. The first number with this Hamming weight (`n = 1`)
+is `2^w - 1`.
+
+# Example
+
+```julia-repl
+julia> CliffordNumbers.hamming_number(3, 2)
+11
+```
+"""
+function hamming_number(w::Integer, n::Integer)
+    val = 2^w - 1
+    for _ in 1:(n-1)
+        c = val & -val
+        r = val + c
+        val = div(xor(r, val) >>> 2, c) | r
+    end
+    return val
+end
+
+"""
     CliffordNumbers.subscript_string(x::Number) -> String
 
 Produces a string representation of a number in subscript format.
