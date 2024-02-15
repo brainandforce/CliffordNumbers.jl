@@ -58,7 +58,7 @@ julia> CliffordNumbers.hamming_number(3, 2)
 ```
 """
 function hamming_number(w::Integer, n::Integer)
-    isone(w) && return 2^(w-1)
+    isone(w) && return 2^(n-1)
     result = 2^w - 1
     for _ in 1:(n-1)
         result = next_of_hamming_weight(result)

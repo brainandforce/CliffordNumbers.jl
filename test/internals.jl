@@ -24,4 +24,6 @@ end
     @test all(x -> next_of_hamming_weight(hamming_weight_3[x]) == hamming_weight_3[x+1], 1:15)
     @test all(x -> count_ones(x) == 3, hamming_weight_3)
     @test hamming_number.(3, 1:16) == hamming_weight_3
+    @test hamming_number.(1, 1:8) == [2^(n-1) for n in 1:8]
+    @test all(x -> isone(count_ones(x)), hamming_number.(1, 1:8))
 end
