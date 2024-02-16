@@ -10,6 +10,7 @@ end
 
 #---Get type parameters----------------------------------------------------------------------------#
 
+QuadraticForm(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
+QuadraticForm(::AbstractCliffordNumber{Q}) where Q = Q
+
 Base.eltype(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
-algebra(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
-algebra(::AbstractCliffordNumber{Q}) where Q = Q

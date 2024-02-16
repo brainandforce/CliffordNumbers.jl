@@ -57,9 +57,9 @@ zero(x::KVector) = zero(typeof(x))
 import Base: show, summary
 
 function show(io::IO, k::KVector{K}) where K
-    print(io, "KVector{", K, ",", algebra(k), ",", eltype(k), "}", k.data)
+    print(io, "KVector{", K, ",", QuadraticForm(k), ",", eltype(k), "}", k.data)
 end
 
 function summary(io::IO, k::KVector{K}) where K
-    println(io, "KVector{", K, ",", algebra(k), ",", eltype(k), "}:")
+    println(io, "KVector{", K, ",", QuadraticForm(k), ",", eltype(k), "}:")
 end

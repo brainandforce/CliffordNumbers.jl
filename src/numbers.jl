@@ -121,7 +121,7 @@ end
 import Base: show, summary
 
 function show(io::IO, m::CliffordNumber)
-    print(io, "CliffordNumber{", algebra(m), ",", eltype(m), "}(", join(m.data, ", "), ")")
+    print(io, "CliffordNumber{", QuadraticForm(m), ",", eltype(m), "}(", join(m.data, ", "), ")")
 end
 
 function to_basis_str(
@@ -140,7 +140,7 @@ function to_basis_str(
 end
 
 function summary(io::IO, m::CliffordNumber)
-    println(io, "CliffordNumber{", algebra(m), ",", eltype(m), "}:")
+    println(io, "CliffordNumber{", QuadraticForm(m), ",", eltype(m), "}:")
 end
 
 function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
