@@ -77,6 +77,21 @@ import Base.length
 length(::Type{<:CliffordNumber{Q}}) where Q = elements(Q)
 length(m::CliffordNumber) = length(typeof(m))
 
+#---Default BitIndices construction should include all possible BitIndex objects-------------------#
+
+BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
+BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
+
+#---Clifford number indexing-----------------------------------------------------------------------#
+
+Base.getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q = sign(b) * x.data[b.blade + 1]
+Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[b.blade % length(x) + 1]
+
+function Base.getindex(m::CliffordNumber, i::Integer)
+    # Throw the correct BoundsError for out of bounds
+    return i in 0:length(m)-1 ? m.data[i+1] : throw(BoundsError(m, i))
+end
+
 #---Generate zero and identity elements-----------------------------------------------------------#
 
 import Base: zero, one, oneunit
@@ -139,20 +154,20 @@ function to_basis_str(
     )
 end
 
-function summary(io::IO, m::CliffordNumber)
-    println(io, "CliffordNumber{", QuadraticForm(m), ",", eltype(m), "}:")
+function summary(io::IO, x::CliffordNumber)
+    println(io, "CliffordNumber{", QuadraticForm(x), ",", eltype(x), "}:")
 end
 
-function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
-    summary(io, m)
+function show(io::IO, ::MIME"text/plain", x::CliffordNumber{Q}) where Q
+    summary(io, x)
     # For a zero multivector, just print zero
     # Make sure to cover the signed zero case for floating point elements
-    iszero(m) && print(io, m[0])
+    iszero(x) && print(io, x[0])
     # Flag to mark when we've *found the first nonzero* element
     ffn = false
     # Print the scalar component first
-    if !iszero(m[0])
-        print(io, m[0])
+    if !iszero(x[0])
+        print(io, x[0])
         ffn = true
     end
     # Loop through all the grades
@@ -160,10 +175,10 @@ function show(io::IO, ::MIME"text/plain", m::CliffordNumber{Q}) where Q
         # Find all numbers with specific Hamming weights
         inds = findall(x -> count_ones(x) == n, 0:(elements(Q) - 1))
         for i in inds .- 1
-            if !iszero(m[i])
+            if !iszero(x[i])
                 print(
-                    io, " "^ffn, (sign(m[i]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(m[i]), 
-                    "*"^(m[i] isa Bool), to_basis_str(Q, i, pseudoscalar="i")
+                    io, " "^ffn, (sign(x[i]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(x[i]), 
+                    "*"^(x[i] isa Bool), to_basis_str(Q, i, pseudoscalar="i")
                 )
                 ffn = true
             end

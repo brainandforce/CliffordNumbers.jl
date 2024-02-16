@@ -35,14 +35,14 @@ export AbstractCliffordNumber
 # Working with the grades represented by an AbstractCliffordNumber subtype
 include("grades.jl")
 export RepresentedGrades
-# Dense representation of a Clifford number
-include("numbers.jl")
-export CliffordNumber
-export pseudoscalar, isscalar, ispseudoscalar
 # Indexing each graded element of an AbstractCliffordNumber
 include("bitindex.jl")
 export BitIndex, BitIndices
 export grade, dual, undual
+# Dense representation of a Clifford number
+include("numbers.jl")
+export CliffordNumber
+export pseudoscalar, isscalar, ispseudoscalar
 include("promote.jl")
 include("convert.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances

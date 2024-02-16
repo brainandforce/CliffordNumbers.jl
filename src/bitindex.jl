@@ -189,16 +189,6 @@ end
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
 
-#---Clifford number indexing-----------------------------------------------------------------------#
-
-Base.getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q = sign(b) * x.data[b.blade + 1]
-Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[b.blade % length(x) + 1]
-
-function Base.getindex(m::CliffordNumber, i::Integer)
-    # Throw the correct BoundsError for out of bounds
-    return i in 0:length(m)-1 ? m.data[i+1] : throw(BoundsError(m, i))
-end
-
 #---Clifford number iteration----------------------------------------------------------------------#
 """
     BitIndices{Q<:QuadraticForm,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
@@ -234,10 +224,7 @@ not constrained to be zero are returned.
 struct BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
 end
 
-BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
 BitIndices{Q}(::Type{T}) where {Q,T<:AbstractCliffordNumber} = BitIndices{Q,T}()
-
-BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 BitIndices(T::Type{<:AbstractCliffordNumber{Q,<:Any}}) where Q = BitIndices{Q,T}()
 
 BitIndices(x::AbstractCliffordNumber{Q,<:Any}) where Q = BitIndices{Q,typeof(x)}()
