@@ -1,8 +1,8 @@
 import Base.convert
 
-convert(S::Type{<:CliffordNumber{Q,T}}, m::CliffordNumber{Q}) where {Q,T} = S(m.data)::S
+convert(S::Type{<:CliffordNumber{Q,T}}, x::CliffordNumber{Q}) where {Q,T} = S(x.data)::S
 
-function convert(S::Type{<:Real}, m::CliffordNumber)
-    isscalar(m) || throw(InexactError(:convert, S, m))
-    return S(m[0])
+function convert(S::Type{<:Real}, x::CliffordNumber)
+    isscalar(x) || throw(InexactError(:convert, S, x))
+    return S(x[BitIndices(x)[1]])
 end
