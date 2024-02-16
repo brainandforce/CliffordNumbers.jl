@@ -1,12 +1,4 @@
-"""
-    AbstractCliffordNumber{Q,T}
-
-An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q` and
-element type `T`.
-"""
-abstract type AbstractCliffordNumber{Q<:QuadraticForm,T<:BaseNumber} <: Number
-end
-
+#---Dense representation of Clifford numbers-------------------------------------------------------#
 """
     CliffordNumber{Q,T,L}
 
@@ -84,12 +76,6 @@ import Base.length
 # This is equal to the `L` parameter
 length(::Type{<:CliffordNumber{Q}}) where Q = elements(Q)
 length(m::CliffordNumber) = length(typeof(m))
-
-#---Get type parameters---------------------------------------------------------------------------#
-
-Base.eltype(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
-algebra(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
-algebra(::AbstractCliffordNumber{Q}) where Q = Q
 
 #---Generate zero and identity elements-----------------------------------------------------------#
 

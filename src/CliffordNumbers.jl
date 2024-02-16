@@ -25,24 +25,31 @@ end
 
 # Contains tools for working with Hamming weights of integers
 include("hamming.jl")
-# nothing to export
+# Tools for defining quadratic forms/metric signatures (convention may not be great)
 include("quadratic.jl")
 export QuadraticForm, APS, STA, VGA, PGA, CGA
 export dimension, elements, grades
-include("numbers.jl")
-export AbstractCliffordNumber, CliffordNumber
-export pseudoscalar, isscalar, ispseudoscalar
+# Abstract supertype for all Clifford numbers
+include("abstract.jl")
+export AbstractCliffordNumber
+# Working with the grades represented by an AbstractCliffordNumber subtype
 include("grades.jl")
 export RepresentedGrades
+# Dense representation of a Clifford number
+include("numbers.jl")
+export CliffordNumber
+export pseudoscalar, isscalar, ispseudoscalar
+# Indexing each graded element of an AbstractCliffordNumber
 include("bitindex.jl")
 export BitIndex, BitIndices
 export grade, dual, undual
 include("promote.jl")
 include("convert.jl")
+# Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
 export select_grade, grade_involution, scalar_product, normalize, left_contraction,
     right_contraction, dot, hestenes_product, wedge, ∧, versor_inverse, sandwich, exppi, exptau
-
+# Compact representation of k-vectors
 include("sparse/kvectors.jl")
 export KVector
 
