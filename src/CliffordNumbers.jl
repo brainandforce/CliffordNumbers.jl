@@ -32,6 +32,8 @@ export dimension, elements, grades
 include("numbers.jl")
 export AbstractCliffordNumber, CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
+include("grades.jl")
+export RepresentedGrades
 include("bitindex.jl")
 export BitIndex, BitIndices
 export grade, dual, undual
