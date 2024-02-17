@@ -119,6 +119,38 @@ Base.abs(b::BitIndex) = typeof(b)(false, b.blade)
 
 grade(b::BitIndex) = count_ones(b.blade)
 
+#---Grade dependent sign inversion-----------------------------------------------------------------#
+import Base: reverse, conj
+
+"""
+    reverse(b::BitIndex) -> BitIndex
+    reverse(x::AbstractCliffordNumber{Q,T}) -> typeof(x)
+
+Performs the reverse operation on the basis blade indexed by `b` or the Clifford number `x`. The 
+sign of the reverse depends on the grade, and is positive for `g % 4 in 0:1` and negative for
+`g % 4 in 2:3`.
+"""
+Base.reverse(b::BitIndex) = typeof(b)(xor(signbit(b), !iszero(grade(b) & 2)), b.blade)
+
+"""
+    grade_involution(b::BitIndex) -> BitIndex
+    grade_involution(x::AbstractCliffordNumber{Q,T}) -> typeof(x)
+
+Calculates the grade involution of the basis blade indexed by `b` or the Clifford number `x`. This
+effectively reflects all of the basis vectors of the space along their own mirror operation, which
+makes elements of odd grade flip sign.
+"""
+grade_involution(b::BitIndex) = typeof(b)(xor(signbit(b), !iseven(b)), b.blade)
+
+"""
+    conj(b::BitIndex) -> BitIndex
+    conj(x::AbstractCliffordNumber{Q,T}) -> typeof(x)
+
+Calculates the Clifford conjugate of the basis blade indexed by `b` or the Clifford number `x`. This
+is equal to `grade_involution(reverse(x))`.
+"""
+Base.conj(b::BitIndex) = typeof(b)(xor(signbit(b), !iszero(grade(b)+1 & 2)), b.blade)
+
 #---Multiplication tools---------------------------------------------------------------------------#
 """
     CliffordNumbers.signbit_of_mult(a::Integer, [b::Integer]) -> Bool
@@ -241,7 +273,7 @@ end
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
 Base.keys(::Type{T}) where T<:AbstractCliffordNumber{<:Any,<:Any} = BitIndices(T)
 
-#---Indexing an AbastractCliffordNumber with BitIndices of a type----------------------------------#
+#---Indexing an AbstractCliffordNumber with BitIndices of a type-----------------------------------#
 
 function Base.getindex(x::AbstractCliffordNumber{Q}, b::BitIndices{Q,T}) where {Q,T}
     data = ntuple(i -> x[b[i]], Val(length(T)))

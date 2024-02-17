@@ -16,39 +16,14 @@ Return the real (scalar) portion of a real Clifford number.
 Base.real(x::CliffordNumber{<:QuadraticForm,<:Real}) = first(x.data)
 
 #---Sign changing operations-----------------------------------------------------------------------#
-"""
-    reverse(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-    ~(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
 
-Calculate the reverse of Clifford number `x`. This effectively reverses the products that form the
-basis blades, or in other words, reverses the order of the geometric product that resulted in `x`.
-"""
-Base.reverse(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iszero(count_ones(i) & 2))
+for f in (:reverse, :grade_involution, :conj)
+    @eval begin
+        $f(x::T) where T<:CliffordNumber = T(ntuple(i -> x[$f(BitIndices(x)[i])], Val(length(T))))
+    end
+end
 
-"""
-    reverse(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-    ~(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-
-Calculate the reverse of a Clifford number. This effectively reverses the products that form the
-basis blades, or in other words, reverses the order of the geometric product that resulted in `x`.
-"""
 Base.:~(x::CliffordNumber) = reverse(x)
-
-"""
-    grade_involution(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-
-Calculates the grade involution of Clifford number `x`. This effectively multiplies all of the basis
-vectors of the space by -1, which makes elements of odd grade flip sign.
-"""
-grade_involution(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iseven(count_ones(i)))
-
-"""
-    conj(x::CliffordNumber{Q,T}) -> CliffordNumber{Q,T}
-
-Calculates the Clifford conjugate of a Clifford number `x`. This is equal to
-`grade_involution(reverse(x))`.
-"""
-Base.conj(x::CliffordNumber) = typeof(x)(i -> x[i] * Int8(-1)^!iszero(i+1 & 2))
 
 #---Addition---------------------------------------------------------------------------------------#
 import Base.:+

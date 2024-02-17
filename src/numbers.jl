@@ -87,12 +87,7 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 Base.getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q = sign(b) * x.data[b.blade + 1]
 Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[b.blade % length(x) + 1]
 
-function Base.getindex(m::CliffordNumber, i::Integer)
-    # Throw the correct BoundsError for out of bounds
-    return i in 0:length(m)-1 ? m.data[i+1] : throw(BoundsError(m, i))
-end
-
-#---Generate zero and identity elements-----------------------------------------------------------#
+#---Generate zero and identity elements------------------------------------------------------------#
 
 import Base: zero, one, oneunit
 
@@ -160,28 +155,28 @@ end
 
 function show(io::IO, ::MIME"text/plain", x::CliffordNumber{Q}) where Q
     summary(io, x)
-    # For a zero multivector, just print zero
-    # Make sure to cover the signed zero case for floating point elements
-    iszero(x) && print(io, x[0])
+    b = BitIndices(x)
     # Flag to mark when we've *found the first nonzero* element
     ffn = false
     # Print the scalar component first
-    if !iszero(x[0])
-        print(io, x[0])
+    if !iszero(x[b[1]])
+        print(io, x[b[1]])
         ffn = true
     end
     # Loop through all the grades
     for n in 1:dimension(Q)
         # Find all numbers with specific Hamming weights
         inds = findall(x -> count_ones(x) == n, 0:(elements(Q) - 1))
-        for i in inds .- 1
-            if !iszero(x[i])
+        for i in inds
+            if !iszero(x[b[i]])
                 print(
-                    io, " "^ffn, (sign(x[i]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(x[i]), 
-                    "*"^(x[i] isa Bool), to_basis_str(Q, i, pseudoscalar="i")
+                    io, " "^ffn, (sign(x[b[i]]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(x[b[i]]), 
+                    "*"^(x[b[i]] isa Bool), to_basis_str(Q, i-1)
                 )
                 ffn = true
             end
         end
     end
+    # If we got through the whole process, just print the zero
+    !ffn && print(io, x[b[1]])
 end
