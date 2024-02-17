@@ -256,12 +256,12 @@ not constrained to be zero are returned.
 struct BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
 end
 
-BitIndices{Q}(::Type{T}) where {Q,T<:AbstractCliffordNumber} = BitIndices{Q,T}()
-BitIndices(T::Type{<:AbstractCliffordNumber{Q,<:Any}}) where Q = BitIndices{Q,T}()
+BitIndices{Q}(::Type{C}) where {Q,C<:AbstractCliffordNumber} = BitIndices{Q,C}()
+BitIndices(C::Type{<:AbstractCliffordNumber{Q,<:Any}}) where Q = BitIndices{Q,C}()
 
 BitIndices(x::AbstractCliffordNumber{Q,<:Any}) where Q = BitIndices{Q,typeof(x)}()
 
-Base.size(::BitIndices{Q,T}) where {Q,T} = tuple(length(T))
+Base.size(::BitIndices{Q,C}) where {Q,C} = tuple(length(C))
 
 function Base.getindex(b::BitIndices{Q}, i::Integer) where Q
     @boundscheck checkbounds(b, i)
