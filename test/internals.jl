@@ -27,3 +27,8 @@ end
     @test hamming_number.(1, 1:8) == [2^(n-1) for n in 1:8]
     @test all(x -> isone(count_ones(x)), hamming_number.(1, 1:8))
 end
+
+@testset "Type relations" begin
+    @test CliffordNumber <: AbstractCliffordNumber
+    @test KVector <: AbstractCliffordNumber
+end

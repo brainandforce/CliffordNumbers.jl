@@ -1,6 +1,6 @@
 #---Dense representation of Clifford numbers-------------------------------------------------------#
 """
-    CliffordNumber{Q,T,L}
+    CliffordNumber{Q,T,L} <: AbstractCliffordNumber{Q,T}
 
 A dense multivector (or Clifford number), with quadratic form `Q`, element type `T`, and length `L`
 (which depends entirely on `Q`).
@@ -10,7 +10,7 @@ grade of an element is given by the Hamming weight of its index. For the algebra
 the order is: 1, e₁, e₂, e₁₂, e₃, e₁₃, e₂₃, e₁₂₃ = i. This order allows for more aggressive SIMD
 optimization when calculating the geometric product.
 """
-struct CliffordNumber{Q,T,L} <: AbstractCliffordNumber{Q,T}
+struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function CliffordNumber{Q,T,L}(x) where {Q,T,L}
         sz = elements(Q)
