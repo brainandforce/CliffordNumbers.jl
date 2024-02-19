@@ -119,5 +119,5 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
 
 function Base.getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C}) where {Q,C}
     data = ntuple(i -> x[b[i]], Val(length(C)))
-    return C(data)
+    return promote_type(C, numeric_type(x))(data)
 end
