@@ -37,6 +37,14 @@ numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
 numeric_type(T::Type{<:BaseNumber}) = T
 numeric_type(x) = numeric_type(typeof(x))
 
+#---Default constructor for zeros------------------------------------------------------------------#
+import Base: zero
+
+zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
+zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
+zero(x::AbstractCliffordNumber) = zero(typeof(x))
+
+
 #---Construct similar types------------------------------------------------------------------------#
 """
     CliffordNumbers.similar_type(
@@ -63,10 +71,3 @@ end
 
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(C, args...))
-
-#---Default constructor for zeros------------------------------------------------------------------#
-import Base: zero
-
-zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
-zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
-zero(x::AbstractCliffordNumber) = zero(typeof(x))
