@@ -32,3 +32,12 @@ end
     @test CliffordNumber <: AbstractCliffordNumber
     @test KVector <: AbstractCliffordNumber
 end
+
+@testset "Represented grades" begin
+    @test nonzero_grades(KVector{2,APS}) === 2:2
+    @test nonzero_grades(zero(KVector{2,APS})) === 2:2
+    @test nonzero_grades(CliffordNumber{APS}) === 0:3
+    @test nonzero_grades(zero(CliffordNumber{APS})) === 0:3
+    @test RepresentedGrades(KVector{2,APS})[0:3] == [false, false, true, false]
+    @test RepresentedGrades(CliffordNumber{APS})[0:3] == trues(4)
+end
