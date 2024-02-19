@@ -47,14 +47,6 @@ function Base.getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
     return k.data[findfirst(isequal(abs(b)), BitIndices(typeof(k)))] * sign(b)
 end
 
-#---Zero elements----------------------------------------------------------------------------------#
-import Base: zero
-
-zero(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L} = KVector{K,Q,T,L}(NTuple{L,T}(zero(T) for n in 1:L))
-zero(S::Type{KVector{K,Q,T}}) where {K,Q,T} = zero(S{length(S)})
-zero(::Type{KVector{K,Q}}) where {K,Q} = zero(KVector{K,Q,Bool,length(KVector{K,Q})})
-zero(x::KVector) = zero(typeof(x))
-
 #---Similar types----------------------------------------------------------------------------------#
 
 function similar_type(::Type{<:KVector{K}}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm}) where K

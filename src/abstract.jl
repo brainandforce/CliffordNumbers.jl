@@ -68,4 +68,5 @@ similar(x::AbstractCliffordNumber, args...) = zero(similar_type(C, args...))
 import Base: zero
 
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
-zero(C::Type{<:AbstractCliffordNumber}) = C(_ -> ntuple(zero(Bool), Val(length(C))))
+zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
+zero(x::AbstractCliffordNumber) = zero(typeof(x))
