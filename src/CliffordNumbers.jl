@@ -47,14 +47,15 @@ export AbstractBitIndices, BitIndices, TransformedBitIndices
 include("cliffordnumber.jl")
 export CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
+# Compact representation of k-vectors
+include("sparse/kvectors.jl")
+export KVector
+# Conversion and promotion tools
 include("promote.jl")
 include("convert.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
 export select_grade, scalar_product, normalize, left_contraction,
     right_contraction, dot, hestenes_product, wedge, ∧, versor_inverse, sandwich, exppi, exptau
-# Compact representation of k-vectors
-include("sparse/kvectors.jl")
-export KVector
 
 end
