@@ -43,7 +43,7 @@ end
 
 function Base.getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
     # Indices with mismatched grades are always zero
-    grade(b) === K || return zero(numbertype(k))
+    grade(b) === K || return zero(numeric_type(k))
     return k.data[findfirst(isequal(abs(b)), BitIndices(typeof(k)))] * sign(b)
 end
 
@@ -59,9 +59,9 @@ zero(x::KVector) = zero(typeof(x))
 import Base: show, summary
 
 function show(io::IO, k::KVector{K}) where K
-    print(io, "KVector{", K, ",", QuadraticForm(k), ",", numbertype(k), "}", k.data)
+    print(io, "KVector{", K, ",", QuadraticForm(k), ",", numeric_type(k), "}", k.data)
 end
 
 function summary(io::IO, k::KVector{K}) where K
-    println(io, "KVector{", K, ",", QuadraticForm(k), ",", numbertype(k), "}:")
+    println(io, "KVector{", K, ",", QuadraticForm(k), ",", numeric_type(k), "}:")
 end

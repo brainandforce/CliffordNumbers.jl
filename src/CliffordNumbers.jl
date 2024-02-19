@@ -32,7 +32,7 @@ export dimension, elements, grades
 # Abstract supertype for all Clifford numbers
 include("abstract.jl")
 export AbstractCliffordNumber
-export numbertype
+export numeric_type
 # Working with the grades represented by an AbstractCliffordNumber subtype
 include("grades.jl")
 export RepresentedGrades
