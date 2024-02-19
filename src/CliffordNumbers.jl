@@ -48,7 +48,7 @@ include("cliffordnumber.jl")
 export CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
 # Compact representation of k-vectors
-include("kvectors.jl")
+include("kvector.jl")
 export KVector
 # Conversion and promotion tools
 include("promote.jl")
