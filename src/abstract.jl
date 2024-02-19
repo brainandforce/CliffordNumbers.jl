@@ -15,7 +15,6 @@ QuadraticForm(::AbstractCliffordNumber{Q}) where Q = Q
 
 """
     numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) = T
-    numeric_type(::Type{<:AbstractCliffordNumber}) = Union{Real,Complex}
     numeric_type(T::Type{<:Union{Real,Complex}}) = T
     numeric_type(x) = numeric_type(typeof(x))
 
@@ -28,12 +27,13 @@ returned.
 
 `AbstractCliffordNumber` instances behave like numbers, not arrays. If `collect()` is called on a
 Clifford number of type `T`, it should not construct a vector of coefficients; instead it should
-return an `Array{T,0}`. Similarly,
+return an `Array{T,0}`. Similarly, a broadcasted multiplication should return the same result as
+normal multiplication, as is the case with complex numbers.
 
 For subtypes `T` of `Number`, `eltype(T) === T`, and this is true for `AbstractCliffordNumber`.
 """
+numeric_type(::Type) = BaseNumber
 numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
-numeric_type(::Type{<:AbstractCliffordNumber}) = Union{Real,Complex}
 numeric_type(T::Type{<:BaseNumber}) = T
 numeric_type(x) = numeric_type(typeof(x))
 
