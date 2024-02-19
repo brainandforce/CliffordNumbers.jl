@@ -25,11 +25,13 @@ Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = x[BitIndex{Q}()]
 
 for f in (:reverse, :grade_involution, :conj)
     @eval begin
-        $f(x::T) where T<:CliffordNumber = T(ntuple(i -> x[$f(BitIndices(x)[i])], Val(length(T))))
+        function $f(x::T) where T<:AbstractCliffordNumber
+            return T(ntuple(i -> x[$f(BitIndices(x)[i])], Val(length(T))))
+        end
     end
 end
 
-Base.:~(x::CliffordNumber) = reverse(x)
+Base.:~(x::AbstractCliffordNumber) = reverse(x)
 
 #---Addition---------------------------------------------------------------------------------------#
 import Base.:+
