@@ -1,3 +1,9 @@
+#---Equality---------------------------------------------------------------------------------------#
+
+function Base.:(==)(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return all(x[i] == y[i] for i in BitIndices(Q))
+end
+
 #---Grade selection--------------------------------------------------------------------------------#
 """
     select_grade(x::CliffordNumber, g::Integer)

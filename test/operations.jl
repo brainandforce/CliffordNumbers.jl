@@ -1,7 +1,11 @@
 @testset "Equality" begin
     x = CliffordNumber{APS,Float64}(1, 2, 3, 4, 5, 6, 7, 8)
+    @test convert(CliffordNumber{APS,Int}, x) isa CliffordNumber{APS,Int}
     @test x == convert(CliffordNumber{APS,Int}, x)
     @test x !== convert(CliffordNumber{APS,Int}, x)
+    # Equality between disparate types
+    @test KVector{2,APS}(4, 2, 0) == CliffordNumber{APS,Int}(0, 0, 0, 4, 0, 2, 0, 0)
+    @test KVector{2,APS}(4, 2, 0) == CliffordNumber{APS,Float64}(0, 0, 0, 4, 0, 2, 0, 0)
 end
 
 @testset "Addition" begin
