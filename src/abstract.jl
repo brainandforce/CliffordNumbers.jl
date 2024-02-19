@@ -62,9 +62,10 @@ function similar(x, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
 end
 
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
-similar(x::CliffordNumber, args...) = zero(similar_type(C, args...))
+similar(x::AbstractCliffordNumber, args...) = zero(similar_type(C, args...))
 
 #---Default constructor for zeros------------------------------------------------------------------#
+import Base: zero
 
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
 zero(C::Type{<:AbstractCliffordNumber}) = C(_ -> ntuple(zero(Bool), Val(length(C))))

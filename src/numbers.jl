@@ -91,7 +91,7 @@ Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[b.blade 
 
 #---Generate zero and identity elements------------------------------------------------------------#
 
-import Base: zero, one, oneunit
+import Base: one, oneunit
 
 zero(S::Type{<:CliffordNumber{Q,T}}) where {Q,T} = S(i -> zero(T))
 oneunit(S::Type{<:CliffordNumber{Q,T}}) where {Q,T} = S(iszero)
