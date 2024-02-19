@@ -37,8 +37,10 @@ include("grades.jl")
 export RepresentedGrades
 # Indexing each graded element of an AbstractCliffordNumber
 include("bitindex.jl")
-export BitIndex, BitIndices
-export grade, dual, undual
+export BitIndex
+export grade, grade_involution, dual, undual
+include("bitindices.jl")
+export AbstractBitIndices, BitIndices, TransformedBitIndices
 # Dense representation of a Clifford number
 include("numbers.jl")
 export CliffordNumber
@@ -47,7 +49,7 @@ include("promote.jl")
 include("convert.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
-export select_grade, grade_involution, scalar_product, normalize, left_contraction,
+export select_grade, scalar_product, normalize, left_contraction,
     right_contraction, dot, hestenes_product, wedge, ∧, versor_inverse, sandwich, exppi, exptau
 # Compact representation of k-vectors
 include("sparse/kvectors.jl")
