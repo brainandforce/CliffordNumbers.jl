@@ -1,30 +1,52 @@
 #---Tools for determining which grades of a Clifford number are nonzero----------------------------#
 """
-    RepresentedGrades{Q} <: AbstractVector{Bool}
+    RepresentedGrades{C<:AbstractCliffordNumber} <: AbstractVector{Bool}
 
-Determines which grades of a Clifford number with quadratic form `Q` are represented by a specific
-data type.
-
-The backing `UInt` is constructed by summing the base 2 exponentials of each represented grade. In
-this sense, `RepresentedGrades{Q}` is a bit vector with length equal to `dimension(Q) + 1`. All bits
-above the maximum grade associated with `Q` are zero.
+A vector describing the grades explicitly represented by some Clifford number type `C`.
 
 Indexing of a `RepresentedGrades{Q}` is zero-based, with indices corresponding to all grades from
-0 (scalar) to `dimension(Q)` (pseudoscalar).
+0 (scalar) to `dimension(Q)` (pseudoscalar), with `true` values indicating nonzero grades, and
+`false` indicating that the grade is zero.
+
+# Implementation
+
+The function `nonzero_grades(::Type{T})` should be implemented for types `T` descending from 
+`AbstractCliffordNumber`.
 """
-struct RepresentedGrades{Q} <: AbstractVector{Bool}
-    bits::UInt
-    RepresentedGrades{Q}(bits::Integer) where Q = new(bits & (2^(dimension(Q) + 1) - 1))
+struct RepresentedGrades{C<:AbstractCliffordNumber} <: AbstractVector{Bool}
 end
 
-Base.size(::RepresentedGrades{Q}) where Q = tuple(dimension(Q) + 1)
-Base.axes(::RepresentedGrades{Q}) where Q = tuple(0:dimension(Q))
+RepresentedGrades(x::AbstractCliffordNumber) = RepresentedGrades{typeof(x)}()
+RepresentedGrades(C::Type{<:AbstractCliffordNumber}) = RepresentedGrades(zero(C))
 
-function Base.getindex(r::RepresentedGrades, i::Integer)
+Base.size(::RepresentedGrades{C}) where C = tuple(dimension(QuadraticForm(C)) + 1)
+Base.axes(::RepresentedGrades{C}) where C = tuple(0:dimension(QuadraticForm(C)))
+
+"""
+    nonzero_grades(::Type{<:AbstractCliffordNumber})
+    nonzero_grades(::AbstractCliffordNumber)
+
+A function returning an indexable object representing all nonzero grades of a Clifford number
+representation.
+
+This function is used to define the indexing of `RepresentedGrades`, and should be defined for any
+subtypes of `AbstractCliffordNumber`.
+
+# Examples
+
+```julia-repl
+julia> CliffordNumbers.nonzero_grades(CliffordNumber{APS})
+0:3
+
+julia> CliffordNumbers.nonzero_grades(KVector{2,APS})
+2:2
+```
+"""
+nonzero_grades(x::Number) = nonzero_grades(typeof(x))
+# TODO: define for Complex?
+nonzero_grades(::Type{<:Real}) = 0:0
+
+function Base.getindex(r::RepresentedGrades{C}, i::Integer) where C
     @boundscheck checkbounds(r, i)
-    return !iszero(r.bits & UInt(2)^i)
+    return i in nonzero_grades(C)
 end
-
-#---Getting represented grades of AbstractCliffordNumber subtypes----------------------------------#
-
-RepresentedGrades(x::AbstractCliffordNumber) = RepresentedGrades(typeof(x))

@@ -34,6 +34,8 @@ length(x::KVector) = length(typeof(x))
 
 Base.size(::BitIndices{Q,<:KVector{K}}) where {Q,K} = tuple(length(KVector{K,Q}))
 
+nonzero_grades(::Type{<:KVector{K}}) where K = K:K
+
 function Base.getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
     @boundscheck checkbounds(b, i)
     return BitIndex{Q}(signbit(i-1), unsigned(hamming_number(K, i)))

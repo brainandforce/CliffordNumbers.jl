@@ -77,6 +77,8 @@ import Base.length
 length(::Type{<:CliffordNumber{Q}}) where Q = elements(Q)
 length(m::CliffordNumber) = length(typeof(m))
 
+nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
+
 #---Default BitIndices construction should include all possible BitIndex objects-------------------#
 
 BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
