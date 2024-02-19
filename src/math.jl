@@ -97,7 +97,7 @@ Calculates the geometric product between multivectors/Clifford numbers `x` and `
 quadratic form `Q`.
 """
 function *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(x), eltype(y))
+    T = promote_type(numbertype(x), numbertype(y))
     result = zero(CliffordNumber{Q,T})
     for a in eachindex(x), b in eachindex(y)
         result += elementwise_product(x, y, a, b)
@@ -150,7 +150,7 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is 
 otherwise it is `grade_select(A*B, n-m)`.
 """
 function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(x), eltype(y))
+    T = promote_type(numbertype(x), numbertype(y))
     result = zero(CliffordNumber{Q,T})
     for a in eachindex(x), b in eachindex(y)
         coeff = x[a] * y[b] * sign_of_mult(a,b)
@@ -170,7 +170,7 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is
 otherwise it is `grade_select(A*B, m-n)`.
 """
 function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(x), eltype(y))
+    T = promote_type(numbertype(x), numbertype(y))
     result = zero(CliffordNumber{Q,T})
     for a in eachindex(x), b in eachindex(y)
         coeff = x[a] * y[b] * sign_of_mult(a,b)
@@ -190,7 +190,7 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal
 contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 """
 function dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(x), eltype(y))
+    T = promote_type(numbertype(x), numbertype(y))
     result = zero(CliffordNumber{Q,T})
     for a in eachindex(x), b in eachindex(y)
         coeff = x[a] * y[b] * sign_of_mult(a,b)
@@ -208,7 +208,7 @@ Returns the Hestenes product: this is equal to the dot product given by `dot(x, 
 to zero when either `x` or `y` is a scalar.
 """
 function hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(x), eltype(y))
+    T = promote_type(numbertype(x), numbertype(y))
     return isscalar(x) || isscalar(y) ? zero(CliffordNumber{Q,T}) : dot(x,y)
 end
 
@@ -219,7 +219,7 @@ end
 Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with quadratic form `Q`.
 """
 function wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(eltype(x), eltype(y))
+    T = promote_type(numbertype(x), numbertype(y))
     result = zero(CliffordNumber{Q,T})
     for a in eachindex(x), b in eachindex(y)
         result += elementwise_product(x, y, a, b) * iszero(a.blade & b.blade)
