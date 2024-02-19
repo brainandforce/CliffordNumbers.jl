@@ -27,3 +27,14 @@ end
 # Note that complex numbers aren't automatically treated as pseudoscalars
 # (this only works in some dimensions...)
 promote_rule(C::Type{<:AbstractCliffordNumber}, N::Type{<:BaseNumber}) = similar_type(C, N)
+
+#---Promotion rules for various representations----------------------------------------------------#
+
+function promote_rule(S::Type{<:KVector{K,Q}}, T::Type{<:KVector{K,Q}}) where {K,Q}
+    return KVector{K,Q,promote_numeric_type(S,T),binomial(dimension(Q),K)}
+end
+
+function promote_rule(S::Type{<:KVector{K1,Q}}, T::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
+    # TODO: logic for even/odd multivector types
+    return CliffordNumber{Q,promote_numeric_type(S,T),elements(Q)}
+end
