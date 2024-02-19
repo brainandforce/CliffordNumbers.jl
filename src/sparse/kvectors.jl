@@ -55,6 +55,21 @@ zero(S::Type{KVector{K,Q,T}}) where {K,Q,T} = zero(S{length(S)})
 zero(::Type{KVector{K,Q}}) where {K,Q} = zero(KVector{K,Q,Bool,length(KVector{K,Q})})
 zero(x::KVector) = zero(typeof(x))
 
+#---Similar types----------------------------------------------------------------------------------#
+
+function similar_type(::Type{<:KVector{K}}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm}) where K
+    return KVector{K,Q,T,binomial(dimension(Q),K)}
+end
+
+function similar_type(
+    ::Type{<:KVector},
+    T::Type{<:BaseNumber},
+    Q::Type{<:QuadraticForm}, 
+    ::Val{K}
+) where K
+    return KVector{K,Q,T,binomial(dimension(Q),K)}
+end
+
 #---Show methods-----------------------------------------------------------------------------------#
 import Base: show, summary
 

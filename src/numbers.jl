@@ -129,6 +129,12 @@ for fn in (:zero, :one, :oneunit, :pseudoscalar)
     @eval $fn(Q::Type{<:QuadraticForm}) = $fn(CliffordNumber{Q,Bool})
 end
 
+#---Similar types----------------------------------------------------------------------------------#
+
+function similar_type(::Type{<:CliffordNumber}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
+    return CliffordNumber{Q,T,elements(Q)}
+end
+
 #---Show methods-----------------------------------------------------------------------------------#
 import Base: show, summary
 
