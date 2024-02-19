@@ -19,9 +19,7 @@ QuadraticForm(::AbstractCliffordNumber{Q}) where Q = Q
     numeric_type(x) = numeric_type(typeof(x))
 
 Returns the numeric type associated with an `AbstractCliffordNumber` instance. For subtypes of
-`Real` and `Complex`, or their instances, this simply returns the input type or instance type. For 
-incompletely instantiated types lacking information about the backing tuple, `Base.Bottom` is
-returned.
+`Real` and `Complex`, or their instances, this simply returns the input type or instance type.
 
 # Why not define `eltype`?
 
