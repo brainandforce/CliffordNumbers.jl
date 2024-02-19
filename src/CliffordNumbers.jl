@@ -44,7 +44,7 @@ export grade, grade_involution, dual, undual
 include("bitindices.jl")
 export AbstractBitIndices, BitIndices, TransformedBitIndices
 # Dense representation of a Clifford number
-include("numbers.jl")
+include("cliffordnumber.jl")
 export CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
 include("promote.jl")
