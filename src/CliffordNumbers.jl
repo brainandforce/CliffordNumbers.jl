@@ -36,7 +36,7 @@ export numeric_type
 # Working with the grades represented by an AbstractCliffordNumber subtype
 include("grades.jl")
 export RepresentedGrades
-export nonzero_grades
+export nonzero_grades, has_grades_of
 # Indexing each graded element of an AbstractCliffordNumber
 include("bitindex.jl")
 export BitIndex

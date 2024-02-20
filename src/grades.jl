@@ -50,3 +50,25 @@ function Base.getindex(r::RepresentedGrades{C}, i::Integer) where C
     @boundscheck checkbounds(r, i)
     return i in nonzero_grades(C)
 end
+
+"""
+    has_grades_of(S::Type{<:AbstractCliffordNumber}, T::Type{<:AbstractCliffordNumber}) -> Bool
+    has_grades_of(x::AbstractCliffordNumber, y::AbstractCliffordNumber) -> Bool
+
+Returns `true` if the grades represented in S are also represented in T; `false` otherwise.
+"""
+function has_grades_of(S::Type{<:AbstractCliffordNumber}, T::Type{<:AbstractCliffordNumber})
+    return all(x in nonzero_grades(T) for x in nonzero_grades(S))
+end
+
+function has_grades_of(x::AbstractCliffordNumber, T::Type{<:AbstractCliffordNumber})
+    return has_grades_of(typeof(x), T)
+end
+
+function has_grades_of(T::Type{<:AbstractCliffordNumber}, x::AbstractCliffordNumber)
+    return has_grades_of(T, typeof(x))
+end
+
+function has_grades_of(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+    return has_grades_of(typeof(x), typeof(y))
+end
