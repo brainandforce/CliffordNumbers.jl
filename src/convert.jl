@@ -2,7 +2,7 @@ import Base.convert
 
 # Default conversion should check for exact representability
 function convert(T::Type{<:AbstractCliffordNumber{Q}}, x::AbstractCliffordNumber{Q}) where Q
-    has_grades_of(x, T) && return T(x)
+    has_grades_of(x, T) && return T(x)::T
     throw(InexactError(:convert, T, x))
 end
 
