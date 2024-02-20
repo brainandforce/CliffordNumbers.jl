@@ -119,8 +119,11 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
 
 function Base.getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C}) where {Q,C}
     data = ntuple(i -> x[b[i]], Val(length(C)))
-    return promote_type(C, numeric_type(x))(data)
+    return similar_type(C, numeric_type(x))(data)
 end
 
-# This allows for an incredibly simple default constructor!
-(T::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q = x[BitIndices(T)]
+# Constructors can follow similar logic, just don't use similar_type
+function (T::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q
+    data = ntuple(i -> x[BitIndices(T)[i]], Val(length(T)))
+    return T(data)
+end
