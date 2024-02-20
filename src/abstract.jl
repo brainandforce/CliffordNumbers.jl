@@ -4,6 +4,24 @@
 
 An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q` and
 element type `T`.
+
+# Interface
+
+## Required implementation
+
+All subtypes `C` of `AbstractCliffordNumber{Q}` must implement the following functions:
+  * `Base.length(x::C)` should return the number of nonzero basis elements represented by `x`.
+  * `CliffordNumbers.similar_type(::Type{C}, ::Type{T}, ::Type{Q}) where {C,T,Q}` should construct a
+new type similar to `C` which subtypes `AbstractCliffordNumber{Q,T}` that may serve as a
+constructor.
+  * `Base.getindex(x::C, b::BitIndex{Q})` should allow one to recover the coefficients associated
+with each basis blade represented by `C`.
+
+## Required implementation for static types
+  * `Base.length(::Type{C})` should be defined, with `Base.length(x::C) = length(typeof(x))`.
+  * `Base.Tuple(x::C)` should return the tuple used to construct `x`. The fallback is
+`getfield(x, :data)::Tuple`, so any type declared with a `NTuple` field named `data` should have
+this defined automatically.
 """
 abstract type AbstractCliffordNumber{Q<:QuadraticForm,T<:BaseNumber} <: Number
 end
@@ -35,15 +53,20 @@ numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
 numeric_type(T::Type{<:BaseNumber}) = T
 numeric_type(x) = numeric_type(typeof(x))
 
-#---Default constructor for zeros------------------------------------------------------------------#
+#---Get underlying tuple---------------------------------------------------------------------------#
+
+Base.Tuple(x::AbstractCliffordNumber) = getfield(x, :data)::Tuple
+
+#---Zero multivectors------------------------------------------------------------------------------#
 import Base: zero
 
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
 zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
 zero(x::AbstractCliffordNumber) = zero(typeof(x))
 
-
 #---Construct similar types------------------------------------------------------------------------#
+import Base.similar
+
 """
     CliffordNumbers.similar_type(
         C::Type{<:AbstractCliffordNumber},
