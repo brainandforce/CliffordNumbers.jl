@@ -26,7 +26,13 @@ end
 # Promote rule for BaseNumber types (real, complex)
 # Note that complex numbers aren't automatically treated as pseudoscalars
 # (this only works in some dimensions...)
-promote_rule(C::Type{<:AbstractCliffordNumber}, N::Type{<:BaseNumber}) = similar_type(C, N)
+function promote_rule(::Type{<:CliffordNumber{Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
+    return CliffordNumber{Q,promote_type(T,N),elements(Q)}
+end
+
+function promote_rule(::Type{CliffordNumber{Q}}, ::Type{N}) where {Q,N<:BaseNumber}
+    return CliffordNumber{Q,N,elements(Q)}
+end
 
 #---Promotion rules for various representations----------------------------------------------------#
 
@@ -37,4 +43,13 @@ end
 function promote_rule(S::Type{<:KVector{K1,Q}}, T::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     # TODO: logic for even/odd multivector types
     return CliffordNumber{Q,promote_numeric_type(S,T),elements(Q)}
+end
+
+function promote_rule(::Type{<:KVector{<:Any,Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
+    return CliffordNumber{Q,promote_type(T,N),elements(Q)}
+end
+
+# 0-vectors are scalars, but keep CliffordNumbers semantics.
+function promote_rule(::Type{<:KVector{0,Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
+    return KVector{0,Q,promote_type(T,N),1}
 end
