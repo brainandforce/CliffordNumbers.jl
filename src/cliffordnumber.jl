@@ -12,7 +12,7 @@ optimization when calculating the geometric product.
 """
 struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
-    function CliffordNumber{Q,T,L}(x) where {Q,T,L}
+    function CliffordNumber{Q,T,L}(x::Tuple) where {Q,T,L}
         sz = elements(Q)
         @assert length(x) == L == sz string(
             "Incorrect number of components: multivectors of ", Q, " have ", sz, " components."

@@ -8,7 +8,7 @@ k-vectors have `binomial(dimension(Q), K)` components.
 """
 struct KVector{K,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
-    function KVector{K,Q,T,L}(x) where {K,Q,T,L}
+    function KVector{K,Q,T,L}(x::Tuple) where {K,Q,T,L}
         sz = binomial(dimension(Q), K)
         @assert length(x) == L == sz string(
             "Incorrect number of components: ", K, "-vectors of ", Q, " have ", sz, " components."

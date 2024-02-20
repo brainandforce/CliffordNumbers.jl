@@ -121,3 +121,6 @@ function Base.getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C})
     data = ntuple(i -> x[b[i]], Val(length(C)))
     return promote_type(C, numeric_type(x))(data)
 end
+
+# This allows for an incredibly simple default constructor!
+(T::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q = x[BitIndices(T)]
