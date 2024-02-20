@@ -23,16 +23,16 @@ end
 
 #---Constructors-----------------------------------------------------------------------------------#
 
-CliffordNumber{Q,T}(x::NTuple{L,<:BaseNumber}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
-CliffordNumber{Q,T}(x::Vararg{BaseNumber,L}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q,T}(x::NTuple{L,<:BaseNumber}) where {Q,T<:BaseNumber,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q,T}(x::Vararg{BaseNumber,L}) where {Q,T<:BaseNumber,L} = CliffordNumber{Q,T,L}(x)
 
 # Constructors similar to `ntuple(::Function)`
 # However, it deals with the offset indexing
-function CliffordNumber{Q,T,L}(f::Function) where {Q,T,L}
+function CliffordNumber{Q,T,L}(f::Function) where {Q,T<:BaseNumber,L}
     return CliffordNumber{Q,T,L}(ntuple(i -> f(i-1), Val{L}()))
 end
 
-CliffordNumber{Q,T}(f::Function) where {Q,T} = CliffordNumber{Q,T,elements(Q)}(f)
+CliffordNumber{Q,T}(f::Function) where {Q,T<:BaseNumber} = CliffordNumber{Q,T,elements(Q)}(f)
 
 # Promote to a common type first 
 
@@ -52,11 +52,11 @@ function CliffordNumber{Q}(f::Function) where {Q}
     return CliffordNumber{Q,eltype(data),L}(data)
 end
 
-function CliffordNumber{Q,T,L}(x::Real) where {Q,T,L}
+function CliffordNumber{Q,T,L}(x::Real) where {Q,T<:BaseNumber,L}
     return CliffordNumber{Q,T,L}(ntuple(i -> T(isone(i) * x), Val{L}()))
 end
 
-CliffordNumber{Q,T}(x::Real) where {Q,T} = CliffordNumber{Q,T,elements(Q)}(x)
+CliffordNumber{Q,T}(x::Real) where {Q,T<:BaseNumber} = CliffordNumber{Q,T,elements(Q)}(x)
 
 function CliffordNumber{Q,T1}(x::Complex{T2}) where {Q,T1<:Real,T2<:Real}
     L = elements(Q)

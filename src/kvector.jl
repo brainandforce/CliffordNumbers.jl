@@ -17,11 +17,11 @@ struct KVector{K,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T
     end
 end
 
-KVector{K,Q,T}(x::NTuple{L,<:BaseNumber}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
-KVector{K,Q,T}(x::Vararg{BaseNumber,L}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
+KVector{K,Q,T}(x::NTuple{L,<:BaseNumber}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
+KVector{K,Q,T}(x::Vararg{BaseNumber,L}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
 
-KVector{K,Q}(x::NTuple{L,T}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
-KVector{K,Q}(x::Vararg{T,L}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
+KVector{K,Q}(x::NTuple{L,T}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
+KVector{K,Q}(x::Vararg{T,L}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
 
 #---Number of elements-----------------------------------------------------------------------------#
 import Base: length
