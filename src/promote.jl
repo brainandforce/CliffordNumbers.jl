@@ -17,32 +17,24 @@ end
 
 # Generic promote rule for Clifford numbers with different element types
 function promote_rule(
-    S::Type{<:AbstractCliffordNumber{Q}},
-    T::Type{<:AbstractCliffordNumber{Q}}
-) where Q
-    return CliffordNumber{Q,promote_numeric_type(S,T),elements(Q)}
+    ::Type{<:AbstractCliffordNumber{Q,S}},
+    ::Type{<:AbstractCliffordNumber{Q,T}}
+) where {Q,S,T}
+    return CliffordNumber{Q,promote_type(S,T),elements(Q)}
 end
 
 # Promote rule for BaseNumber types (real, complex)
 # Note that complex numbers aren't automatically treated as pseudoscalars
 # (this only works in some dimensions...)
-function promote_rule(::Type{<:CliffordNumber{Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
-    return CliffordNumber{Q,promote_type(T,N),elements(Q)}
-end
-
-function promote_rule(::Type{CliffordNumber{Q}}, ::Type{N}) where {Q,N<:BaseNumber}
-    return CliffordNumber{Q,N,elements(Q)}
+function promote_rule(C::Type{<:AbstractCliffordNumber{Q}}, ::Type{N}) where {Q,N<:BaseNumber}
+    T = numeric_type(C)
+    return ifelse(T >: BaseNumber, C, similar_type(C, promote_type(T,N)))
 end
 
 #---Promotion rules for various representations----------------------------------------------------#
 
-function promote_rule(S::Type{<:KVector{K,Q}}, T::Type{<:KVector{K,Q}}) where {K,Q}
-    return KVector{K,Q,promote_numeric_type(S,T),binomial(dimension(Q),K)}
-end
-
-function promote_rule(S::Type{<:KVector{K1,Q}}, T::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
-    # TODO: logic for even/odd multivector types
-    return CliffordNumber{Q,promote_numeric_type(S,T),elements(Q)}
+function promote_rule(::Type{<:KVector{K,Q,S}}, ::Type{<:KVector{K,Q,T}}) where {K,Q,S,T}
+    return KVector{K,Q,promote_type(S,T),binomial(dimension(Q),K)}
 end
 
 function promote_rule(::Type{<:KVector{<:Any,Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
