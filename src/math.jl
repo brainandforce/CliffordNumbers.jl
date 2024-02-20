@@ -33,32 +33,42 @@ end
 
 Base.:~(x::AbstractCliffordNumber) = reverse(x)
 
-#---Addition---------------------------------------------------------------------------------------#
-import Base.:+
+#---Addition, negation, and subtraction------------------------------------------------------------#
+import Base: +, -
 
-+(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q = CliffordNumber{Q}(x.data .+ y.data)
++(x::T, y::T) where T<:AbstractCliffordNumber = T(Tuple(x) .+ Tuple(y))
 
-function +(x::CliffordNumber{Q}, y::BaseNumber) where Q
-    return CliffordNumber{Q}(ntuple(i -> x.data[i] + (isone(i) * y), Val{length(x)}()))
-end
-
-# Adding imaginary numbers to elements of real Clifford algebras (geometric algebras) should add
-# the real part to the scalar and the imaginary part to the pseudoscalar
-function +(x::CliffordNumber{<:QuadraticForm,<:Real}, y::Complex)
-    L = length(x)
-    data = ntuple(i -> x.data[i] + (isone(i) * real(y)) + ((i == L) * imag(y)), Val{L}())
-    return typeof(x)(data)
+function +(x::AbstractCliffordNumber, y::BaseNumber)
+    T = promote_type(typeof(x), typeof(y))
+    b = BitIndices(T)
+    data = ntuple(i -> x[b[i]] + (iszero(grade(b[i])) * y), Val(length(T)))
+    return T(data)
 end
 
 +(x::BaseNumber, y::CliffordNumber) = y + x
 
-#---Negation and subtraction-----------------------------------------------------------------------#
-import Base.:-
+function -(x::AbstractCliffordNumber)
+    data = (-).(Tuple(x))
+    return similar_type(x, eltype(data))(data)
+end
 
--(x::CliffordNumber{Q}) where Q = CliffordNumber{Q}((-).(x.data))
--(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q = x + (-y)
+-(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = x + (-y)
 
-# Automatically promote 
+function -(x::AbstractCliffordNumber, y::BaseNumber)
+    T = promote_type(typeof(x), typeof(y))
+    b = BitIndices(T)
+    data = ntuple(i -> x[b[i]] - (iszero(grade(b[i])) * y), Val(length(T)))
+    return T(data)
+end
+
+function -(x::BaseNumber, y::AbstractCliffordNumber)
+    T = promote_type(typeof(x), typeof(y))
+    b = BitIndices(T)
+    data = ntuple(i -> (iszero(grade(b[i])) * x) - y[b[i]], Val(length(T)))
+    return T(data)
+end
+
+# TODO: is it more efficient to define some more specific methods for some types?
 
 #---Scalar multiplication--------------------------------------------------------------------------#
 import Base.:*
@@ -75,11 +85,10 @@ for op in (:*, :/, ://)
 end
 
 #---Geometric product-----------------------------------------------------------------------------#
-
 import Base.:*
 
 """
-    CliffordAlgebra.elementwise_product(
+    CliffordNumbers.elementwise_product(
         x::CliffordNumber{Q},
         y::CliffordNumber{Q},
         a::BitIndex{Q},
@@ -114,7 +123,6 @@ function *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
 end
 
 #---Scalar products--------------------------------------------------------------------------------#
-
 """
     scalar_product(x::CliffordNumber{Q,T1}, y::CliffordNumber{Q,T2}) -> promote_type(T1,T2)
 
