@@ -86,10 +86,6 @@ end
 similar_type(x, T::Type{<:BaseNumber}) = similar_type(x, T, QuadraticForm(x))
 similar_type(x, Q::Type{<:QuadraticForm}) = similar_type(x, numeric_type(x), Q)
 
-function similar(x, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
-    return zero(similar_type(x))
-end
-
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
 
