@@ -91,30 +91,25 @@ similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
 
 #---Error checking---------------------------------------------------------------------------------#
 """
-    CliffordNumbers.check_element_count(f, Q::Type{<:QuadraticForm}, data)
+    CliffordNumbers.check_element_count(f, Q::Type{<:QuadraticForm}, [L,] data)
 
 Ensures that the number of elements in `data` is the same as the result of `f(Q)`, where `f` is a
-function that generates the expected number of elements for the type.
+function that generates the expected number of elements for the type. This function is used in the
+inner constructors of subtypes of `AbstractCliffordNumber{Q}` to ensure that the input has the
+correct length.
 
-This function is used in the inner constructors of subtypes of `AbstractCliffordNumber{Q}` to ensure
-that the input is the correct length.
+If provided, the length type parameter `L` can be included as an argument, and it will be checked
+for type (must be an `Int`) and value (must be equal to `f(Q)`).
+
+This function returns nothing, but throws an `AssertionError` for failed checks.
 """
 function check_element_count(f, Q::Type{QuadraticForm{X,Y,Z}}, data) where {X,Y,Z}
     @assert length(data) == f(Q) "Expected $(f(Q)) scalars from input, got $(length(data))"
     return nothing
 end
 
-"""
-    CliffordNumbers.check_length_parameter(f, Q::Type{<:QuadraticForm}, L)
-
-Ensures that the length type parameter `L` is a `Int` equal to `f(Q)`, where `f` where `f` is a
-function that generates the expected number of elements for the type.
-
-This function is used in the inner constructors of subtypes of `AbstractCliffordNumber{Q}` to ensure
-that the input is the correct length.
-"""
-function check_length_parameter(f, Q::Type{QuadraticForm{X,Y,Z}}, L) where {X,Y,Z}
+function check_element_count(f, Q::Type{QuadraticForm{X,Y,Z}}, L, data) where {X,Y,Z}
     @assert L isa Int || "Length type parameter must be an Int (got $(typeof(L)))."
     @assert L = f(Q) || "Length type parameter must equal $(f(Q)) (got $L)."
-    return nothing
+    check_element_count(f, Q, data)
 end
