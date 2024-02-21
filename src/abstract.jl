@@ -91,4 +91,4 @@ function similar(x, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
 end
 
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
-similar(x::AbstractCliffordNumber, args...) = zero(similar_type(C, args...))
+similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
