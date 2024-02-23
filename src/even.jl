@@ -33,8 +33,8 @@ end
 
 Z2CliffordNumber{P,Q}(x::Vararg{BaseNumber,L}) where {P,Q,L} = Z2CliffordNumber{P,Q}(x)
 
-const EvenCliffordNumber{Q,T,L} = Z2CliffordNumber{false,Q,T,L}
-const OddCliffordNumber{Q,T,L} = Z2CliffordNumber{true,Q,T,L}
+const EvenCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{false,Q,T,L}
+const OddCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{true,Q,T,L}
 
 #---Convert scalars to even Clifford numbers-------------------------------------------------------#
 
@@ -56,8 +56,8 @@ nonzero_grades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = P:2:dimension(Q)
 
 function Base.getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
     @boundscheck checkbounds(b, i)
-    n = unsigned(2*(i-1))
-    return BitIndex{Q}(signbit(n), number_of_parity(n, P))
+    n = number_of_parity(i, P)
+    return BitIndex{Q}(signbit(n), unsigned(n))
 end
 
 function Base.getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
