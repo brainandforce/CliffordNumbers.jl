@@ -31,17 +31,12 @@ end
 
 CliffordNumber{Q,T}(f::Function) where {Q,T<:BaseNumber} = CliffordNumber{Q,T,elements(Q)}(f)
 
-# Promote to a common type first 
-
 function CliffordNumber{Q}(x::NTuple{L,<:BaseNumber}) where {Q,L}
-    T = promote_type(typeof.(x)...)
-    return CliffordNumber{Q,T,L}(promote(x...))
+    data = promote(x...)
+    return CliffordNumber{Q,eltype(data),L}(data)
 end
 
-function CliffordNumber{Q}(x::Vararg{BaseNumber,L}) where {Q,L}
-    T = promote_type(typeof.(x)...)
-    return CliffordNumber{Q,T,L}(promote(x...))
-end
+CliffordNumber{Q}(x::Vararg{BaseNumber}) where {Q} = CliffordNumber{Q}(x)
 
 function CliffordNumber{Q}(f::Function) where {Q}
     L = elements(Q)

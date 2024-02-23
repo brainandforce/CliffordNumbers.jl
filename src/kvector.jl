@@ -18,8 +18,12 @@ end
 KVector{K,Q,T}(x::NTuple{L,<:BaseNumber}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
 KVector{K,Q,T}(x::Vararg{BaseNumber,L}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
 
-KVector{K,Q}(x::NTuple{L,T}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
-KVector{K,Q}(x::Vararg{T,L}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
+function KVector{K,Q}(x::NTuple{L,<:BaseNumber}) where {K,Q,L}
+    data = promote(x...)
+    return KVector{K,Q,eltype(data),L}(data)
+end
+
+KVector{K,Q}(x::Vararg{BaseNumber}) where {K,Q} = KVector{K,Q}(x)
 
 #---Number of elements-----------------------------------------------------------------------------#
 import Base: length
