@@ -110,6 +110,6 @@ end
 
 function check_element_count(f, Q::Type{QuadraticForm{X,Y,Z}}, L, data) where {X,Y,Z}
     @assert L isa Int || "Length type parameter must be an Int (got $(typeof(L)))."
-    @assert L = f(Q) || "Length type parameter must equal $(f(Q)) (got $L)."
+    @assert L == f(Q) || "Length type parameter must equal $(f(Q)) (got $L)."
     check_element_count(f, Q, data)
 end
