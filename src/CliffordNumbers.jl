@@ -47,6 +47,9 @@ export AbstractBitIndices, BitIndices, TransformedBitIndices
 include("cliffordnumber.jl")
 export CliffordNumber
 export pseudoscalar, isscalar, ispseudoscalar
+# Representations of even/odd grade Clifford numbers
+include("even.jl")
+export EvenCliffordNumber, OddCliffordNumber
 # Compact representation of k-vectors
 include("kvector.jl")
 export KVector
