@@ -15,13 +15,21 @@ odd.
 isodious(i::Integer) = !isevil(i)
 
 """
+    CliffordNumbers.number_of_parity(n::Integer, modulo::Bool)
+
+Returns the nth number whose Hamming weight is even (for `modulo = false`) or odd
+(for `modulo = true`).
+"""
+number_of_parity(n::Integer, modulo::Bool) = (x = 2*(n-1); return x + xor(isodious(x), modulo))
+
+"""
     CliffordNumbers.evil_number(n::Integer)
 
 Returns the nth evil number, with the first evil number (`n == 1`) defined to be 0.
 
 Evil numbers are numbers which have an even Hamming weight (sum of its binary digits).
 """
-evil_number(n::Integer) = (x = 2*(n-1); return x + !isevil(x))
+evil_number(n::Integer) = number_of_parity(n, false)
 
 """
     CliffordNumbers.odious_number(n::Integer)
@@ -30,7 +38,7 @@ Returns the nth odious number, with the first odious number (`n == 1`) defined t
 
 Odious numbers are numbers which have an odd Hamming weight (sum of its binary digits).
 """
-odious_number(n::Integer) = (x = 2*(n-1); return x + !isodious(x))
+odious_number(n::Integer) = number_of_parity(n, true)
 
 """
     CliffordNumbers.next_of_hamming_weight(n::Integer)
