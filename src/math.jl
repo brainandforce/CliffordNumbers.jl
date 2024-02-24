@@ -333,6 +333,21 @@ wedge(x::BaseNumber, y::BaseNumber) = x * y
 
 const ∧ = wedge
 
+#---Commutator and anticommutator products---------------------------------------------------------#
+"""
+    commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the commutator product, equal to `1//2 * (x*y - y*x)`, or equivalently, 
+`1//2 * (x*y - reverse(x*y))`.
+"""
+function commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    z = x*y
+    return (x*y - reverse(x*y)) // 2
+end
+
+const × = commutator
+
 #---Duals------------------------------------------------------------------------------------------#
 """
     dual(x::CliffordNumber) -> CliffordNumber

@@ -58,8 +58,8 @@ include("promote.jl")
 include("convert.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
-export select_grade, scalar_product, normalize, left_contraction,
-    right_contraction, dot, hestenes_product, wedge, versor_inverse, sandwich, exppi, exptau
-export ⨼, ⨽, ∧
+export select_grade, scalar_product, normalize, left_contraction, right_contraction,
+    dot, hestenes_product, wedge, commutator, versor_inverse, sandwich, exppi, exptau
+export ⨼, ⨽, ∧, ×
 
 end
