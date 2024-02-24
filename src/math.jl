@@ -98,31 +98,38 @@ import Base.:*
         x::AbstractCliffordNumber{Q},
         y::AbstractCliffordNumber{Q},
         a::BitIndex{Q},
-        b::BitIndex{Q}
+        b::BitIndex{Q},
+        [condition = true]
     ) where {Q,T<:AbstractCliffordNumber{Q}} -> C
 
 Calculates the geometric product between the element of `x` indexed by `a` and the element of `y`
-indexed by `b`. The result is return as type `C`, but this can be inferred automatically if not
+indexed by `b`. The result is returned as type `C`, but this can be inferred automatically if not
 provided.
+
+An optional boolean condition can be provided, which simplifies the implementation of certain
+products derived from the geometric product.
 """
 @inline function elementwise_product(
     ::Type{C},
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
     a::BitIndex{Q},
-    b::BitIndex{Q}
+    b::BitIndex{Q},
+    condition::Bool = true
 ) where {Q,C<:AbstractCliffordNumber{Q}}
     inds = BitIndices(C)
-    return C(ntuple(i -> x[a] * y[b] * sign_of_mult(a,b) * (inds[i] == abs(a*b)), Val(length(C))))
+    coeff = x[a] * y[b] * sign_of_mult(a,b) * condition
+    return C(ntuple(i -> coeff * (inds[i] == abs(a*b)), Val(length(C))))
 end
 
 @inline function elementwise_product(
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
     a::BitIndex{Q},
-    b::BitIndex{Q}
+    b::BitIndex{Q},
+    condition::Bool = true
 ) where Q
-    return elementwise_product(promote_type(typeof(x), typeof(y)), x, y, a, b)
+    return elementwise_product(promote_type(typeof(x), typeof(y)), x, y, a, b, condition)
 end
 
 @generated function geometric_product_type(
@@ -273,10 +280,9 @@ Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with qu
 """
 function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     T = wedge_product_type(typeof(x), typeof(y))
-    return sum(
-        elementwise_product(T, x, y, a, b) * iszero(a.blade & b.blade)
-        for a in eachindex(x), b in eachindex(y)
-    )
+    # Only iterate through elements that have nonzero wedge products
+    itr = Iterators.filter(t -> has_wedge(t...), Iterators.product(eachindex(x), eachindex(y)))
+    return sum(elementwise_product(T, x, y, a, b) for (a,b) in itr)
 end
 
 wedge(x::Real, y::AbstractCliffordNumber) = x * y
