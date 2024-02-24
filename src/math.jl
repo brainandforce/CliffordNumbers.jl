@@ -189,6 +189,7 @@ Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Contractions-----------------------------------------------------------------------------------#
+#= Old implementations, left here for reference
 """
     left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
@@ -228,6 +229,46 @@ function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     end
     return result
 end
+=#
+
+function contraction_type(
+    ::Type{<:KVector{K1,Q}},
+    ::Type{<:KVector{K2,Q}},
+    left::Val{B}
+) where {K1,K2,Q,B}
+    K = abs(K1 - K2)
+    return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
+end
+
+function contraction_type(
+    ::Type{C1},
+    ::Type{C2}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    return geometric_product_type(C1, C2)
+end
+
+function contraction(
+    x::AbstractCliffordNumber{Q},
+    y::AbstractCliffordNumber{Q},
+    left::Val{B}
+) where {Q,B}
+    T = contraction_type(typeof(x), typeof(y), left)
+    itr = Iterators.filter(Iterators.product(eachindex(x), eachindex(y))) do t
+        return (grade(a) - grade(b)) * (-1)^left == grade(a*b)
+    end
+    return sum(elementwise_product(T, x, y, a, b) for (a,b) in itr)
+end
+
+function left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return contraction(x, y, Val(true))
+end
+
+function right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return contraction(x, y, Val(false))
+end
+
+const ⨼ = left_contraction
+const ⨽ = right_contraction
 
 """
     dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
