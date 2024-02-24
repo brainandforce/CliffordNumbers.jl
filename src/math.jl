@@ -76,11 +76,16 @@ import Base.:/
 import Base.://
 
 # These all have the same structure
-
 for op in (:*, :/, ://)
     @eval begin
-        $op(x::CliffordNumber{Q}, y::BaseNumber) where Q = CliffordNumber{Q}($op.(x.data, y))
-        $op(x::BaseNumber, y::CliffordNumber{Q}) where Q = CliffordNumber{Q}($op.(x, y.data))
+        function $op(x::AbstractCliffordNumber, y::BaseNumber)
+            data = $op.(x.data, y)
+            return similar_type(typeof(x), eltype(data))(data)
+        end
+        function $op(x::BaseNumber, y::AbstractCliffordNumber)
+            data = $op.(x, y.data)
+            return similar_type(typeof(y), eltype(data))(data)
+        end
     end
 end
 
@@ -89,37 +94,57 @@ import Base.:*
 
 """
     CliffordNumbers.elementwise_product(
-        x::CliffordNumber{Q},
-        y::CliffordNumber{Q},
+        [::Type{C},]
+        x::AbstractCliffordNumber{Q},
+        y::AbstractCliffordNumber{Q},
         a::BitIndex{Q},
         b::BitIndex{Q}
-    )
+    ) where {Q,T<:AbstractCliffordNumber{Q}} -> C
 
 Calculates the geometric product between the element of `x` indexed by `a` and the element of `y`
-indexed by `b`.
+indexed by `b`. The result is return as type `C`, but this can be inferred automatically if not
+provided.
 """
 @inline function elementwise_product(
-    x::CliffordNumber{Q},
-    y::CliffordNumber{Q},
+    ::Type{C},
+    x::AbstractCliffordNumber{Q},
+    y::AbstractCliffordNumber{Q},
     a::BitIndex{Q},
     b::BitIndex{Q}
-) where {Q}
-    return CliffordNumber{Q}(i -> x[a] * y[b] * sign_of_mult(a,b) * (i == (a*b).blade))
+) where {Q,C<:AbstractCliffordNumber{Q}}
+    inds = BitIndices(C)
+    return C(ntuple(i -> x[a] * y[b] * sign_of_mult(a,b) * (inds[i] == abs(a*b)), Val(length(C))))
 end
 
-"""
-    *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
+@inline function elementwise_product(
+    x::AbstractCliffordNumber{Q},
+    y::AbstractCliffordNumber{Q},
+    a::BitIndex{Q},
+    b::BitIndex{Q}
+) where Q
+    return elementwise_product(promote_type(typeof(x), typeof(y)), x, y, a, b)
+end
 
-Calculates the geometric product between multivectors/Clifford numbers `x` and `y` which share the
-quadratic form `Q`.
-"""
-function *(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(numeric_type(x), numeric_type(y))
-    result = zero(CliffordNumber{Q,T})
-    for a in eachindex(x), b in eachindex(y)
-        result += elementwise_product(x, y, a, b)
+@generated function geometric_product_type(
+    ::Type{C1},
+    ::Type{C2}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    c1_odd = all(isodd, nonzero_grades(C1))
+    c2_odd = all(isodd, nonzero_grades(C2))
+    c1_even = all(iseven, nonzero_grades(C1))
+    c2_even = all(iseven, nonzero_grades(C2))
+    P = (c1_odd && c2_even) || (c1_even && c2_odd)
+    T = promote_numeric_type(C1,C2)
+    if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
+        return :(CliffordNumber{Q,$T,elements(Q)})
+    else
+        return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
     end
-    return result
+end
+
+function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    T = geometric_product_type(typeof(x), typeof(y))
+    return sum(elementwise_product(T, x, y, a, b) for a in eachindex(x), b in eachindex(y))
 end
 
 #---Scalar products--------------------------------------------------------------------------------#
@@ -127,34 +152,34 @@ end
     scalar_product(x::CliffordNumber{Q,T1}, y::CliffordNumber{Q,T2}) -> promote_type(T1,T2)
 
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
-`Real` or `Complex` number. This can be converted back to a `CliffordNumber`.
-
-This is equal to `grade_select(x*y, 0)` but is significantly more efficient.
+`Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
 """
-function scalar_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    return sum(x[i] * y[i] * sign_of_mult(i) for i in eachindex(CliffordNumber{Q}))
+function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    # Only iterate through a minimal set of indices, known to be nonzero
+    inds = eachindex(promote_type(typeof(x), typeof(y)))
+    return sum(x[i] * y[i] * sign_of_mult(i) for i in inds)
 end
 
 """
-    abs2(x::CliffordNumber{Q}) -> CliffordNumber{Q}
+    abs2(x::AbstractCliffordNumber{Q,T}) -> T
 
 Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
 """
-Base.abs2(x::CliffordNumber) = scalar_product(x, ~x)
+Base.abs2(x::AbstractCliffordNumber) = scalar_product(x, ~x)
 
 """
-    abs2(x::CliffordNumber{Q}) -> CliffordNumber{Q}
+    abs2(x::CliffordNumber{Q,T}) -> Union{Real,Complex}
 
 Calculates the norm of `x`, equal to `sqrt(scalar_product(x, ~x))`.
 """
-Base.abs(x::CliffordNumber) = sqrt(abs2(x))
+Base.abs(x::AbstractCliffordNumber) = sqrt(abs2(x))
 
 """
-    normalize(x::CliffordNumber{Q}) -> CliffordNumber{Q}
+    normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
 
 Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 """
-normalize(x::CliffordNumber) = x / abs(x)
+normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Contractions-----------------------------------------------------------------------------------#
 """
@@ -229,22 +254,33 @@ function hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
+
+function wedge_product_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
+    return KVector{K1+K2,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K1+K2)}
+end
+
+function wedge_product_type(
+    ::Type{C1},
+    ::Type{C2}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    return geometric_product_type(C1, C2)
+end
+
 """
     wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
 
 Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with quadratic form `Q`.
 """
-function wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(numeric_type(x), numeric_type(y))
-    result = zero(CliffordNumber{Q,T})
-    for a in eachindex(x), b in eachindex(y)
-        result += elementwise_product(x, y, a, b) * iszero(a.blade & b.blade)
-    end
-    return result
+function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    T = wedge_product_type(typeof(x), typeof(y))
+    return sum(
+        elementwise_product(T, x, y, a, b) * iszero(a.blade & b.blade)
+        for a in eachindex(x), b in eachindex(y)
+    )
 end
 
-wedge(x::Real, y::CliffordNumber{Q}) where Q = CliffordNumber{Q}(x .* y.data)
-wedge(x::CliffordNumber{Q}, y::Real) where Q = CliffordNumber{Q}(y .* x.data)
+wedge(x::Real, y::AbstractCliffordNumber) = x * y
+wedge(x::AbstractCliffordNumber, y::Real) = x * y
 
 wedge(x::BaseNumber, y::BaseNumber) = x * y
 
