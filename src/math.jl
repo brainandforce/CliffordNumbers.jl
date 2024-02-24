@@ -89,6 +89,8 @@ for op in (:*, :/, ://)
     end
 end
 
+(x::AbstractCliffordNumber)(y::BaseNumber) = x * y
+
 #---Geometric product-----------------------------------------------------------------------------#
 import Base.:*
 
@@ -149,10 +151,19 @@ end
     end
 end
 
+"""
+    *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    (x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q})
+
+Calculates the geometric product of `x` and `y`, returning the smallest type which is able to
+represent all nonzero basis blades of the result.
+"""
 function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     T = geometric_product_type(typeof(x), typeof(y))
     return sum(elementwise_product(T, x, y, a, b) for a in eachindex(x), b in eachindex(y))
 end
+
+(x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q}) where Q = x * y
 
 #---Scalar products--------------------------------------------------------------------------------#
 """
