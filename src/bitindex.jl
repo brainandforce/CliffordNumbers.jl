@@ -218,5 +218,12 @@ function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     return BitIndex{Q}(signbit_of_mult(a,b), xor(a.blade, b.blade))
 end
 
+"""
+    CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) -> Bool
+
+Returns `true` if the basis blades indexed by `a` and `b` may have a nonzero wedge product.
+"""
+has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero(a.blade & b.blade)
+
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
