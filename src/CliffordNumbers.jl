@@ -42,7 +42,8 @@ include("bitindex.jl")
 export BitIndex
 export grade, scalar_index, pseudoscalar_index, grade_involution, dual, undual
 include("bitindices.jl")
-export AbstractBitIndices, BitIndices, TransformedBitIndices
+export AbstractBitIndices, BitIndices, TransformedBitIndices, ReversedBitIndices,
+    GradeInvolutedBitIndices, ConjugatedBitIndices
 # Dense representation of a Clifford number
 include("cliffordnumber.jl")
 export CliffordNumber
