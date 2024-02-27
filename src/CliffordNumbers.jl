@@ -40,7 +40,7 @@ export nonzero_grades, has_grades_of
 # Indexing each graded element of an AbstractCliffordNumber
 include("bitindex.jl")
 export BitIndex
-export grade, grade_involution, dual, undual
+export grade, scalar_index, pseudoscalar_index, grade_involution, dual, undual
 include("bitindices.jl")
 export AbstractBitIndices, BitIndices, TransformedBitIndices
 # Dense representation of a Clifford number

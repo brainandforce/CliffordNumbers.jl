@@ -119,6 +119,22 @@ Base.abs(b::BitIndex) = typeof(b)(false, b.blade)
 
 grade(b::BitIndex) = count_ones(b.blade)
 
+"""
+    scalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}()
+
+Constructs the `BitIndex` used to obtain the scalar (grade zero) portion of `x`.
+"""
+scalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}()
+scalar_index(x::AbstractCliffordNumber) = scalar_index(typeof(x))
+
+"""
+    pseudoscalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}()
+
+Constructs the `BitIndex` used to obtain the pseudoscalar (highest grade) portion of `x`.
+"""
+pseudoscalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}(false, typemax(UInt))
+pseudoscalar_index(x::AbstractCliffordNumber) = pseudoscalar_index(typeof(x))
+
 #---Grade dependent sign inversion-----------------------------------------------------------------#
 import Base: reverse, conj
 

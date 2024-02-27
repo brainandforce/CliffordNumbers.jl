@@ -7,6 +7,8 @@
     @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == aps_bivector_indices
     @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == BitIndices(KVector{2,VGA(3)}(4,2,0))
     @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
+    @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex{VGA(3)}()
+    @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex{VGA(3)}(1,2,3)
 end
 
 @testset "Indexing" begin
