@@ -128,53 +128,10 @@ end
 #---Show methods-----------------------------------------------------------------------------------#
 import Base: show, summary
 
-function show(io::IO, m::CliffordNumber)
-    print(io, "CliffordNumber{", QuadraticForm(m), ",", eltype(m), "}(", join(m.data, ", "), ")")
-end
-
-function to_basis_str(
-    Cl::Type{QuadraticForm{P,Q,R}},
-    i::Integer;
-    pseudoscalar=""
-) where {P,Q,R}
-    if i >= elements(Cl)
-        error("i = $i exceeds maximum number of elements for $Cl")
-    elseif i == elements(Cl) - 1 && !isempty(pseudoscalar)
-        return string(pseudoscalar)
-    end
-    return join(
-        [("e" * subscript_string(n+1))^!iszero(typeof(i)(2)^n & i) for n in 0:(dimension(Cl) - 1)]
-    )
+function show(io::IO, x::CliffordNumber)
+    print(io, CliffordNumber, "{", QuadraticForm(x), ",", numeric_type(x), "}", Tuple(x))
 end
 
 function summary(io::IO, x::CliffordNumber)
-    println(io, "CliffordNumber{", QuadraticForm(x), ",", eltype(x), "}:")
-end
-
-function show(io::IO, ::MIME"text/plain", x::CliffordNumber{Q}) where Q
-    summary(io, x)
-    b = BitIndices(x)
-    # Flag to mark when we've *found the first nonzero* element
-    ffn = false
-    # Print the scalar component first
-    if !iszero(x[b[1]])
-        print(io, x[b[1]])
-        ffn = true
-    end
-    # Loop through all the grades
-    for n in 1:dimension(Q)
-        # Find all numbers with specific Hamming weights
-        inds = findall(x -> count_ones(x) == n, 0:(elements(Q) - 1))
-        for i in inds
-            if !iszero(x[b[i]])
-                print(
-                    io, " "^ffn, (sign(x[b[i]]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(x[b[i]]), 
-                    "*"^(x[b[i]] isa Bool), to_basis_str(Q, i-1)
-                )
-                ffn = true
-            end
-        end
-    end
-    # If we got through the whole process, just print the zero
-    !ffn && print(io, x[b[1]])
+    println(io, CliffordNumber, "{", QuadraticForm(x), ",", numeric_type(x), "}:")
 end
