@@ -83,17 +83,17 @@ Lazy representation of `BitIndices{Q,C}` with some function of type `f` applied 
 These objects can be used to perform common operations which act on basis blades or grades, such as
 the reverse or grade involution.
 """
-struct TransformedBitIndices{Q,C,F} <: AbstractBitIndices{Q,C}
+struct TransformedBitIndices{Q,C<:AbstractCliffordNumber{Q},F} <: AbstractBitIndices{Q,C}
     f::F
 end
 
 TransformedBitIndices{Q,C}(f) where {Q,C} = TransformedBitIndices{Q,C,typeof(f)}(f)
 TransformedBitIndices(f, ::BitIndices{Q,C}) where {Q,C} = TransformedBitIndices{Q,C}(f)
-TransformedBitIndices(f, x) = TransformedBitIndices(BitIndices(x), f)
+TransformedBitIndices(f, x) = TransformedBitIndices(f, BitIndices(x))
 
-function Base.getindex(b::TransformedBitIndices{Q}, i::Integer) where Q
+function Base.getindex(b::TransformedBitIndices{Q,C}, i::Integer) where {Q,C}
     @boundscheck checkbounds(b, i)
-    return b.f(BitIndex{Q}(signbit(i-1), unsigned(i-1)))
+    return b.f(BitIndices{Q,C}()[i])
 end
 
 #---Broadcasting implementation--------------------------------------------------------------------#
@@ -101,7 +101,7 @@ end
 Base.Broadcast.broadcasted(f, b::BitIndices) = TransformedBitIndices(f, b)
 
 function Base.Broadcast.broadcasted(f, b::TransformedBitIndices{Q,C}) where {Q,C}
-    return TransformedBitIndices{Q,C}(b.f |> f)
+    return TransformedBitIndices{Q,C}(x -> f(b.f(x)))
 end
 
 #---Aliases for commonly used cases----------------------------------------------------------------#
