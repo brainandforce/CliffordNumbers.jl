@@ -140,7 +140,7 @@ import Base: reverse, conj
 
 """
     reverse(b::BitIndex) -> BitIndex
-    reverse(x::AbstractCliffordNumber{Q,T}) -> typeof(x)
+    reverse(x::AbstractCliffordNumber) -> typeof(x)
 
 Performs the reverse operation on the basis blade indexed by `b` or the Clifford number `x`. The 
 sign of the reverse depends on the grade, and is positive for `g % 4 in 0:1` and negative for
@@ -160,7 +160,7 @@ grade_involution(b::BitIndex) = typeof(b)(xor(signbit(b), isodd(grade(b))), b.bl
 
 """
     conj(b::BitIndex) -> BitIndex
-    conj(x::AbstractCliffordNumber{Q,T}) -> typeof(x)
+    conj(x::AbstractCliffordNumber) -> typeof(x)
 
 Calculates the Clifford conjugate of the basis blade indexed by `b` or the Clifford number `x`. This
 is equal to `grade_involution(reverse(x))`.
