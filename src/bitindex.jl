@@ -229,10 +229,13 @@ sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(
 sign_of_mult(i) = sign_of_mult(i,i)
 
 #---Multiplication and duals-----------------------------------------------------------------------#
+"""
+    *(a::BitIndex{Q}, b::BitIndex{Q}) -> BitIndex{Q}
 
-function Base.:*(a::BitIndex{Q}, b::BitIndex{Q}) where Q
-    return BitIndex{Q}(signbit_of_mult(a,b), xor(a.blade, b.blade))
-end
+Returns the `BitIndex` corresponding to the basis blade resulting from the geometric product of the
+basis blades indexed by `a` and `b`.
+"""
+Base.:*(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(a.blade, b.blade))
 
 """
     CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) -> Bool
