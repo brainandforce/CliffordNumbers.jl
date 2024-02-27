@@ -109,7 +109,7 @@ import Base.://
 # These all have the same structure
 for op in (:*, :/, ://)
     @eval begin
-        function $op(x::AbstractCliffordNumber, y::BaseNumber)
+       function $op(x::AbstractCliffordNumber, y::BaseNumber)
             data = $op.(x.data, y)
             return similar_type(typeof(x), eltype(data))(data)
         end
@@ -510,6 +510,24 @@ intlog2(x::Real) = intlog2(Float64(x))
 # intlog2(x::Integer) = 8*sizeof(x) - leading_zeros(abs(x) >>> 1)
 
 """
+    CliffordNumbers.exponential_type(::Type{<:AbstractCliffordNumber})
+    CliffordNumbers.exponential_type(x::AbstractCliffordNumber)
+
+Returns the type expected when exponentiating a Clifford number. This is an `EvenCliffordNumber` if
+the nonzero grades of the input are even, a `CliffordNumber` otherwise.
+"""
+@generated function exponential_type(::Type{C}) where {Q,C<:AbstractCliffordNumber{Q}}
+    T = typeof(exp(zero(numeric_type(C))))
+    if all(iseven, nonzero_grades(C))
+        return :(EvenCliffordNumber{Q,$T,div(elements(Q), 2)})
+    else
+        return :(CliffordNumber{Q,$T,elements(Q)})
+    end
+end
+
+exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
+
+"""
     CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = 12)
 
 Calculates the exponential of `x` using a Taylor expansion up to the specified order. In most cases,
@@ -517,7 +535,11 @@ Calculates the exponential of `x` using a Taylor expansion up to the specified o
 """
 function exp_taylor(x::AbstractCliffordNumber, order = 12)
     s = nextpow(2, abs(x))
-    return sum((x/s)^n / factorial(n) for n in 0:order)^s
+    result = zero(exponential_type(x))
+    for n in 0:order
+        result += (x/s)^n / factorial(n)
+    end
+    return result^s
 end
 
 """
@@ -534,11 +556,13 @@ For special cases where m squares to a scalar, the following shortcuts can be us
 See also: [`exppi`](@ref), [`exptau`](@ref).
 """
 function Base.exp(x::AbstractCliffordNumber)
-    sq = x^2
+    T = exponential_type(x)
+    sq = x*x
     if isscalar(sq)
-        scalar(sq) < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
-        scalar(sq) > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
-        return 1 + x
+        Tx = convert(T, x)
+        scalar(sq) < 0 && return cos(abs(x)) + Tx * sin(abs(x)) / abs(x)
+        scalar(sq) > 0 && return cosh(abs(x)) + Tx * sinh(abs(x)) / abs(x)
+        return 1 + Tx
     end
     return exp_taylor(x)
 end
@@ -552,16 +576,17 @@ Returns the natural exponential of `π * x` with greater accuracy than `exp(π *
 See also: [`exp`](@ref), [`exptau`](@ref).
 """
 function exppi(x::AbstractCliffordNumber)
-    sq = x^2
+    T = exponential_type(x)
+    sq = x*x
     if isscalar(sq)
-        scalar(sq) < 0 && return cospi(abs(x)) + x * sinpi(abs(x)) / abs(x)
+        Tx = convert(T, x)
+        scalar(sq) < 0 && return cospi(abs(x)) + Tx * sinpi(abs(x)) / abs(x)
         # TODO: is this really more accurate?
-        scalar(sq) > 0 && return cosh(π*abs(x)) + x * sinh(π*abs(x)) / abs(x)
+        scalar(sq) > 0 && return cosh(π*abs(x)) + Tx * sinh(π*abs(x)) / abs(x)
         return 1 + x
     end
     # TODO: compare this to the regular Taylor expansion result
-    s = nextpow(2, π*abs(x))
-    return sum((x/s)^n * pi^n / factorial(n) for n in 0:20)^s
+    return exp_taylor(π*x)
 end
 
 """
