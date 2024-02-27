@@ -8,21 +8,6 @@ encompasses all types that may be used to construct a `CliffordNumber`.
 """
 const BaseNumber = Union{Real,Complex}
 
-"""
-    CliffordNumbers.subscript_string(x::Number) -> String
-
-Produces a string representation of a number in subscript format.
-"""
-function subscript_string(x::Number)
-    str = collect(string(x))
-    for (n,c) in enumerate(str)
-        ('0' <= c <= '9') && (str[n] = c + 0x2050)
-        (c === '-') && (str[n] = '₋')
-        (c === '+') && (str[n] = '₊')
-    end
-    return String(str)
-end
-
 # Contains tools for working with Hamming weights of integers
 include("hamming.jl")
 # Tools for defining quadratic forms/metric signatures (convention may not be great)
