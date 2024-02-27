@@ -4,6 +4,37 @@ function Base.:(==)(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) 
     return all(x[i] == y[i] for i in BitIndices(Q))
 end
 
+#---Scalars and pseudoscalars----------------------------------------------------------------------#
+"""
+    isscalar(x::AbstractCliffordNumber)
+
+Determines whether the Clifford number `x` is a scalar, meaning that all of its blades of nonzero
+grade are zero.
+"""
+function isscalar(x::AbstractCliffordNumber)
+    inds = Iterators.filter(i -> !iszero(grade(i)), BitIndices(x))
+    return all(iszero, x[i] for i in inds)
+end
+
+isscalar(x::OddCliffordNumber) = iszero(x)
+isscalar(x::KVector) = iszero(x)
+isscalar(::KVector{0}) = true
+isscalar(::AbstractCliffordNumber{QuadraticForm{0,0,0}}) = true
+isscalar(::BaseNumber) = true
+
+"""
+    ispseudoscalar(m::AbstractCliffordNumber)
+
+Determines whether the Clifford number `x` is a pseudoscalar, meaning that all of its blades with
+grades below the dimension of the space are zero.
+"""
+function ispseudoscalar(x::AbstractCliffordNumber)
+    inds = Iterators.filter(i -> grade(i) != dimension(QuadraticForm(x)), BitIndices(x))
+    return all(iszero, x[i] for i in inds)
+end
+
+ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
+
 #---Grade selection--------------------------------------------------------------------------------#
 """
     select_grade(x::CliffordNumber, g::Integer)
