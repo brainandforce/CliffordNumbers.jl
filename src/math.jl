@@ -232,14 +232,6 @@ normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Contractions-----------------------------------------------------------------------------------#
 #= Old implementations, left here for reference
-"""
-    left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
-
-Calculates the left contraction of `x` and `y`.
-
-For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
-otherwise it is `grade_select(A*B, n-m)`.
-"""
 function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(numeric_type(x), numeric_type(y))
     result = zero(CliffordNumber{Q,T})
@@ -252,14 +244,6 @@ function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     return result
 end
 
-"""
-    right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
-
-Calculates the right contraction of `x` and `y`.
-
-For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
-otherwise it is `grade_select(A*B, m-n)`.
-"""
 function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     T = promote_type(numeric_type(x), numeric_type(y))
     result = zero(CliffordNumber{Q,T})
@@ -273,12 +257,8 @@ function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
 end
 =#
 
-function contraction_type(
-    ::Type{<:KVector{K1,Q}},
-    ::Type{<:KVector{K2,Q}},
-    left::Val{B}
-) where {K1,K2,Q,B}
-    K = abs(K1 - K2)
+function contraction_type(::Type{<:KVector{K1,Q}}, ::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
+    K = abs(K1 - K2) # this works in all cases, if K2 > K1 then the values are just zero
     return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
 end
 
@@ -289,58 +269,79 @@ function contraction_type(
     return geometric_product_type(C1, C2)
 end
 
+"""
+    CliffordNumbers.contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}, ::Val)
+
+Generic implementation of left and right contractions as well as dot products. The left contraction
+is calculated if the final argument is `Val(true)`; the right contraction is calcluated if the final
+argument is `Val(false)`, and the dot product is calculated for any other `Val`.
+
+In general, code should never refer to this method directly; use `left_contraction`,
+`right_contraction`, or `dot` if needed.
+"""
 function contraction(
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
-    left::Val{B}
+    ::Val{B}
 ) where {Q,B}
-    T = contraction_type(typeof(x), typeof(y), left)
+    T = contraction_type(typeof(x), typeof(y))
     itr = Iterators.filter(Iterators.product(eachindex(x), eachindex(y))) do t
-        return (grade(a) - grade(b)) * (-1)^left == grade(a*b)
+        gdiff = grade(a) - grade(b)
+        return gdiff * ifelse(B isa Bool, sign(gdiff), (-1)^B) == grade(a*b)
     end
     return sum(elementwise_product(T, x, y, a, b) for (a,b) in itr)
 end
 
+"""
+    left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the left contraction of `x` and `y`.
+
+For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
+otherwise it is `grade_select(A*B, n-m)`.
+"""
 function left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return contraction(x, y, Val(true))
 end
 
+"""
+    right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the right contraction of `x` and `y`.
+
+For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
+otherwise it is `grade_select(A*B, m-n)`.
+"""
 function right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return contraction(x, y, Val(false))
 end
 
-const ⨼ = left_contraction
-const ⨽ = right_contraction
-
 """
-    dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
+    dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the dot product of `x` and `y`.
 
 For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal to the left
 contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 """
-function dot(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(numeric_type(x), numeric_type(y))
-    result = zero(CliffordNumber{Q,T})
-    for a in eachindex(x), b in eachindex(y)
-        coeff = x[a] * y[b] * sign_of_mult(a,b)
-        # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (abs(grade(b) - grade(a)) == grade(a*b))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == (a*b).blade))
-    end
-    return result
+function dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q 
+    return contraction(x, y, Val(nothing))
 end
 
+const ⨼ = left_contraction
+const ⨽ = right_contraction
+
 """
-    hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
+    hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Returns the Hestenes product: this is equal to the dot product given by `dot(x, y)` but is equal to
 to zero when either `x` or `y` is a scalar.
+
+This product is generally understood to lack utility; left and right contractions are preferred over
+this product in almost every case. It is implemented for the sake of completeness.
 """
-function hestenes_product(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(numeric_type(x), numeric_type(y))
-    return isscalar(x) || isscalar(y) ? zero(CliffordNumber{Q,T}) : dot(x,y)
+function hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return ifelse(isscalar(x) || isscalar(y), zero(promote_type(typeof(x), typeof(y))), dot(x,y))
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
