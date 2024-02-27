@@ -150,13 +150,13 @@ Base.reverse(b::BitIndex) = typeof(b)(xor(signbit(b), !iszero(grade(b) & 2)), b.
 
 """
     grade_involution(b::BitIndex) -> BitIndex
-    grade_involution(x::AbstractCliffordNumber{Q,T}) -> typeof(x)
+    grade_involution(x::AbstractCliffordNumber) -> typeof(x)
 
 Calculates the grade involution of the basis blade indexed by `b` or the Clifford number `x`. This
 effectively reflects all of the basis vectors of the space along their own mirror operation, which
 makes elements of odd grade flip sign.
 """
-grade_involution(b::BitIndex) = typeof(b)(xor(signbit(b), !iseven(b)), b.blade)
+grade_involution(b::BitIndex) = typeof(b)(xor(signbit(b), isodd(grade(b))), b.blade)
 
 """
     conj(b::BitIndex) -> BitIndex
