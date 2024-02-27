@@ -1,12 +1,11 @@
 import Base.convert
 
 # Default conversion should check for exact representability
-function convert(T::Type{<:AbstractCliffordNumber{Q}}, x::AbstractCliffordNumber{Q}) where Q
+function convert(::Type{T}, x::AbstractCliffordNumber{Q}) where {Q,T<:AbstractCliffordNumber{Q}}
     has_grades_of(x, T) && return T(x)::T
     throw(InexactError(:convert, T, x))
 end
 
-function convert(S::Type{<:Real}, x::CliffordNumber)
-    isscalar(x) || throw(InexactError(:convert, S, x))
-    return S(x[BitIndices(x)[1]])
+function convert(::Type{T}, x::AbstractCliffordNumber) where T<:BaseNumber
+    return isscalar(x) ? T(x[BitIndex{QuadraticForm(x)}()]) : throw(InexactError(:convert, T, x))
 end
