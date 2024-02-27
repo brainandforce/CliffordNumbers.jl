@@ -269,31 +269,6 @@ Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Contractions-----------------------------------------------------------------------------------#
-#= Old implementations, left here for reference
-function left_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(numeric_type(x), numeric_type(y))
-    result = zero(CliffordNumber{Q,T})
-    for a in eachindex(x), b in eachindex(y)
-        coeff = x[a] * y[b] * sign_of_mult(a,b)
-        # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (grade(b) - grade(a) == grade(a*b))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == (a*b).blade))
-    end
-    return result
-end
-
-function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    T = promote_type(numeric_type(x), numeric_type(y))
-    result = zero(CliffordNumber{Q,T})
-    for a in eachindex(x), b in eachindex(y)
-        coeff = x[a] * y[b] * sign_of_mult(a,b)
-        # Set to zero if the grade difference of b and a is not equal the grade of the new index
-        coeff *= (grade(a) - grade(b) == grade(a*b))
-        result += CliffordNumber{Q,T}(i -> coeff * (i == (a*b).blade))
-    end
-    return result
-end
-=#
 
 function contraction_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     K = abs(K1 - K2) # this works in all cases, if K2 > K1 then the values are just zero
