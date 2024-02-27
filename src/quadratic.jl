@@ -26,6 +26,20 @@ function Base.sign(::Type{QuadraticForm{P,Q,R}}, i::Integer) where {P,Q,R}
 end
 
 #---Special geometric algebras---------------------------------------------------------------------#
+"""
+    CliffordNumbers.QFComplex
+
+The quadratic form with zero dimensions, `QuadraticForm{0,0,0}`, isomorphic to the real numbers.
+"""
+const QFReal = QuadraticForm{0,0,0}
+
+"""
+    CliffordNumbers.QFComplex
+
+The quadratic form with one dimension squaring to -1, `QuadraticForm{0,1,0}`. This generates a
+Clifford algebra isomorphic to the complex numbers.
+"""
+const QFComplex = QuadraticForm{0,1,0}
 
 """
     APS
