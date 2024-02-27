@@ -1,0 +1,9 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 50%    # the required coverage value
+        threshold: 5%  # the leniency in hitting the target
+ignore:
+  - src/metrics.jl
+  - src/show.jl
