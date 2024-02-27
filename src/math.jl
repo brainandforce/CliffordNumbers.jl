@@ -470,7 +470,18 @@ intlog2(x::Real) = intlog2(Float64(x))
 # intlog2(x::Integer) = 8*sizeof(x) - leading_zeros(abs(x) >>> 1)
 
 """
-    exp(x::CliffordNumber{Q}) -> CliffordNumber{Q,<:AbstractFloat}
+    CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = 12)
+
+Calculates the exponential of `x` using a Taylor expansion up to the specified order. In most cases,
+12 is as sufficient number.
+"""
+function exp_taylor(x::AbstractCliffordNumber, order = 12)
+    s = nextpow(2, abs(x))
+    return sum((x/s)^n / factorial(n) for n in 0:order)^s
+end
+
+"""
+    exp(x::AbstractCliffordNumber{Q})
 
 Returns the natural exponential of a Clifford number.
 
@@ -482,29 +493,25 @@ For special cases where m squares to a scalar, the following shortcuts can be us
 
 See also: [`exppi`](@ref), [`exptau`](@ref).
 """
-function Base.exp(x::CliffordNumber)
+function Base.exp(x::AbstractCliffordNumber)
     sq = x^2
     if isscalar(sq)
         scalar(sq) < 0 && return cos(abs(x)) + x * sin(abs(x)) / abs(x)
         scalar(sq) > 0 && return cosh(abs(x)) + x * sinh(abs(x)) / abs(x)
         return 1 + x
     end
-    # General case: Taylor expansion
-    # Divide x by s which is chosen to keep its norm reasonably close to unity
-    # But it's also kept as a power of 2 to make the power calculation more efficient
-    s = 2^intlog2(abs(x))
-    return sum((x/s)^n / factorial(n) for n in 0:12)^s
+    return exp_taylor(x)
 end
 
 """
-    exppi(x::CliffordNumber)
+    exppi(x::AbstractCliffordNumber)
 
 Returns the natural exponential of `π * x` with greater accuracy than `exp(π * x)` in the case where
-`x^2` is a negative scalar.
+`x^2` is a negative scalar, especially for large values of `abs(x)`.
 
 See also: [`exp`](@ref), [`exptau`](@ref).
 """
-function exppi(x::CliffordNumber)
+function exppi(x::AbstractCliffordNumber)
     sq = x^2
     if isscalar(sq)
         scalar(sq) < 0 && return cospi(abs(x)) + x * sinpi(abs(x)) / abs(x)
@@ -512,19 +519,17 @@ function exppi(x::CliffordNumber)
         scalar(sq) > 0 && return cosh(π*abs(x)) + x * sinh(π*abs(x)) / abs(x)
         return 1 + x
     end
-    # General case: Taylor expansion
-    # Divide x by s which is chosen to keep its norm reasonably close to unity
-    # But it's also kept as a power of 2 to make the power calculation more efficient
-    s = 2^intlog2(π*abs(x))
+    # TODO: compare this to the regular Taylor expansion result
+    s = nextpow(2, π*abs(x))
     return sum((x/s)^n * pi^n / factorial(n) for n in 0:20)^s
 end
 
 """
-    exptau(x::CliffordNumber)
+    exptau(x::AbstractCliffordNumber)
 
 Returns the natural exponential of `2π * x` with greater accuracy than `exp(2π * x)` in the case
-where `x^2` is a negative scalar.
+where `x^2` is a negative scalar, especially for large values of `abs(x)`.
 
 See also: [`exp`](@ref), [`exppi`](@ref).
 """
-exptau(x::CliffordNumber) = exppi(2*x)
+exptau(x::AbstractCliffordNumber) = exppi(2*x)
