@@ -387,15 +387,20 @@ const ∧ = wedge
     commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
-Calculates the commutator product, equal to `1//2 * (x*y - y*x)`, or equivalently, 
-`1//2 * (x*y - reverse(x*y))`.
+Calculates the commutator (or antisymmetric) product, equal to `1//2 * (x*y - y*x)`,
+or equivalently, `1//2 * (x*y - reverse(x*y))`.
 
-Note that the wedge product, in general, is *not* equal to the wedge product, which may be invoked
-with the `wedge` function or the `∧` operator.
+Note that the commutator product, in general, is *not* equal to the wedge product, which may be
+invoked with the `wedge` function or the `∧` operator.
+
+# Type promotion
+
+Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
+will be promoted to `Rational` subtypes.
 """
 function commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     z = x*y
-    return (x*y - reverse(x*y)) // 2
+    return 1//2 * (z - reverse(z))
 end
 
 const × = commutator
