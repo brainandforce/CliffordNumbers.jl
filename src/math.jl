@@ -405,6 +405,28 @@ end
 
 const × = commutator
 
+"""
+    anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the anticommutator (or symmetric) product, equal to `1//2 * (x*y + y*x)`, or
+equivalently, `1//2 * (x*y + reverse(x*y))`.
+
+Note that the dot product, in general, is *not* equal to the anticommutator product, which may be
+invoked with `dot`. In some cases, the preferred operators might be the left and right contractions,
+which use infix operators `⨼` and `⨽` respectively.
+
+# Type promotion
+
+Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
+will be promoted to `Rational` subtypes.
+"""
+function anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    z = x*y
+    return 1//2 * (z + reverse(z))
+end
+
+const ⨰ = anticommutator
+
 #---Duals------------------------------------------------------------------------------------------#
 """
     dual(x::CliffordNumber) -> CliffordNumber
