@@ -183,6 +183,45 @@ end
 end
 
 """
+    CliffordNumbers.product_kernel(
+        ::Type{T},
+        x::AbstractCliffordNumber{Q},
+        y::AbstractCliffordNumber{Q},
+        f = ((a,b) -> true)
+    )
+
+Leverages `CliffordNumbers.elementwise_product` to calculate a geometric product in a 
+
+The optional function `f` is a condition used to exclude elementwise products whose associated
+`BitIndex{Q}` objects `a` and `b` do not meet a specific criterion. This function must always
+evaluate to a `Bool`. By default, it evaluates to `true` every time.
+
+# Why not simply use `sum()`?
+
+It appears that `sum()` is unable to correctly infer the type of the result of an expression like
+the one given below:
+```julia
+sum(
+    elementwise_product(T, x, y, a, b)
+    for (a,b) in Iterators.filter(f, Iterators.product(BitIndices(x), BitIndices(y)))
+)
+```
+Therefore, it is manually implemented in a `for` loop.
+"""
+function product_kernel(
+    ::Type{T},
+    x::AbstractCliffordNumber{Q},
+    y::AbstractCliffordNumber{Q},
+    f = ((a,b) -> true)
+) where {Q,T<:AbstractCliffordNumber{Q}}
+    result = zero(T)
+    for a in BitIndices(x), b in BitIndices(y)
+        result += elementwise_product(T, x, y, a, b, f(a,b))
+    end
+    return result
+end
+
+"""
     *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     (x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q})
 
@@ -190,8 +229,7 @@ Calculates the geometric product of `x` and `y`, returning the smallest type whi
 represent all nonzero basis blades of the result.
 """
 function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    T = geometric_product_type(typeof(x), typeof(y))
-    return sum(elementwise_product(T, x, y, a, b) for a in eachindex(x), b in eachindex(y))
+    return product_kernel(geometric_product_type(typeof(x), typeof(y)), x, y)
 end
 
 (x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q}) where Q = x * y
@@ -257,7 +295,7 @@ function right_contraction(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
 end
 =#
 
-function contraction_type(::Type{<:KVector{K1,Q}}, ::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
+function contraction_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     K = abs(K1 - K2) # this works in all cases, if K2 > K1 then the values are just zero
     return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
 end
@@ -284,12 +322,12 @@ function contraction(
     y::AbstractCliffordNumber{Q},
     ::Val{B}
 ) where {Q,B}
+    @assert B isa Bool string(
+        "Final argument must be Val(true) for left contraction or Val(false) for right contraction."
+    )
     T = contraction_type(typeof(x), typeof(y))
-    itr = Iterators.filter(Iterators.product(eachindex(x), eachindex(y))) do t
-        gdiff = grade(a) - grade(b)
-        return gdiff * ifelse(B isa Bool, sign(gdiff), (-1)^B) == grade(a*b)
-    end
-    return sum(elementwise_product(T, x, y, a, b) for (a,b) in itr)
+    f = (a,b) -> (grade(a) - grade(b)) * Int8(-1)^B == grade(a*b)
+    return product_kernel(T, x, y, f)
 end
 
 """
@@ -327,7 +365,9 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal
 contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 """
 function dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q 
-    return contraction(x, y, Val(nothing))
+    T = contraction_type(typeof(x), typeof(y))
+    f = (a,b) -> abs(grade(a) - grade(b)) == grade(a*b)
+    return product_kernel(T, x, y, f)
 end
 
 const ⨼ = left_contraction
@@ -370,9 +410,7 @@ product), which may be invoked with the `commutator` function or the `×` operat
 """
 function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     T = wedge_product_type(typeof(x), typeof(y))
-    # Only iterate through elements that have nonzero wedge products
-    itr = Iterators.filter(t -> has_wedge(t...), Iterators.product(eachindex(x), eachindex(y)))
-    return sum(elementwise_product(T, x, y, a, b) for (a,b) in itr)
+    return product_kernel(T, x, y, has_wedge)
 end
 
 wedge(x::Real, y::AbstractCliffordNumber) = x * y
