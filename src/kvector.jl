@@ -58,6 +58,11 @@ function Base.getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
     return k.data[findfirst(isequal(abs(b)), BitIndices(typeof(k)))] * sign(b)
 end
 
+#---Generating multiplicative identities for arbitrary types---------------------------------------#
+
+Base.oneunit(C::Type{<:AbstractCliffordNumber{Q}}) where Q = KVector{0,Q}(numeric_type(C)(true))
+Base.one(C::Type{<:AbstractCliffordNumber{Q}}) where Q = KVector{0,Q}(numeric_type(C)(true))
+
 #---Similar types----------------------------------------------------------------------------------#
 
 function similar_type(::Type{<:KVector{K}}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm}) where K
