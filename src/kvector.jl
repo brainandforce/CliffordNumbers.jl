@@ -36,6 +36,15 @@ length(x::KVector) = length(typeof(x))
 
 Base.size(::BitIndices{Q,<:KVector{K}}) where {Q,K} = tuple(length(KVector{K,Q}))
 
+"""
+    grade(::Type{<:KVector{K}}) = K
+    grade(x::KVector{K}) = k
+
+Returns the grade represented by a `KVector{K}`, which is K.
+"""
+grade(::Type{<:KVector{K}}) where K = K
+grade(x::KVector) = grade(typeof(x))
+
 nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 
 function Base.getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
