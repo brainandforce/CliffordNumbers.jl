@@ -294,6 +294,7 @@ end
 
 """
     left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    ⨼(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the left contraction of `x` and `y`.
 
@@ -306,6 +307,7 @@ end
 
 """
     right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    ⨽(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the right contraction of `x` and `y`.
 
@@ -358,9 +360,13 @@ function wedge_product_type(
 end
 
 """
-    wedge(x::CliffordNumber{Q}, y::CliffordNumber{Q}) -> CliffordNumber{Q}
+    wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    ∧(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with quadratic form `Q`.
+
+Note that the wedge product, in general, is *not* equal to the commutator product (or antisymmetric
+product), which may be invoked with the `commutator` function or the `×` operator.
 """
 function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     T = wedge_product_type(typeof(x), typeof(y))
@@ -383,6 +389,9 @@ const ∧ = wedge
 
 Calculates the commutator product, equal to `1//2 * (x*y - y*x)`, or equivalently, 
 `1//2 * (x*y - reverse(x*y))`.
+
+Note that the wedge product, in general, is *not* equal to the wedge product, which may be invoked
+with the `wedge` function or the `∧` operator.
 """
 function commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     z = x*y
