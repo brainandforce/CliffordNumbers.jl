@@ -77,11 +77,9 @@ end
 #---Show methods-----------------------------------------------------------------------------------#
 
 function Base.show(io::IO, x::Z2CliffordNumber{P}) where P
-    parity = ifelse(P, "Odd", "Even")
-    print(io, parity, "CliffordNumber{", QuadraticForm(x), ",", numeric_type(x), "}", x.data)
+    print(io, Z2CliffordNumber{P}, "{", QuadraticForm(x), ",", numeric_type(x), "}", x.data)
 end
 
 function Base.summary(io::IO, x::Z2CliffordNumber{P}) where P
-    parity = ifelse(P, "Odd", "Even")
-    print(io, parity, "CliffordNumber{", QuadraticForm(x), ",", numeric_type(x), "}:")
+    println(io, Z2CliffordNumber{P}, "{", QuadraticForm(x), ",", numeric_type(x), "}:")
 end
