@@ -8,13 +8,15 @@
     @test KVector{2,APS}(4, 2, 0) == CliffordNumber{APS,Float64}(0, 0, 0, 4, 0, 2, 0, 0)
 end
 
-@testset "Addition" begin
+@testset "Addition and subtraction" begin
     x = CliffordNumber{APS}(1, 2, 3, 4, 5, 6, 7, 8)
     y = CliffordNumber{APS,Float64}(9, -10, 11, -12, 13, 14, -15, 16)
     # Type promotion test
     @test x + y isa CliffordNumber{APS,Float64}
     # Equality test (mixed types)
     @test x + y == CliffordNumber{APS}(10, -8, 14, -8, 18, 20, -8, 24)
+    @test -x === CliffordNumber{APS}(-1, -2, -3, -4, -5, -6, -7, -8)
+    @test x - y === CliffordNumber{APS}(-8.0, 12.0, -8.0, 16.0, -8.0, -8.0, 22.0, -8.0)
 end
 
 @testset "Geometric product" begin
@@ -25,19 +27,31 @@ end
     @test y * x == CliffordNumber{APS}(6, 0, 0, -8, 0, 0, 0, 0)
 end
 
+@testset "Scalars" begin
+    k = KVector{2,APS}(3, 4, 0)
+    @test abs2(k) === 25
+    @test abs(k) == 5
+    @test normalize(k) == k / 5
+end
+
 @testset "Wedge product" begin
     x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
     y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
+    k1 = KVector{1,APS}(3, 4, 0)
+    k2 = KVector{2,APS}(4, 2, 0)
     five = 5 * one(CliffordNumber{APS})
     # Self wedges should be zero
     @test iszero(x ∧ x)
     @test iszero(y ∧ y)
     # Reversing the order should flip the sign for vectors
     @test x ∧ y == -(y ∧ x)
+    @test KVector{1,APS}(x) ∧ KVector{1,APS}(y) == -(KVector{1,APS}(y) ∧ KVector{1,APS}(x))
     # Ensure the behavior of scalars (both CliffordNumber and normal) are correct
     @test 5 ∧ x == 5 * x
     @test five ∧ x == x ∧ five
     @test 5 ∧ 5 == 25
+    # Turns out reversing the order shouldn't change anything
+    @test k1 ∧ k2 == KVector{3,APS}(-8)
 end
 
 @testset "Exponentiation" begin
@@ -46,4 +60,10 @@ end
     @test exptau(e12) == 1
     @test exppi(e12) ≈ exp(pi*e12)
     @test exptau(e12) ≈ exp(2*pi*e12)
+    @test exp(KVector{1,APS}(1,0,0)) isa CliffordNumber
+    @test exp(KVector{2,APS}(1,0,0)) isa EvenCliffordNumber
+    k = KVector{2,APS}(1,0,0)
+    @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exp(pi/2 * k)
+    @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exppi(1//2 * k)
+    @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exptau(1//4 * k)
 end
