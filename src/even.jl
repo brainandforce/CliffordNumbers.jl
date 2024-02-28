@@ -64,6 +64,11 @@ function Base.getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
     return sign(b) * x.data[div(b.blade, 2) + 1] * xor(isevil(b.blade), P)
 end
 
+#---Multiplicative identity for EvenCliffordNumber-------------------------------------------------#
+
+Base.oneunit(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
+Base.one(C::Type{<:EvenCliffordNumber{Q}}) where Q = oneunit(C)
+
 #---Similar types----------------------------------------------------------------------------------#
 
 function similar_type(
