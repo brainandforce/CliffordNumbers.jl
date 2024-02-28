@@ -80,10 +80,4 @@ end
 
 #---Show methods-----------------------------------------------------------------------------------#
 
-function Base.show(io::IO, x::Z2CliffordNumber{P}) where P
-    print(io, Z2CliffordNumber{P}, "{", QuadraticForm(x), ",", numeric_type(x), "}", x.data)
-end
-
-function Base.summary(io::IO, x::Z2CliffordNumber{P}) where P
-    println(io, Z2CliffordNumber{P}, "{", QuadraticForm(x), ",", numeric_type(x), "}:")
-end
+short_typename(::Type{<:Z2CliffordNumber{P,Q,T}}) where {P,Q,T} = Z2CliffordNumber{P,Q,T}

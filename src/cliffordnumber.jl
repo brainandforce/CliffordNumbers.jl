@@ -62,12 +62,5 @@ function similar_type(::Type{<:CliffordNumber}, T::Type{<:BaseNumber}, Q::Type{<
 end
 
 #---Show methods-----------------------------------------------------------------------------------#
-import Base: show, summary
 
-function show(io::IO, x::CliffordNumber)
-    print(io, CliffordNumber, "{", QuadraticForm(x), ",", numeric_type(x), "}", Tuple(x))
-end
-
-function summary(io::IO, x::CliffordNumber)
-    println(io, CliffordNumber, "{", QuadraticForm(x), ",", numeric_type(x), "}:")
-end
+short_typename(::Type{<:CliffordNumber{Q,T}}) where {Q,T} = CliffordNumber{Q,T}

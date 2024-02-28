@@ -118,3 +118,21 @@ function check_element_count(f, Q::Type{QuadraticForm{X,Y,Z}}, L, data) where {X
     @assert L == f(Q) "Length type parameter must equal $(f(Q)) (got $L)."
     check_element_count(f, Q, data)
 end
+
+#---Printed representations------------------------------------------------------------------------#
+"""
+    CliffordNumbers.short_name(T::Type{<:AbstractCliffordNumber})
+    CliffordNumbers.short_name(x::AbstractCliffordNumber})
+    
+Returns a type with a shorter name than `T`, but still constructs `T`. This is achieved by removing
+dependent type parameters; often this includes the length parameter.
+"""
+short_typename(x::AbstractCliffordNumber) = short_typename(typeof(x))
+
+function Base.show(io::IO, x::AbstractCliffordNumber)
+    print(io, short_typename(x), (isone(length(x)) ? string('(', only(Tuple(x)), ')') : Tuple(x)))
+end
+
+function Base.summary(io::IO, x::AbstractCliffordNumber)
+    println(io, length(x), "-element ", short_typename(x), ":")
+end

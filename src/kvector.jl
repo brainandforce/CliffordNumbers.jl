@@ -86,12 +86,5 @@ function similar_type(
 end
 
 #---Show methods-----------------------------------------------------------------------------------#
-import Base: show, summary
 
-function show(io::IO, k::KVector{K}) where K
-    print(io, "KVector{", K, ",", QuadraticForm(k), ",", numeric_type(k), "}", k.data)
-end
-
-function summary(io::IO, k::KVector{K}) where K
-    println(io, "KVector{", K, ",", QuadraticForm(k), ",", numeric_type(k), "}:")
-end
+short_typename(::Type{<:KVector{K,Q,T}}) where {K,Q,T} = KVector{K,Q,T}
