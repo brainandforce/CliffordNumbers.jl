@@ -1,9 +1,3 @@
-#---Equality---------------------------------------------------------------------------------------#
-
-function Base.:(==)(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return all(x[i] == y[i] for i in BitIndices(Q))
-end
-
 #---Scalars and pseudoscalars----------------------------------------------------------------------#
 """
     isscalar(x::AbstractCliffordNumber)
@@ -12,7 +6,7 @@ Determines whether the Clifford number `x` is a scalar, meaning that all of its 
 grade are zero.
 """
 function isscalar(x::AbstractCliffordNumber)
-    inds = Iterators.filter(i -> !iszero(grade(i)), BitIndices(x))
+    inds = Iterators.filter(!isequal(scalar_index(x)), BitIndices(x))
     return all(iszero, x[i] for i in inds)
 end
 
@@ -22,6 +16,8 @@ isscalar(::KVector{0}) = true
 isscalar(::AbstractCliffordNumber{QuadraticForm{0,0,0}}) = true
 isscalar(::BaseNumber) = true
 
+scalar(x::AbstractCliffordNumber) = x[scalar_index(x)]
+
 """
     ispseudoscalar(m::AbstractCliffordNumber)
 
@@ -29,11 +25,21 @@ Determines whether the Clifford number `x` is a pseudoscalar, meaning that all o
 grades below the dimension of the space are zero.
 """
 function ispseudoscalar(x::AbstractCliffordNumber)
-    inds = Iterators.filter(i -> grade(i) != dimension(QuadraticForm(x)), BitIndices(x))
+    inds = Iterators.filter(!isequal(pseudoscalar_index(x)), BitIndices(x))
     return all(iszero, x[i] for i in inds)
 end
 
 ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
+
+#---Equality---------------------------------------------------------------------------------------#
+
+function Base.:(==)(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return all(x[i] == y[i] for i in BitIndices(promote_type(typeof(x), typeof(y))))
+end
+
+# Define equality with scalar values in terms of scalar operations above
+Base.:(==)(x::AbstractCliffordNumber, y::BaseNumber) = isscalar(x) && (scalar(x) == y)
+Base.:(==)(x::BaseNumber, y::AbstractCliffordNumber) = isscalar(y) && (x == scalar(y))
 
 #---Grade selection--------------------------------------------------------------------------------#
 """
@@ -42,8 +48,6 @@ ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
 Returns a multivector similar to `x` where all elements not of grade `g` are equal to zero.
 """
 select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (count_ones(i) == g))
-
-scalar(x::AbstractCliffordNumber{Q}) where Q = x[BitIndex{Q}()]
 
 """
     real(x::CliffordNumber{Q,T<:Real}) = T
@@ -312,7 +316,7 @@ end
 Calculates the left contraction of `x` and `y`.
 
 For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
-otherwise it is `grade_select(A*B, n-m)`.
+otherwise it is `KVector{n-m,Q}(A*B)`.
 """
 function left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return contraction(x, y, Val(true))
@@ -325,7 +329,7 @@ end
 Calculates the right contraction of `x` and `y`.
 
 For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
-otherwise it is `grade_select(A*B, m-n)`.
+otherwise it is `KVector{m-n,Q}(A*B)`.
 """
 function right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return contraction(x, y, Val(false))
