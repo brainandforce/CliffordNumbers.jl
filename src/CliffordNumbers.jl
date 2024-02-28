@@ -32,7 +32,6 @@ export AbstractBitIndices, BitIndices, TransformedBitIndices, ReversedBitIndices
 # Dense representation of a Clifford number
 include("cliffordnumber.jl")
 export CliffordNumber
-export pseudoscalar, isscalar, ispseudoscalar
 # Representations of even/odd grade Clifford numbers
 include("even.jl")
 export EvenCliffordNumber, OddCliffordNumber
@@ -44,9 +43,9 @@ include("promote.jl")
 include("convert.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
-export select_grade, scalar_product, normalize, left_contraction, right_contraction,
-    dot, hestenes_product, wedge, commutator, anticommutator, versor_inverse, sandwich, exppi,
-    exptau
+export isscalar, ispseudoscalar, select_grade, scalar_product, normalize, left_contraction, 
+    right_contraction, dot, hestenes_product, wedge, commutator, anticommutator, versor_inverse, 
+    sandwich, exppi, exptau
 export ⨼, ⨽, ∧, ×, ⨰
 # Pretty printing
 include("show.jl")

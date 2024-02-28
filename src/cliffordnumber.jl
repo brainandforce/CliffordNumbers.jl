@@ -81,26 +81,9 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 Base.getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q = sign(b) * x.data[b.blade + 1]
 Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[b.blade % length(x) + 1]
 
-#---Generate zero and identity elements------------------------------------------------------------#
-import Base: one, oneunit
+#---Multiplicative identity------------------------------------------------------------------------#
 
-oneunit(S::Type{<:CliffordNumber{Q,T}}) where {Q,T} = S(iszero)
-one(S::Type{<:CliffordNumber{Q,T}}) where {Q,T} = oneunit(S)
-
-function pseudoscalar(::Type{<:CliffordNumber{Q,T}}) where {Q,T}
-    L = elements(Q)
-    return CliffordNumber{Q,T,L}(ntuple(isequal(L), Val{L}()))
-end
-
-pseudoscalar(m::CliffordNumber) = pseudoscalar(typeof(m))
-
-#---Constructors using just the quadratic forms----------------------------------------------------#
-
-for fn in (:zero, :one, :oneunit, :pseudoscalar)
-    # Default to Bools since they are promoted to any wider type
-    @eval $fn(::Type{CliffordNumber{Q}}) where Q = $fn(CliffordNumber{Q,Bool})
-    @eval $fn(Q::Type{<:QuadraticForm}) = $fn(CliffordNumber{Q,Bool})
-end
+Base.one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 

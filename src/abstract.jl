@@ -57,7 +57,7 @@ numeric_type(x) = numeric_type(typeof(x))
 
 Base.Tuple(x::AbstractCliffordNumber) = getfield(x, :data)::Tuple
 
-#---Zero multivectors------------------------------------------------------------------------------#
+#---Additive and multiplicative identities---------------------------------------------------------#
 import Base: zero, oneunit
 
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
