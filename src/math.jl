@@ -498,20 +498,6 @@ sandwich(x::BaseNumber, ::CliffordNumber) = x
 import Base: exp, ^
 
 """
-    CliffordNumbers.intlog2(x::Real) -> Int
-
-Efficiently approximates the integer portion of the base-2 logarithm of `abs(x)` for calculating the
-multivector exponential.
-
-Note that this function returns `0` when `x == 0`.
-"""
-# log2(sqrt(2)) ≈ 0.5, so use that as a natural cutoff
-intlog2(x::AbstractFloat) = last(Base.Math.frexp(sqrt(2) * x)) - !iszero(x)
-intlog2(x::Real) = intlog2(Float64(x))
-# It's likely not worth specializing on integers when considering the sqrt(2) factor
-# intlog2(x::Integer) = 8*sizeof(x) - leading_zeros(abs(x) >>> 1)
-
-"""
     CliffordNumbers.exponential_type(::Type{<:AbstractCliffordNumber})
     CliffordNumbers.exponential_type(x::AbstractCliffordNumber)
 
