@@ -20,47 +20,17 @@ end
 
 #---Constructors-----------------------------------------------------------------------------------#
 
-CliffordNumber{Q,T}(x::NTuple{L,<:BaseNumber}) where {Q,T<:BaseNumber,L} = CliffordNumber{Q,T,L}(x)
-CliffordNumber{Q,T}(x::Vararg{BaseNumber,L}) where {Q,T<:BaseNumber,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q,T}(x::Tuple{Vararg{BaseNumber,L}}) where {Q,T,L} = CliffordNumber{Q,T,L}(x)
+CliffordNumber{Q}(x::Tuple{Vararg{T}}) where {Q,T<:BaseNumber} = CliffordNumber{Q,T}(x)
 
-# Constructors similar to `ntuple(::Function)`
-# However, it deals with the offset indexing
-function CliffordNumber{Q,T,L}(f::Function) where {Q,T<:BaseNumber,L}
-    return CliffordNumber{Q,T,L}(ntuple(i -> f(i-1), Val{L}()))
-end
+# Automatically convert arguments to a common type
+CliffordNumber{Q}(x::Tuple{Vararg{BaseNumber}}) where Q = CliffordNumber{Q}(promote(x...))
 
-CliffordNumber{Q,T}(f::Function) where {Q,T<:BaseNumber} = CliffordNumber{Q,T,elements(Q)}(f)
+# Allow varargs arguments
+(::Type{T})(x::Vararg{BaseNumber}) where {T<:CliffordNumber} = T(x)
 
-function CliffordNumber{Q}(x::NTuple{L,<:BaseNumber}) where {Q,L}
-    data = promote(x...)
-    return CliffordNumber{Q,eltype(data),L}(data)
-end
-
-CliffordNumber{Q}(x::Vararg{BaseNumber}) where {Q} = CliffordNumber{Q}(x)
-
-function CliffordNumber{Q}(f::Function) where {Q}
-    L = elements(Q)
-    data = ntuple(i -> f(i-1), Val{L}())
-    return CliffordNumber{Q,eltype(data),L}(data)
-end
-
-function CliffordNumber{Q,T,L}(x::Real) where {Q,T<:BaseNumber,L}
-    return CliffordNumber{Q,T,L}(ntuple(i -> T(isone(i) * x), Val{L}()))
-end
-
-CliffordNumber{Q,T}(x::Real) where {Q,T<:BaseNumber} = CliffordNumber{Q,T,elements(Q)}(x)
-
-function CliffordNumber{Q,T1}(x::Complex{T2}) where {Q,T1<:Real,T2<:Real}
-    L = elements(Q)
-    T = promote_type(T1,T2)
-    data = ntuple(Val{L}()) do i
-        i == 1 && return T(real(x))
-        i == L && return T(imag(x))
-    end
-    return CliffordNumber{Q,T,L}(data)
-end
-
-CliffordNumber{Q}(x::BaseNumber) where Q = CliffordNumber{Q,typeof(x)}(x)
+# Convert real/complex numbers to CliffordNumber
+(::Type{T})(x::BaseNumber) where T<:CliffordNumber = T(ntuple(i -> x*isone(i), Val(length(T))))
 
 #---Number of elements-----------------------------------------------------------------------------#
 

@@ -445,6 +445,7 @@ end
 const ⨰ = anticommutator
 
 #---Duals------------------------------------------------------------------------------------------#
+# TODO: make this work for things that aren't CliffordNumber
 """
     dual(x::CliffordNumber) -> CliffordNumber
 
@@ -457,7 +458,8 @@ periodicity of
   * If the metric is degenerate, the dual is not unique.
 """
 function dual(x::CliffordNumber{Q}) where Q
-    isdegenerate(Q) || return CliffordNumber{Q}(i -> x[undual(BitIndices(Q)[i])])
+    isdegenerate(Q) && error("Cannot calculate the dual in a degenerate metric.")
+    return CliffordNumber{Q}(ntuple(i -> x[dual(BitIndices(Q)[i])], Val(length(x))))
 end
 
 """
@@ -467,7 +469,8 @@ Calculates the undual of `x`, which is equal to the left contraction of `x` with
 This function can be used to reverse the behavior of `dual()`.
 """
 function undual(x::CliffordNumber{Q}) where Q
-    isdegenerate(Q) || return CliffordNumber{Q}(i -> x[undual(BitIndices(Q)[i])])
+    isdegenerate(Q) && error("Cannot calculate the ;undual in a degenerate metric.")
+    return CliffordNumber{Q}(ntuple(i -> x[undual(BitIndices(Q)[i])], Val(length(x))))
 end
 
 #---Division---------------------------------------------------------------------------------------#
