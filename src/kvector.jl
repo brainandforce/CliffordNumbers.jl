@@ -15,15 +15,16 @@ struct KVector{K,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T
     end
 end
 
-KVector{K,Q,T}(x::NTuple{L,<:BaseNumber}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
-KVector{K,Q,T}(x::Vararg{BaseNumber,L}) where {K,Q,T<:BaseNumber,L} = KVector{K,Q,T,L}(x)
+#---Constructors-----------------------------------------------------------------------------------#
 
-function KVector{K,Q}(x::NTuple{L,<:BaseNumber}) where {K,Q,L}
-    data = promote(x...)
-    return KVector{K,Q,eltype(data),L}(data)
-end
+KVector{K,Q,T}(x::Tuple{Vararg{BaseNumber,L}}) where {K,Q,T,L} = KVector{K,Q,T,L}(x)
+KVector{K,Q}(x::Tuple{Vararg{T}}) where {K,Q,T<:BaseNumber} = KVector{K,Q,T}(x)
 
-KVector{K,Q}(x::Vararg{BaseNumber}) where {K,Q} = KVector{K,Q}(x)
+# Automatically convert arguments to a common type
+KVector{K,Q}(x::Tuple{Vararg{BaseNumber}}) where {K,Q} = KVector{K,Q}(promote(x...))
+
+# Allow varargs arguments
+(::Type{T})(x::Vararg{BaseNumber}) where T<:KVector = T(x)
 
 #---Number of elements-----------------------------------------------------------------------------#
 import Base: length
