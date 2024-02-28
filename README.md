@@ -51,7 +51,7 @@ instance returns a `TransformedBitIndices`, a wrapper which lazily associates a 
 The following mathematical operations are supported by this package:
   * Addition (`+`), subtraction and negation (`-`)
   * The geometric product (`*`)
-  * Left (`/`) and right (`\`) division, including rational division (`//`)
+  * Scalar left (`/`) and right (`\`) division, including rational division (`//`)
   * The reverse (`~`), grade involution, and Clifford conjugation
   * The modulus and absolute value (with `abs2` and `abs`)
   * The wedge product (`∧`)
