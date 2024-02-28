@@ -23,27 +23,27 @@ struct Z2CliffordNumber{P,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordN
     end
 end
 
-Z2CliffordNumber{P,Q,T}(x::NTuple{L,<:BaseNumber}) where {P,Q,T,L} = Z2CliffordNumber{P,Q,T,L}(x)
-Z2CliffordNumber{P,Q,T}(x::Vararg{BaseNumber,L}) where {P,Q,T,L} = Z2CliffordNumber{P,Q,T,L}(x)
-
-function Z2CliffordNumber{P,Q}(x::NTuple{L,<:BaseNumber}) where {P,Q,L}
-    data = promote(x...)
-    return Z2CliffordNumber{P,Q,eltype(data),L}(data)
-end
-
-Z2CliffordNumber{P,Q}(x::Vararg{BaseNumber,L}) where {P,Q,L} = Z2CliffordNumber{P,Q}(x)
-
 const EvenCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{false,Q,T,L}
 const OddCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{true,Q,T,L}
 
-#---Convert scalars to even Clifford numbers-------------------------------------------------------#
+#---Constructors-----------------------------------------------------------------------------------#
 
-function EvenCliffordNumber{Q,T,L}(x::BaseNumber) where {Q,T,L}
-    return EvenCliffordNumber{Q,T,L}(ntuple(i -> T(isone(i) * x), Val(L)))
+function Z2CliffordNumber{P,Q,T}(x::Tuple{Vararg{BaseNumber,L}}) where {P,Q,T,L}
+    return Z2CliffordNumber{P,Q,T,L}(x)
 end
 
-EvenCliffordNumber{Q,T}(x::BaseNumber) where {Q,T} = EvenCliffordNumber{Q,T,div(elements(Q), 2)}(x)
-EvenCliffordNumber{Q}(x::T) where {Q,T<:BaseNumber} = EvenCliffordNumber{Q,T,div(elements(Q), 2)}(x)
+Z2CliffordNumber{P,Q}(x::Tuple{Vararg{T}}) where {P,Q,T<:BaseNumber} = Z2CliffordNumber{P,Q,T}(x)
+
+# Automatically convert arguments to a common type
+function Z2CliffordNumber{P,Q}(x::Tuple{Vararg{BaseNumber}}) where {P,Q}
+    return Z2CliffordNumber{P,Q}(promote(x...))
+end
+
+# Allow varargs arguments
+(::Type{T})(x::Vararg{BaseNumber}) where {P,Q,T<:Z2CliffordNumber{P,Q}} = T(x)
+
+# Convert real/complex numbers to CliffordNumber
+(::Type{T})(x::BaseNumber) where {T<:Z2CliffordNumber} = T(ntuple(i -> x*isone(i), Val(length(T))))
 
 #---Number of elements-----------------------------------------------------------------------------#
 

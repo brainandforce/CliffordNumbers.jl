@@ -37,3 +37,13 @@ end
     @test_throws InexactError oneunit(KVector{3,APS})
     @test_throws InexactError oneunit(OddCliffordNumber{APS})
 end
+
+@testset "Constructors" begin
+    @test CliffordNumber{APS}(1337) === CliffordNumber{APS}(1337, 0, 0, 0, 0, 0, 0, 0)
+    @test EvenCliffordNumber{APS}(1337) === EvenCliffordNumber{APS}(1337, 0, 0, 0)
+    # Mixed types in input
+    @test CliffordNumber{APS}(0.0, 0, 0, 0, 0, 0, 0, 0) === zero(CliffordNumber{APS,Float64})
+    @test CliffordNumber{APS}(0, 0, 0, 0, 0, 0, 0, 0.0) === zero(CliffordNumber{APS,Float64})
+    @test EvenCliffordNumber{APS}(0.0, 0, 0, 0) === zero(EvenCliffordNumber{APS,Float64})
+    @test EvenCliffordNumber{APS}(0, 0, 0, 0.0) === zero(EvenCliffordNumber{APS,Float64})
+end
