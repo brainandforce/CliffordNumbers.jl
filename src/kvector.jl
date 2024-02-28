@@ -60,7 +60,6 @@ end
 
 #---Generating multiplicative identities for arbitrary types---------------------------------------#
 
-Base.oneunit(C::Type{<:AbstractCliffordNumber{Q}}) where Q = KVector{0,Q}(numeric_type(C)(true))
 Base.one(C::Type{<:AbstractCliffordNumber{Q}}) where Q = KVector{0,Q}(numeric_type(C)(true))
 
 #---Similar types----------------------------------------------------------------------------------#

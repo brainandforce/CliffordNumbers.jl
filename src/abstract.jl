@@ -58,11 +58,16 @@ numeric_type(x) = numeric_type(typeof(x))
 Base.Tuple(x::AbstractCliffordNumber) = getfield(x, :data)::Tuple
 
 #---Zero multivectors------------------------------------------------------------------------------#
-import Base: zero
+import Base: zero, oneunit
 
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
 zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
 zero(x::AbstractCliffordNumber) = zero(typeof(x))
+
+# The default defintion assumes oneunit(T) = T(one(x))
+# But this doesn't work here, because T(one(x)) doesn't do any error checking
+# Only the explicit conversion does the error checking
+oneunit(::Union{T,Type{T}}) where T<:AbstractCliffordNumber = convert(T, one(T))
 
 #---Construct similar types------------------------------------------------------------------------#
 import Base.similar
