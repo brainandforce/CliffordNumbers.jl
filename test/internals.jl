@@ -30,6 +30,8 @@ end
 
 @testset "Type relations" begin
     @test CliffordNumber <: AbstractCliffordNumber
+    @test EvenCliffordNumber <: AbstractCliffordNumber
+    @test OddCliffordNumber <: AbstractCliffordNumber
     @test KVector <: AbstractCliffordNumber
 end
 

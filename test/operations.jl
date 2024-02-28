@@ -66,4 +66,15 @@ end
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exp(pi/2 * k)
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exppi(1//2 * k)
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exptau(1//4 * k)
+    # Integer exponentiation of a multivector
+    k1 = KVector{1,APS}(4, 2, 0)
+    k2 = KVector{2,APS}(0, 6, 9)
+    @test k1^2 isa CliffordNumber
+    @test k2^2 isa EvenCliffordNumber
+    @test k1^0 == one(k1)
+    @test k1^1 == k1
+    @test k1^2 == k1 * k1
+    @test k2^0 == one(k2)
+    @test k2^1 == k2
+    @test k2^2 == k2 * k2
 end
