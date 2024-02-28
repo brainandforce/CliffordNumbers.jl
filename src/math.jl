@@ -495,6 +495,8 @@ end
 sandwich(x::BaseNumber, ::CliffordNumber) = x
 
 #---Exponentials-----------------------------------------------------------------------------------#
+import Base: exp
+
 """
     CliffordNumbers.intlog2(x::Real) -> Int
 
@@ -555,7 +557,7 @@ For special cases where m squares to a scalar, the following shortcuts can be us
 
 See also: [`exppi`](@ref), [`exptau`](@ref).
 """
-function Base.exp(x::AbstractCliffordNumber)
+function exp(x::AbstractCliffordNumber)
     T = exponential_type(x)
     sq = x*x
     if isscalar(sq)
