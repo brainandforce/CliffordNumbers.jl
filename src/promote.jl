@@ -50,7 +50,7 @@ end
     if xor(iseven(K1), iseven(K2))
         return :(CliffordNumber{Q,promote_type(T1,T2),elements(Q)})
     else
-        return :(Z2CliffordNumber{iseven(K1),Q,promote_type(T1,T2),div(elements(Q),2)})
+        return :(Z2CliffordNumber{isodd(K1),Q,promote_type(T1,T2),div(elements(Q),2)})
     end
 end
 
