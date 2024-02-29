@@ -154,9 +154,8 @@ products derived from the geometric product.
     b::BitIndex{Q},
     condition::Bool = true
 ) where {Q,C<:AbstractCliffordNumber{Q}}
-    inds = BitIndices(C)
-    coeff = x[a] * y[b] * sign_of_mult(a,b) * condition
-    return C(ntuple(i -> coeff * (inds[i] == abs(a*b)), Val(length(C))))
+    coeff = (@inbounds x[a]) * (@inbounds y[b]) * sign_of_mult(a,b) * condition
+    return C(ntuple(i -> coeff * (@inbounds(BitIndices(C)[i]) == abs(a*b)), Val(length(C))))
 end
 
 @inline function elementwise_product(
@@ -198,7 +197,7 @@ Sums the products of each pair of nonzero basis blades of `x` and `y`. This can 
 implement various products by supplying a function `f` which acts on the indices of `x` and `y` to
 return a `Bool`, and the product of the basis blades is excluded if it evaluates to `true`.
 """
-function product_kernel(
+@inline function product_kernel(
     ::Type{T},
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
@@ -219,11 +218,11 @@ end
 Calculates the geometric product of `x` and `y`, returning the smallest type which is able to
 represent all nonzero basis blades of the result.
 """
-function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+@inline function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return product_kernel(geometric_product_type(typeof(x), typeof(y)), x, y)
 end
 
-(x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q}) where Q = x * y
+@inline (x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q}) where Q = x * y
 
 #---Scalar products--------------------------------------------------------------------------------#
 """
@@ -283,7 +282,7 @@ argument is `Val(false)`, and the dot product is calculated for any other `Val`.
 In general, code should never refer to this method directly; use `left_contraction`,
 `right_contraction`, or `dot` if needed.
 """
-function contraction(
+@inline function contraction(
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
     ::Val{B}
@@ -374,15 +373,15 @@ Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with qu
 Note that the wedge product, in general, is *not* equal to the commutator product (or antisymmetric
 product), which may be invoked with the `commutator` function or the `×` operator.
 """
-function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+@inline function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     T = wedge_product_type(typeof(x), typeof(y))
     return product_kernel(T, x, y, has_wedge)
 end
 
-wedge(x::Real, y::AbstractCliffordNumber) = x * y
-wedge(x::AbstractCliffordNumber, y::Real) = x * y
+@inline wedge(x::Real, y::AbstractCliffordNumber) = x * y
+@inline wedge(x::AbstractCliffordNumber, y::Real) = x * y
 
-wedge(x::BaseNumber, y::BaseNumber) = x * y
+@inline wedge(x::BaseNumber, y::BaseNumber) = x * y
 
 const ∧ = wedge
 

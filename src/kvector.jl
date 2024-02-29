@@ -56,7 +56,7 @@ end
 function Base.getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
     # Indices with mismatched grades are always zero
     i = findfirst(isequal(abs(b)), BitIndices(typeof(k)))
-    return k.data[ifelse(isnothing(i), 1, i)] * sign(b) * (grade(b) === K)
+    return (@inbounds k.data[ifelse(isnothing(i), 1, i)]) * sign(b) * (grade(b) === K)
 end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
