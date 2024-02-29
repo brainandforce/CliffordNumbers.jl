@@ -191,26 +191,12 @@ end
         ::Type{T},
         x::AbstractCliffordNumber{Q},
         y::AbstractCliffordNumber{Q},
-        f = ((a,b) -> true)
+        [f = ((a,b) -> true)]
     )
 
-Leverages `CliffordNumbers.elementwise_product` to calculate a geometric product in a 
-
-The optional function `f` is a condition used to exclude elementwise products whose associated
-`BitIndex{Q}` objects `a` and `b` do not meet a specific criterion. This function must always
-evaluate to a `Bool`. By default, it evaluates to `true` every time.
-
-# Why not simply use `sum()`?
-
-It appears that `sum()` is unable to correctly infer the type of the result of an expression like
-the one given below:
-```julia
-sum(
-    elementwise_product(T, x, y, a, b)
-    for (a,b) in Iterators.filter(f, Iterators.product(BitIndices(x), BitIndices(y)))
-)
-```
-Therefore, it is manually implemented in a `for` loop.
+Sums the products of each pair of nonzero basis blades of `x` and `y`. This can be used to to
+implement various products by supplying a function `f` which acts on the indices of `x` and `y` to
+return a `Bool`, and the product of the basis blades is excluded if it evaluates to `true`.
 """
 function product_kernel(
     ::Type{T},
@@ -218,9 +204,10 @@ function product_kernel(
     y::AbstractCliffordNumber{Q},
     f = ((a,b) -> true)
 ) where {Q,T<:AbstractCliffordNumber{Q}}
+    # Tested against sum(); this is slightly better
     result = zero(T)
     for a in BitIndices(x), b in BitIndices(y)
-        result += elementwise_product(T, x, y, a, b, f(a,b))
+        result += elementwise_product(T, x, y, a, b, f(a,b)::Bool)
     end
     return result
 end
