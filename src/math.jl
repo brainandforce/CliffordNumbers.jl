@@ -185,6 +185,13 @@ end
     end
 end
 
+# Needs to be a separate function to maintain type stability
+function raw_tuple_add(::Type{C}, data::NTuple{L}, x, b) where {C,L}
+    return ntuple(Val{L}()) do i
+        convert(numeric_type(C), muladd((@inbounds BitIndices(C)[i]).blade == b.blade, x, data[i]))
+    end
+end
+
 """
     CliffordNumbers.product_kernel(
         ::Type{T},
@@ -197,6 +204,7 @@ Sums the products of each pair of nonzero basis blades of `x` and `y`. This can 
 implement various products by supplying a function `f` which acts on the indices of `x` and `y` to
 return a `Bool`, and the product of the basis blades is excluded if it evaluates to `true`.
 """
+#=
 @inline function product_kernel(
     ::Type{T},
     x::AbstractCliffordNumber{Q},
@@ -209,6 +217,20 @@ return a `Bool`, and the product of the basis blades is excluded if it evaluates
         result += elementwise_product(T, x, y, a, b, f(a,b)::Bool)
     end
     return result
+end
+=#
+@inline function product_kernel(
+    ::Type{C},
+    x::AbstractCliffordNumber{Q},
+    y::AbstractCliffordNumber{Q},
+    f = ((a,b) -> true)
+) where {Q,C<:AbstractCliffordNumber{Q}}
+    data = ntuple(_ -> zero(numeric_type(C)), Val(length(C)))
+    for a in BitIndices(x), b in BitIndices(y)
+        coeff = (@inbounds x[a]) * (@inbounds y[b]) * sign_of_mult(a,b) * f(a,b)::Bool
+        data = raw_tuple_add(C, data, coeff, a*b)
+    end
+    return C(data)
 end
 
 """
