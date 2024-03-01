@@ -6,6 +6,9 @@
     @test zero(EvenCliffordNumber{APS}) == EvenCliffordNumber{APS,Bool}(0, 0, 0, 0)
     @test zero(OddCliffordNumber{APS}) == OddCliffordNumber{APS,Bool}(0, 0, 0, 0)
     @test zero(CliffordNumber{APS}) == CliffordNumber{APS,Bool}(0, 0, 0, 0, 0, 0, 0, 0)
+    @test zero(EvenCliffordNumber{APS,Int}) === EvenCliffordNumber{APS,Int}(0, 0, 0, 0)
+    @test zero(OddCliffordNumber{APS,Float32}) === OddCliffordNumber{APS,Float32}(0, 0, 0, 0)
+    @test zero(CliffordNumber{APS,BigInt}) == CliffordNumber{APS,BigInt}(0, 0, 0, 0, 0, 0, 0, 0)
 end
 
 @testset "Units" begin
@@ -46,4 +49,20 @@ end
     @test CliffordNumber{APS}(0, 0, 0, 0, 0, 0, 0, 0.0) === zero(CliffordNumber{APS,Float64})
     @test EvenCliffordNumber{APS}(0.0, 0, 0, 0) === zero(EvenCliffordNumber{APS,Float64})
     @test EvenCliffordNumber{APS}(0, 0, 0, 0.0) === zero(EvenCliffordNumber{APS,Float64})
+    @test KVector{1,APS}(0, 0.0, 0) === zero(KVector{1,APS,Float64})
+end
+
+@testset "Similar types" begin
+    import CliffordNumbers.similar_type
+    @test similar(CliffordNumber{APS}, Int, VGA(2)) isa CliffordNumber{VGA(2),Int}
+    @test similar(EvenCliffordNumber{APS}, Int) isa EvenCliffordNumber{APS,Int}
+end
+
+@testset "Scalar types" begin
+    @test numeric_type(Int) === Int
+    @test numeric_type(ComplexF16) === ComplexF16
+    @test numeric_type(Int(420)) === Int
+    @test numeric_type(ComplexF16(69)) === ComplexF16
+    @test numeric_type(CliffordNumber{APS,Float64,8}) === Float64
+    @test numeric_type(zero(OddCliffordNumber{APS,Int})) === Int
 end

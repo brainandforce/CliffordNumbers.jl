@@ -31,3 +31,13 @@ end
     @test RepresentedGrades(KVector{2,APS})[0:3] == [false, false, true, false]
     @test RepresentedGrades(CliffordNumber{APS})[0:3] == trues(4)
 end
+
+@testset "Printing/display" begin
+    import CliffordNumbers.short_typename
+    @test short_typename(zero(CliffordNumber{APS,Float64,8})) === CliffordNumber{APS,Float64}
+    @test short_typename(zero(CliffordNumber{APS,Float64})) === CliffordNumber{APS,Float64}
+    @test short_typename(zero(EvenCliffordNumber{APS,Int,4})) === EvenCliffordNumber{APS,Int}
+    @test short_typename(zero(OddCliffordNumber{APS,Int})) === OddCliffordNumber{APS,Int}
+    @test short_typename(zero(KVector{1,APS,Bool,3})) === KVector{1,APS,Bool}
+    @test short_typename(zero(KVector{2,APS,Bool})) === KVector{2,APS,Bool}
+end
