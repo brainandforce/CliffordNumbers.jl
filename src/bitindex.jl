@@ -94,7 +94,7 @@ BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
 
 #---Show method------------------------------------------------------------------------------------#
 
-function Base.show(io::IO, b::BitIndex{Q}) where Q
+function show(io::IO, b::BitIndex{Q}) where Q
     print(io, "-"^signbit(b), BitIndex, "(", Q, iszero(UInt(b)) ? ")" : ", ")
     iszero(UInt(b)) && return nothing
     found_first_vector = false
@@ -110,11 +110,11 @@ end
 
 #---Other useful functions-------------------------------------------------------------------------#
 
-Base.signbit(i::BitIndex) = !iszero(UInt(i) & signmask(UInt))
-Base.sign(i::BitIndex) = Int8(-1)^signbit(i)
+signbit(i::BitIndex) = !iszero(UInt(i) & signmask(UInt))
+sign(i::BitIndex) = Int8(-1)^signbit(i)
 
-Base.:-(i::BitIndex) = typeof(i)(xor(signmask(UInt), UInt(i)))
-Base.abs(i::BitIndex) = typeof(i)(UInt(i) & ~signmask(UInt))
+-(i::BitIndex) = typeof(i)(xor(signmask(UInt), UInt(i)))
+abs(i::BitIndex) = typeof(i)(UInt(i) & ~signmask(UInt))
 
 grade(i::BitIndex) = count_ones(UInt(i) & ~signmask(UInt))
 
@@ -151,7 +151,7 @@ Performs the reverse operation on the basis blade indexed by `b` or the Clifford
 sign of the reverse depends on the grade, and is positive for `g % 4 in 0:1` and negative for
 `g % 4 in 2:3`.
 """
-Base.reverse(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i) & 2)), UInt(i))
+reverse(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i) & 2)), UInt(i))
 
 """
     grade_involution(i::BitIndex) -> BitIndex
@@ -170,7 +170,7 @@ grade_involution(i::BitIndex) = typeof(i)(xor(signbit(i), isodd(grade(i))), UInt
 Calculates the Clifford conjugate of the basis blade indexed by `b` or the Clifford number `x`. This
 is equal to `grade_involution(reverse(x))`.
 """
-Base.conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i)+1 & 2)), UInt(i))
+conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i)+1 & 2)), UInt(i))
 
 #---Multiplication tools---------------------------------------------------------------------------#
 """
@@ -240,7 +240,7 @@ sign_of_mult(i) = sign_of_mult(i,i)
 Returns the `BitIndex` corresponding to the basis blade resulting from the geometric product of the
 basis blades indexed by `a` and `b`.
 """
-Base.:*(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(UInt(a), UInt(b)))
+*(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(UInt(a), UInt(b)))
 
 """
     CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) -> Bool

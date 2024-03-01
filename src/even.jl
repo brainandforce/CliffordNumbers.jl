@@ -47,28 +47,28 @@ end
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-Base.length(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(elements(Q), 2)
-Base.length(x::Z2CliffordNumber) = length(typeof(x))
+length(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(elements(Q), 2)
+length(x::Z2CliffordNumber) = length(typeof(x))
 
 nonzero_grades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = P:2:dimension(Q)
 
 #---Indexing---------------------------------------------------------------------------------------#
 
-function Base.getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
+function getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
     @boundscheck checkbounds(b, i)
     n = number_of_parity(i, P)
     return BitIndex{Q}(signbit(n), unsigned(n))
 end
 
-Base.to_index(::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
+to_index(::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
 
-function Base.getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
-    return sign(b) * (@inbounds x.data[Base.to_index(x, b)]) * xor(iseven(grade(b)), P)
+function getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
+    return sign(b) * (@inbounds x.data[to_index(x, b)]) * xor(iseven(grade(b)), P)
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#
 
-Base.one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
+one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 

@@ -10,11 +10,11 @@ end
 
 #---Specialized conversion methods for certain representations and signatures----------------------#
 
-function Base.convert(::Type{T}, x::AbstractCliffordNumber{QFComplex,<:Real}) where T<:BaseNumber
+function convert(::Type{T}, x::AbstractCliffordNumber{QFComplex,<:Real}) where T<:BaseNumber
     return convert(T, x[scalar_index(x)] + x[pseudoscalar_index(x)] * im)
 end
 
-function Base.convert(::Type{T}, z::Complex) where T<:AbstractCliffordNumber{QFComplex,<:Real}
+function convert(::Type{T}, z::Complex) where T<:AbstractCliffordNumber{QFComplex,<:Real}
     return convert(T, CliffordNumber{QFComplex}(real(z), imag(z)))
 end
 

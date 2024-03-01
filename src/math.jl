@@ -33,13 +33,13 @@ ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
 
 #---Equality---------------------------------------------------------------------------------------#
 
-function Base.:(==)(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+function ==(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return all(x[i] == y[i] for i in BitIndices(promote_type(typeof(x), typeof(y))))
 end
 
 # Define equality with scalar values in terms of scalar operations above
-Base.:(==)(x::AbstractCliffordNumber, y::BaseNumber) = isscalar(x) && (scalar(x) == y)
-Base.:(==)(x::BaseNumber, y::AbstractCliffordNumber) = isscalar(y) && (x == scalar(y))
+==(x::AbstractCliffordNumber, y::BaseNumber) = isscalar(x) && (scalar(x) == y)
+==(x::BaseNumber, y::AbstractCliffordNumber) = isscalar(y) && (x == scalar(y))
 
 #---Grade selection--------------------------------------------------------------------------------#
 """
@@ -66,7 +66,7 @@ for f in (:reverse, :grade_involution, :conj)
     end
 end
 
-Base.:~(x::AbstractCliffordNumber) = reverse(x)
+~(x::AbstractCliffordNumber) = reverse(x)
 
 #---Addition, negation, and subtraction------------------------------------------------------------#
 
@@ -258,14 +258,14 @@ end
 
 Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
 """
-Base.abs2(x::AbstractCliffordNumber) = scalar_product(x, ~x)
+abs2(x::AbstractCliffordNumber) = scalar_product(x, ~x)
 
 """
     abs2(x::CliffordNumber{Q,T}) -> Union{Real,Complex}
 
 Calculates the norm of `x`, equal to `sqrt(scalar_product(x, ~x))`.
 """
-Base.abs(x::AbstractCliffordNumber) = sqrt(abs2(x))
+abs(x::AbstractCliffordNumber) = sqrt(abs2(x))
 
 """
     normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}

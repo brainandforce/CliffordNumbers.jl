@@ -21,7 +21,7 @@ grades(Q::Type{<:QuadraticForm}) = 0:dimension(Q)
 
 Gets the sign associated with dimension `i` of a quadratric form.
 """
-function Base.sign(::Type{QuadraticForm{P,Q,R}}, i::Integer) where {P,Q,R} 
+function sign(::Type{QuadraticForm{P,Q,R}}, i::Integer) where {P,Q,R} 
     return Int8(-1)^(i in P .+ (1:Q)) * !(i in (P + Q) .+ (1:R))
 end
 
@@ -93,6 +93,7 @@ CGA(D) = QuadraticForm{D+1,1,0}
 
 #---Show methods for special quadratic forms-------------------------------------------------------#
 
+# Module prefix is left here just to avoid some incorrect warnings with VS Code extension
 Base.show(io::IO, ::Type{VGA(D)}) where D = print(io, VGA, "($D)")
 Base.show(io::IO, ::Type{PGA(D)}) where D = print(io, PGA, "($D)")
 Base.show(io::IO, ::Type{QuadraticForm{D,1,0}}) where D = print(io, CGA, "($(D-1))")

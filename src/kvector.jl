@@ -34,7 +34,7 @@ length(x::KVector) = length(typeof(x))
 
 #---Indexing---------------------------------------------------------------------------------------#
 
-Base.size(::BitIndices{Q,<:KVector{K}}) where {Q,K} = tuple(length(KVector{K,Q}))
+size(::BitIndices{Q,<:KVector{K}}) where {Q,K} = tuple(length(KVector{K,Q}))
 
 """
     grade(::Type{<:KVector{K}}) = K
@@ -47,25 +47,25 @@ grade(x::KVector) = grade(typeof(x))
 
 nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 
-function Base.getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
+function getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
     @boundscheck checkbounds(b, i)
     return BitIndex{Q}(signbit(i-1), unsigned(hamming_number(K, i)))
 end
 
-function Base.to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
+function to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
     i = findfirst(a -> is_same_blade(a, b), BitIndices(k))
     # Default to 1 as an index that's always valid
     return ifelse(isnothing(i), 1, i)
 end
 
-function Base.getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
-    return (@inbounds k.data[Base.to_index(k, b)]) * sign(b) * (grade(b) === K)
+function getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
+    return (@inbounds k.data[to_index(k, b)]) * sign(b) * (grade(b) === K)
 end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
 
-Base.one(C::Type{Q}) where Q<:QuadraticForm = KVector{0,Q}(numeric_type(C)(true))
-Base.one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(Q)
+one(C::Type{Q}) where Q<:QuadraticForm = KVector{0,Q}(numeric_type(C)(true))
+one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(Q)
 
 pseudoscalar(::Type{Q}) where Q<:QuadraticForm = KVector{dimension(Q),Q}(true)
 

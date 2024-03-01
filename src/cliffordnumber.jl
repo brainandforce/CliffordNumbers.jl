@@ -46,19 +46,19 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 
 #---Clifford number indexing-----------------------------------------------------------------------#
 
-function Base.getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
-    return sign(b) * (@inbounds x.data[Base.to_index(x, b)])
+to_index(::CliffordNumber{Q}, i::BitIndex{Q}) where Q = (Int(i) % elements(Q) + 1)
+
+function getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
+    return sign(b) * (@inbounds x.data[to_index(x, b)])
 end
 
-Base.to_index(::CliffordNumber{Q}, i::BitIndex{Q}) where Q = (Int(i) % elements(Q) + 1)
-
-function Base.getindex(x::CliffordNumber{Q}, b::GenericBitIndex) where Q
-    return sign(b) * x.data[Base.to_index(x, b)]
+function getindex(x::CliffordNumber{Q}, b::GenericBitIndex) where Q
+    return sign(b) * x.data[to_index(x, b)]
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#
 
-Base.one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
+one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 

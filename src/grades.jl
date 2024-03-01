@@ -19,8 +19,8 @@ end
 RepresentedGrades(x::AbstractCliffordNumber) = RepresentedGrades{typeof(x)}()
 RepresentedGrades(C::Type{<:AbstractCliffordNumber}) = RepresentedGrades(zero(C))
 
-Base.size(::RepresentedGrades{C}) where C = tuple(dimension(QuadraticForm(C)) + 1)
-Base.axes(::RepresentedGrades{C}) where C = tuple(0:dimension(QuadraticForm(C)))
+size(::RepresentedGrades{C}) where C = tuple(dimension(QuadraticForm(C)) + 1)
+axes(::RepresentedGrades{C}) where C = tuple(0:dimension(QuadraticForm(C)))
 
 """
     nonzero_grades(::Type{<:AbstractCliffordNumber})
@@ -46,7 +46,7 @@ nonzero_grades(x::Number) = nonzero_grades(typeof(x))
 # TODO: define for Complex?
 nonzero_grades(::Type{<:Real}) = 0:0
 
-function Base.getindex(r::RepresentedGrades{C}, i::Integer) where C
+function getindex(r::RepresentedGrades{C}, i::Integer) where C
     @boundscheck checkbounds(r, i)
     return i in nonzero_grades(C)
 end

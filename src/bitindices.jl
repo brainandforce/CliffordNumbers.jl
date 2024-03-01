@@ -8,18 +8,18 @@ by `C`.
 abstract type AbstractBitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractVector{BitIndex{Q}}
 end
 
-Base.size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(length(C))
-Base.size(b::AbstractBitIndices) = size(typeof(b))
+size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(length(C))
+size(b::AbstractBitIndices) = size(typeof(b))
 
 #---Broadcasting-----------------------------------------------------------------------------------#
 
 #=
-struct BitIndicesStyle{Q,C<:AbstractCliffordNumber{Q}} <: Base.Broadcast.AbstractArrayStyle{1}
+struct BitIndicesStyle{Q,C<:AbstractCliffordNumber{Q}} <: Broadcast.AbstractArrayStyle{1}
 end
 
-Base.Broadcast.BroadcastStyle(::Type{<:AbstractBitIndices{Q,C}}) = BitIndicesStyle{Q,C}()
-Base.Broadcast.BroadcastStyle(::BitIndicesStyle, s::Base.Broadcast.DefaultArrayStyle) = s
-Base.Broadcast.BroadcastStyle(s::Base.Broadcast.DefaultArrayStyle, ::BitIndicesStyle) = s
+Broadcast.BroadcastStyle(::Type{<:AbstractBitIndices{Q,C}}) = BitIndicesStyle{Q,C}()
+Broadcast.BroadcastStyle(::BitIndicesStyle, s::Broadcast.DefaultArrayStyle) = s
+Broadcast.BroadcastStyle(s::Broadcast.DefaultArrayStyle, ::BitIndicesStyle) = s
 =#
 
 #---Clifford number iteration----------------------------------------------------------------------#
@@ -65,7 +65,7 @@ BitIndices(x) = BitIndices{QuadraticForm(x)}(x)
 
 # TODO: more efficient defintion of equality
 
-function Base.getindex(b::BitIndices{Q}, i::Integer) where Q
+function getindex(b::BitIndices{Q}, i::Integer) where Q
     @boundscheck checkbounds(b, i)
     return BitIndex{Q}(signbit(i-1), unsigned(i-1))
 end
@@ -91,16 +91,16 @@ TransformedBitIndices{Q,C}(f) where {Q,C} = TransformedBitIndices{Q,C,typeof(f)}
 TransformedBitIndices(f, ::BitIndices{Q,C}) where {Q,C} = TransformedBitIndices{Q,C}(f)
 TransformedBitIndices(f, x) = TransformedBitIndices(f, BitIndices(x))
 
-function Base.getindex(b::TransformedBitIndices{Q,C}, i::Integer) where {Q,C}
+function getindex(b::TransformedBitIndices{Q,C}, i::Integer) where {Q,C}
     @boundscheck checkbounds(b, i)
     return b.f(BitIndices{Q,C}()[i])
 end
 
 #---Broadcasting implementation--------------------------------------------------------------------#
 
-Base.Broadcast.broadcasted(f, b::BitIndices) = TransformedBitIndices(f, b)
+Broadcast.broadcasted(f, b::BitIndices) = TransformedBitIndices(f, b)
 
-function Base.Broadcast.broadcasted(f, b::TransformedBitIndices{Q,C}) where {Q,C}
+function Broadcast.broadcasted(f, b::TransformedBitIndices{Q,C}) where {Q,C}
     return TransformedBitIndices{Q,C}(x -> f(b.f(x)))
 end
 
@@ -117,7 +117,7 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
 
 #---Indexing an AbstractCliffordNumber with BitIndices of a type-----------------------------------#
 
-function Base.getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C}) where {Q,C}
+function getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C}) where {Q,C}
     data = ntuple(i -> x[b[i]], Val(length(C)))
     return similar_type(C, numeric_type(x))(data)
 end

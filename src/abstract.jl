@@ -125,10 +125,10 @@ dependent type parameters; often this includes the length parameter.
 """
 short_typename(x::AbstractCliffordNumber) = short_typename(typeof(x))
 
-function Base.show(io::IO, x::AbstractCliffordNumber)
+function show(io::IO, x::AbstractCliffordNumber)
     print(io, short_typename(x), (isone(length(x)) ? string('(', only(Tuple(x)), ')') : Tuple(x)))
 end
 
-function Base.summary(io::IO, x::AbstractCliffordNumber)
+function summary(io::IO, x::AbstractCliffordNumber)
     println(io, length(x), "-element ", short_typename(x), ":")
 end
