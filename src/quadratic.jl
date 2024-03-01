@@ -11,7 +11,7 @@ end
 
 dimension(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (P + Q + R)
 isdegenerate(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = !iszero(R)
-iseuclidean(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (iszero(P) && iszero(Q))
+iseuclidean(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (iszero(Q) && iszero(R))
 
 elements(Q::Type{<:QuadraticForm}) = 2^dimension(Q)
 grades(Q::Type{<:QuadraticForm}) = 0:dimension(Q)
