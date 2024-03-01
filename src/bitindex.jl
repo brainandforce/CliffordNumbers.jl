@@ -24,7 +24,8 @@ function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
     return BitIndex{Q}(UInt(blade % elements(Q)) | signmask(UInt, signbit))
 end
 
-UInt(i::BitIndex) = getfield(i, :i)
+Base.UInt(i::BitIndex) = getfield(i, :i)
+Base.Int(i::BitIndex) = Int(UInt(i) & ~signmask(Int))
 
 const GenericBitIndex = BitIndex{QuadraticForm}
 

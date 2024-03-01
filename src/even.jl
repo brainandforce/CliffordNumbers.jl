@@ -60,8 +60,10 @@ function Base.getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) whe
     return BitIndex{Q}(signbit(n), unsigned(n))
 end
 
+Base.to_index(::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
+
 function Base.getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
-    return sign(b) * (@inbounds x.data[div(UInt(b), 2) + 1]) * xor(iseven(grade(b)), P)
+    return sign(b) * (@inbounds x.data[Base.to_index(x, b)]) * xor(iseven(grade(b)), P)
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#
