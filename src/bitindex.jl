@@ -143,8 +143,6 @@ pseudoscalar_index(::Type{Q}) where Q<:QuadraticForm = BitIndex{Q}(false, typema
 pseudoscalar_index(x) = pseudoscalar_index(QuadraticForm(x))
 
 #---Grade dependent sign inversion-----------------------------------------------------------------#
-import Base: reverse, conj
-
 """
     reverse(i::BitIndex) -> BitIndex
     reverse(x::AbstractCliffordNumber) -> typeof(x)

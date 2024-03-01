@@ -1,5 +1,3 @@
-import Base.convert
-
 # Default conversion should check for exact representability
 function convert(::Type{T}, x::AbstractCliffordNumber{Q}) where {Q,T<:AbstractCliffordNumber{Q}}
     has_grades_of(x, T) && return T(x)::T

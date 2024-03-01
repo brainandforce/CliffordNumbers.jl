@@ -69,7 +69,6 @@ end
 Base.:~(x::AbstractCliffordNumber) = reverse(x)
 
 #---Addition, negation, and subtraction------------------------------------------------------------#
-import Base: +, -
 
 +(x::T, y::T) where T<:AbstractCliffordNumber = T(Tuple(x) .+ Tuple(y))
 
@@ -106,11 +105,7 @@ end
 # TODO: is it more efficient to define some more specific methods for some types?
 
 #---Scalar multiplication--------------------------------------------------------------------------#
-import Base.:*
-import Base.:/
-import Base.://
 
-# These all have the same structure
 for op in (:*, :/, ://)
     @eval begin
        function $op(x::AbstractCliffordNumber, y::BaseNumber)
@@ -127,8 +122,6 @@ end
 (x::AbstractCliffordNumber)(y::BaseNumber) = x * y
 
 #---Geometric product-----------------------------------------------------------------------------#
-import Base.:*
-
 """
     CliffordNumbers.elementwise_product(
         [::Type{C},]
@@ -511,8 +504,6 @@ end
 sandwich(x::BaseNumber, ::CliffordNumber) = x
 
 #---Exponentials-----------------------------------------------------------------------------------#
-import Base: exp, ^
-
 """
     CliffordNumbers.exponential_type(::Type{<:AbstractCliffordNumber})
     CliffordNumbers.exponential_type(x::AbstractCliffordNumber)

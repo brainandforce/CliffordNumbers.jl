@@ -1,5 +1,3 @@
-import Base.promote_rule
-
 # Inspired by Base.promote_eltype in Julia Base
 """
     promote_numeric_type(x, y)

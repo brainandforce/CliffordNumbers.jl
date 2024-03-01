@@ -58,8 +58,6 @@ numeric_type(x) = numeric_type(typeof(x))
 Base.Tuple(x::AbstractCliffordNumber) = getfield(x, :data)::Tuple
 
 #---Additive and multiplicative identities---------------------------------------------------------#
-import Base: zero, oneunit
-
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
 zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
 zero(x::AbstractCliffordNumber) = zero(typeof(x))
@@ -70,8 +68,6 @@ zero(x::AbstractCliffordNumber) = zero(typeof(x))
 oneunit(::Union{T,Type{T}}) where T<:AbstractCliffordNumber = convert(T, one(T))
 
 #---Construct similar types------------------------------------------------------------------------#
-import Base.similar
-
 """
     CliffordNumbers.similar_type(
         C::Type{<:AbstractCliffordNumber},

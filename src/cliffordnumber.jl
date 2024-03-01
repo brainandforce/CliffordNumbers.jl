@@ -34,8 +34,6 @@ CliffordNumber{Q}(x::Tuple{Vararg{BaseNumber}}) where Q = CliffordNumber{Q}(prom
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-import Base.length
-# This is equal to the `L` parameter
 length(::Type{<:CliffordNumber{Q}}) where Q = elements(Q)
 length(m::CliffordNumber) = length(typeof(m))
 

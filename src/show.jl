@@ -1,4 +1,3 @@
-
 #---Pretty printing methods for exported types-----------------------------------------------------#
 """
     CliffordNumbers.subscript_string(x::Number) -> String

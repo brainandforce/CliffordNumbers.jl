@@ -27,7 +27,6 @@ KVector{K,Q}(x::Tuple{Vararg{BaseNumber}}) where {K,Q} = KVector{K,Q}(promote(x.
 (::Type{T})(x::Vararg{BaseNumber}) where T<:KVector = T(x)
 
 #---Number of elements-----------------------------------------------------------------------------#
-import Base: length
 
 length(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L} = L
 length(::Type{<:KVector{K,Q}}) where {K,Q} = binomial(dimension(Q), K)
