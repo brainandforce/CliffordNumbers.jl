@@ -44,7 +44,7 @@ function to_basis_str(b::BitIndex{Q}; label = nothing, pseudoscalar = nothing) w
         end
     end
     return join(
-        (label * subscript_string(n+1))^!iszero(2^n & b.blade) for n in 0:(dimension(Q) - 1)
+        (label * subscript_string(n+1))^!iszero(2^n & UInt(b)) for n in 0:(dimension(Q) - 1)
     )
 end
 

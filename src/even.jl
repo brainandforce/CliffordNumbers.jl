@@ -61,7 +61,7 @@ function Base.getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) whe
 end
 
 function Base.getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
-    return sign(b) * (@inbounds x.data[div(b.blade, 2) + 1]) * xor(isevil(b.blade), P)
+    return sign(b) * (@inbounds x.data[div(UInt(b), 2) + 1]) * xor(iseven(grade(b)), P)
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#

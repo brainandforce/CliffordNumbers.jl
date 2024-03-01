@@ -54,7 +54,7 @@ select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (count_ones(
 
 Return the real (scalar) portion of a real Clifford number. 
 """
-Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = x[BitIndex{Q}()]
+Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = scalar(x)
 
 #---Sign changing operations-----------------------------------------------------------------------#
 
@@ -188,7 +188,8 @@ end
 # Needs to be a separate function to maintain type stability
 function raw_tuple_add(::Type{C}, data::NTuple{L}, x, b) where {C,L}
     return ntuple(Val{L}()) do i
-        convert(numeric_type(C), muladd((@inbounds BitIndices(C)[i]).blade == b.blade, x, data[i]))
+        a = @inbounds BitIndices(C)[i]
+        convert(numeric_type(C), muladd(abs(a) == abs(b), x, data[i]))
     end
 end
 

@@ -1,11 +1,12 @@
 """
-    CliffordNumbers.signmask(T::Type{<:Integer}, signbit::Bool = true) -> T1
+    CliffordNumbers.signmask([T::Type{<:Integer} = UInt], [signbit::Bool = true]) -> T
 
 Generates a signmask, or a string of bits where the only 1 bit is the sign bit. If `signbit` is set
-to false, this returns a string of bits.
+to false, this returns zero (or whatever value is represented by all bits being 0).
 """
 signmask(T::Type{<:Integer}, signbit::Bool = true) = bitreverse(T(signbit))
 signmask(x::Integer, signbit::Bool = true) = bitreverse(typeof(x)(signbit))
+signmask(signbit::Bool = true) = signmask(UInt, signbit)
 
 """
     BitIndex{Q<:QuadraticForm}
@@ -15,28 +16,19 @@ form `Q`.
 """
 struct BitIndex{Q<:QuadraticForm}
     i::UInt
-    # Construct with the sign bit separately
-    function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
-        x = ifelse(Q === QuadraticForm, signmask(blade), elements(Q))
-        return new((blade % x) | signmask(blade, signbit))
-    end
+    BitIndex{Q}(i::Unsigned) where Q = new(UInt(i % elements(Q)) | (UInt(i) & signmask(i)))
 end
+
+# Construct with the sign bit as a separate argument
+function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
+    return BitIndex{Q}(UInt(blade % elements(Q)) | signmask(UInt, signbit))
+end
+
+UInt(i::BitIndex) = getfield(i, :i)
 
 const GenericBitIndex = BitIndex{QuadraticForm}
 
-#---Properties (defined separately from fields)----------------------------------------------------#
-
-function Base.propertynames(::BitIndex; private=false)
-    return private ? (:i, :signbit, :blade) : (:signbit, :blade)
-end
-
-function Base.getproperty(b::BitIndex, s::Symbol)
-    s === :signbit && return !iszero(getfield(b, :i) & signmask(UInt))
-    s === :blade && return getfield(b, :i) & ~signmask(UInt)
-    return getfield(b, s)
-end
-
-#---Constructor tools------------------------------------------------------------------------------#
+#---Convenience constructors-----------------------------------------------------------------------#
 """
     CliffordNumbers._sort_with_parity!(v::AbstractVector{<:Real}) -> Tuple{typeof(v),Bool}
 
@@ -66,41 +58,47 @@ function _sort_with_parity!(v::AbstractVector{<:Real})
         # Complete the swap of x and y values
         v[j] = x
     end
-    return (v, !iseven(swaps))
+    return (v, isodd(swaps))
 end
 
-function _bitindex!(Q::Type{<:QuadraticForm}, v::AbstractVector{<:Integer})
-    (v, parity) = _sort_with_parity!(v)
-    # Remove pairs of identical elements in v
-    for n in axes(v,1)[2:end]
-        # If we find a pair, set both elements to zero
-        v[n] == v[n-1] && (v[[n,n-1]] .= 0)
+function _sort_with_parity(t::NTuple{L}) where L
+    (v, sign) = _sort_with_parity!(collect(t))
+    return (ntuple(i -> v[i], Val(L)), sign)
+end
+
+function _bitindex(Q::Type{<:QuadraticForm}, t::NTuple)
+    @assert all(in(1:elements(Q)), t) "1-vector indices are between 1 and $(elements(Q))."
+    (t, parity) = _sort_with_parity(t)
+    i = signmask(UInt, parity)
+    for x in t
+        # Pairs of identical elements will be removed with xor
+        i = xor(i, 2^(x-1))
     end
-    return BitIndex{Q}(parity, sum(UInt(2)^(x-1) for x in filter!(!iszero, v); init=UInt(0)))
+    return BitIndex{Q}(i)
 end
 
 """
-    BitIndex{Q}(x::Integer...)
-    BitIndex{Q}(v::AbstractVector{<:Integer})
+    BitIndex(Q::Type{<:QuadraticForm}, i::Integer...)
+    BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
 
-Constructs a `BitIndex{Q}` from a list of integers that represent the basis vectors of the space.
+Constructs a `BitIndex{Q}` from a list of integers that represent the basis 1-vectors of the space.
+`Q` can be determined from the `QuadraticForm` associated with `x`, whether it be a type or object.
 
 This package uses a lexicographic convention for basis blades: in the algebra of physical space, the
 basis bivectors are {e₁e₂, e₁e₃, e₂e₃}. The sign of the `BitIndex{Q}` is negative when the parity of
 the basis vector permutation is odd.
 """
-BitIndex{Q}(x::Integer...) where Q = _bitindex!(Q, collect(x))
-BitIndex{Q}(v::AbstractVector{<:Integer}) where Q = _bitindex!(Q, deepcopy(v))
-
-BitIndex(x) = GenericBitIndex(x)
+BitIndex(::Type{Q}, i::Integer...) where Q<:QuadraticForm = _bitindex(Q, promote(i...))
+BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
 
 #---Show method------------------------------------------------------------------------------------#
 
 function Base.show(io::IO, b::BitIndex{Q}) where Q
-    print(io, "-"^b.signbit, typeof(b), "(")
+    print(io, "-"^signbit(b), BitIndex, "(", Q, iszero(UInt(b)) ? ")" : ", ")
+    iszero(UInt(b)) && return nothing
     found_first_vector = false
-    for a in 1:min(dimension(Q), 8*sizeof(b.i) - 1)
-        if !iszero(b.i & 2^(a-1))
+    for a in 1:min(dimension(Q), 8*sizeof(UInt) - 1)
+        if !iszero(UInt(b) & 2^(a-1))
             found_first_vector && print(io, ", ")
             print(io, a)
             found_first_vector = true
@@ -111,61 +109,61 @@ end
 
 #---Other useful functions-------------------------------------------------------------------------#
 
-Base.signbit(b::BitIndex) = b.signbit
-Base.sign(b::BitIndex) = Int8(-1)^b.signbit
+Base.signbit(i::BitIndex) = !iszero(UInt(i) & signmask(UInt))
+Base.sign(i::BitIndex) = Int8(-1)^signbit(i)
 
-Base.:-(b::BitIndex) = typeof(b)(!b.signbit, b.blade)
-Base.abs(b::BitIndex) = typeof(b)(false, b.blade)
+Base.:-(i::BitIndex) = typeof(i)(xor(signmask(UInt), UInt(i)))
+Base.abs(i::BitIndex) = typeof(i)(UInt(i) & ~signmask(UInt))
 
-grade(b::BitIndex) = count_ones(b.blade)
+grade(i::BitIndex) = count_ones(UInt(i) & ~signmask(UInt))
 
 """
     scalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}()
 
 Constructs the `BitIndex` used to obtain the scalar (grade zero) portion of `x`.
 """
-scalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}()
-scalar_index(x::AbstractCliffordNumber) = scalar_index(typeof(x))
+scalar_index(::Type{Q}) where Q<:QuadraticForm = BitIndex{Q}(false, UInt(0))
+scalar_index(x) = scalar_index(QuadraticForm(x))
 
 """
-    pseudoscalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}()
+    pseudoscalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}
 
 Constructs the `BitIndex` used to obtain the pseudoscalar (highest grade) portion of `x`.
 """
-pseudoscalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}(false, typemax(UInt))
-pseudoscalar_index(x::AbstractCliffordNumber) = pseudoscalar_index(typeof(x))
+pseudoscalar_index(::Type{Q}) where Q<:QuadraticForm = BitIndex{Q}(false, typemax(UInt))
+pseudoscalar_index(x) = pseudoscalar_index(QuadraticForm(x))
 
 #---Grade dependent sign inversion-----------------------------------------------------------------#
 import Base: reverse, conj
 
 """
-    reverse(b::BitIndex) -> BitIndex
+    reverse(i::BitIndex) -> BitIndex
     reverse(x::AbstractCliffordNumber) -> typeof(x)
 
 Performs the reverse operation on the basis blade indexed by `b` or the Clifford number `x`. The 
 sign of the reverse depends on the grade, and is positive for `g % 4 in 0:1` and negative for
 `g % 4 in 2:3`.
 """
-Base.reverse(b::BitIndex) = typeof(b)(xor(signbit(b), !iszero(grade(b) & 2)), b.blade)
+Base.reverse(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i) & 2)), UInt(i))
 
 """
-    grade_involution(b::BitIndex) -> BitIndex
+    grade_involution(i::BitIndex) -> BitIndex
     grade_involution(x::AbstractCliffordNumber) -> typeof(x)
 
 Calculates the grade involution of the basis blade indexed by `b` or the Clifford number `x`. This
 effectively reflects all of the basis vectors of the space along their own mirror operation, which
 makes elements of odd grade flip sign.
 """
-grade_involution(b::BitIndex) = typeof(b)(xor(signbit(b), isodd(grade(b))), b.blade)
+grade_involution(i::BitIndex) = typeof(i)(xor(signbit(i), isodd(grade(i))), UInt(i))
 
 """
-    conj(b::BitIndex) -> BitIndex
+    conj(i::BitIndex) -> BitIndex
     conj(x::AbstractCliffordNumber) -> typeof(x)
 
 Calculates the Clifford conjugate of the basis blade indexed by `b` or the Clifford number `x`. This
 is equal to `grade_involution(reverse(x))`.
 """
-Base.conj(b::BitIndex) = typeof(b)(xor(signbit(b), !iszero(grade(b)+1 & 2)), b.blade)
+Base.conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i)+1 & 2)), UInt(i))
 
 #---Multiplication tools---------------------------------------------------------------------------#
 """
@@ -192,17 +190,17 @@ end
 
 # Account for the sign bits of signed integers
 signbit_of_mult(a::Integer, b::Integer) = xor(signbit_of_mult(unsigned.(a,b)...), signbit(xor(a,b)))
-signbit_of_mult(a::GenericBitIndex, b::GenericBitIndex) = signbit_of_mult(a.blade, b.blade)
+signbit_of_mult(a::GenericBitIndex, b::GenericBitIndex) = signbit_of_mult(UInt(a), UInt(b))
 
 function signbit_of_mult(
     a::BitIndex{QuadraticForm{P,Q,R}},
     b::BitIndex{QuadraticForm{P,Q,R}}
 ) where {P,Q,R}
-    base_signbit = xor(signbit_of_mult(a.blade, b.blade), a.signbit, b.signbit)
+    base_signbit = xor(signbit_of_mult(UInt(a), UInt(b)), signbit(a), signbit(b))
     iszero(Q) && return base_signbit
     # Only perform this test for pseudo-Riemannian metrics
     q = sum(UInt(2)^(n-1) for n in P .+ (1:Q); init=0)
-    return xor(base_signbit, !isevil(a.blade & b.blade & q))
+    return xor(base_signbit, !isevil(UInt(a) & UInt(b) & q))
 end
 
 signbit_of_mult(i) = signbit_of_mult(i,i)
@@ -217,12 +215,12 @@ function sign_of_mult(
     a::BitIndex{QuadraticForm{P,Q,R}},
     b::BitIndex{QuadraticForm{P,Q,R}}
 ) where {P,Q,R}
-    base_signbit = signbit_of_mult(a.blade, b.blade)
+    base_signbit = signbit_of_mult(UInt(a), UInt(b))
     # For Euclidean spaces no further processing is needed
     iszero(R) && return Int8(-1)^base_signbit
     # If any dimension squares to zero, just return zero
     r = sum(UInt(2)^(n-1) for n in (P + Q) .+ (1:R); init=0)
-    return iszero(a.blade & b.blade & r) ? Int8(-1)^base_signbit : Int8(0)
+    return iszero(UInt(a) & UInt(b) & r) ? Int8(-1)^base_signbit : Int8(0)
 end
 
 sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(a,b)
@@ -235,14 +233,14 @@ sign_of_mult(i) = sign_of_mult(i,i)
 Returns the `BitIndex` corresponding to the basis blade resulting from the geometric product of the
 basis blades indexed by `a` and `b`.
 """
-Base.:*(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(a.blade, b.blade))
+Base.:*(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(UInt(a), UInt(b)))
 
 """
     CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) -> Bool
 
 Returns `true` if the basis blades indexed by `a` and `b` may have a nonzero wedge product.
 """
-has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero(a.blade & b.blade)
+has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero(UInt(a) & UInt(b))
 
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))

@@ -49,10 +49,10 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 #---Clifford number indexing-----------------------------------------------------------------------#
 
 function Base.getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
-    return sign(b) * (@inbounds x.data[b.blade + 1])
+    return sign(b) * (@inbounds x.data[UInt(b) + 1])
 end
 
-Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[b.blade % length(x) + 1]
+Base.getindex(x::CliffordNumber, b::GenericBitIndex) = sign(b) * x.data[UInt(b) % length(x) + 1]
 
 #---Multiplicative identity------------------------------------------------------------------------#
 

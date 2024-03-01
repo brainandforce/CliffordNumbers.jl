@@ -7,13 +7,13 @@ function convert(::Type{T}, x::AbstractCliffordNumber{Q}) where {Q,T<:AbstractCl
 end
 
 function convert(::Type{T}, x::AbstractCliffordNumber) where T<:BaseNumber
-    return isscalar(x) ? T(x[BitIndex{QuadraticForm(x)}()]) : throw(InexactError(:convert, T, x))
+    return isscalar(x) ? T(scalar(x)) : throw(InexactError(:convert, T, x))
 end
 
 #---Specialized conversion methods for certain representations and signatures----------------------#
 
 function Base.convert(::Type{T}, x::AbstractCliffordNumber{QFComplex,<:Real}) where T<:BaseNumber
-    return convert(T, x[BitIndex{QFComplex}()] + x[BitIndex{QFComplex}(1)] * im)
+    return convert(T, x[scalar_index(x)] + x[pseudoscalar_index(x)] * im)
 end
 
 function Base.convert(::Type{T}, z::Complex) where T<:AbstractCliffordNumber{QFComplex,<:Real}
