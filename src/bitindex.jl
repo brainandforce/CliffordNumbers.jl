@@ -118,6 +118,14 @@ Base.abs(i::BitIndex) = typeof(i)(UInt(i) & ~signmask(UInt))
 grade(i::BitIndex) = count_ones(UInt(i) & ~signmask(UInt))
 
 """
+    CliffordNumbers.is_same_blade(a::BitIndex{Q}, b::BitIndex{Q})
+
+Checks if `a` and `b` perform identical indexing up to sign.
+"""
+is_same_blade(a::T, b::T) where T<:BitIndex = (UInt(a) << 1) == (UInt(b) << 1)
+is_same_blade(a::BitIndex, b::BitIndex) = false
+
+"""
     scalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}()
 
 Constructs the `BitIndex` used to obtain the scalar (grade zero) portion of `x`.

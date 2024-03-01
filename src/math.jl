@@ -186,10 +186,10 @@ end
 end
 
 # Needs to be a separate function to maintain type stability
-function raw_tuple_add(::Type{C}, data::NTuple{L}, x, b) where {C,L}
+@inline function raw_tuple_add(::Type{C}, data::NTuple{L}, x, b) where {C,L}
     return ntuple(Val{L}()) do i
         a = @inbounds BitIndices(C)[i]
-        convert(numeric_type(C), muladd(abs(a) == abs(b), x, data[i]))
+        convert(numeric_type(C), muladd(is_same_blade(a,b), x, data[i]))
     end
 end
 
