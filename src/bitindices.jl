@@ -11,6 +11,9 @@ end
 size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(length(C))
 size(b::AbstractBitIndices) = size(typeof(b))
 
+# Conversion to tuple
+Base.Tuple(b::AbstractBitIndices) = ntuple(i -> b[i], Val(length(b)))
+
 #---Broadcasting-----------------------------------------------------------------------------------#
 
 #=
