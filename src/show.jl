@@ -53,8 +53,8 @@ function show(io::IO, ::MIME"text/plain", x::AbstractCliffordNumber{Q}) where Q
     # Flag to mark when we've *found the first nonzero* element
     ffn = false
     # Print the scalar component first
-    if !iszero(x[BitIndex{Q}()])
-        print(io, x[BitIndex{Q}()])
+    if !iszero(scalar(x))
+        print(io, scalar(x))
         ffn = true
     end
     # Loop through all the grades
