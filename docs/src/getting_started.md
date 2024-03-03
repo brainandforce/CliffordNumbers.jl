@@ -58,7 +58,8 @@ quadratic form associated with the Clifford algebra. This information needs to b
 parameter for `CliffordNumber`.
 
 To handle this, the `QuadraticForm{P,Q,R}` type is used to store information about the quadratic
-form. In this type, `P` represents
+form. In this type, `P` represents the number of dimensions squaring to a positive number, `Q`
+represents the number squaring to a negative number, and `R` represents the number squaring to zero.
 
 !!! note By convention, the `QuadraticForm` type is not instantiated when used as a type parameter
 for `CliffordNumber` instances.
@@ -66,10 +67,10 @@ for `CliffordNumber` instances.
 CliffordNumbers.jl provides the following aliases for common algebras:
 
 | Algebra    | Alias                  | Note                                           |
-| `VGA{D}`   | `QuadraticForm{D,0,0}` | Vanilla/vector geometric algebra               |
-| `PGA{D}`   | `QuadraticForm{D,0,1}` | Projective geometric algebra                   |
+| `VGA(D)`   | `QuadraticForm{D,0,0}` | Vanilla/vector geometric algebra               |
+| `PGA(D)`   | `QuadraticForm{D,0,1}` | Projective geometric algebra                   |
 | `APS`      | `QuadraticForm{3,0,0}` | Algebra of physical space                      |
-| `STA`      | `QuadraticForm{1,3,0}` | Spacetime algebra. By default, uses a -+++     |
+| `STA`      | `QuadraticForm{1,3,0}` | Spacetime algebra. By default, uses a +---     |
 |            |                        | convention to distinguish it from a conformal  |
 |            |                        | geometric algebra.                             |
 
