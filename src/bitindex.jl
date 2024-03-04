@@ -29,6 +29,10 @@ Base.Int(i::BitIndex) = Int(UInt(i) & ~signmask(Int))
 
 const GenericBitIndex = BitIndex{QuadraticForm}
 
+#---Treat as scalar for the sake of broadcasting---------------------------------------------------#
+
+Broadcast.broadcastable(b::BitIndex) = tuple(b)
+
 #---Convenience constructors-----------------------------------------------------------------------#
 """
     CliffordNumbers._sort_with_parity!(v::AbstractVector{<:Real}) -> Tuple{typeof(v),Bool}

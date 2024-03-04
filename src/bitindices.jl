@@ -16,14 +16,7 @@ Base.Tuple(b::AbstractBitIndices) = ntuple(i -> b[i], Val(length(b)))
 
 #---Broadcasting-----------------------------------------------------------------------------------#
 
-#=
-struct BitIndicesStyle{Q,C<:AbstractCliffordNumber{Q}} <: Broadcast.AbstractArrayStyle{1}
-end
-
-Broadcast.BroadcastStyle(::Type{<:AbstractBitIndices{Q,C}}) = BitIndicesStyle{Q,C}()
-Broadcast.BroadcastStyle(::BitIndicesStyle, s::Broadcast.DefaultArrayStyle) = s
-Broadcast.BroadcastStyle(s::Broadcast.DefaultArrayStyle, ::BitIndicesStyle) = s
-=#
+Broadcast.broadcastable(b::AbstractBitIndices) = Tuple(b)
 
 #---Clifford number iteration----------------------------------------------------------------------#
 """
