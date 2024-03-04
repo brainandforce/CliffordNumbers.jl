@@ -185,8 +185,14 @@ end
 
 # Needs to be a separate function to maintain type stability
 @inline function raw_tuple_add(::Type{C}, data::NTuple{L}, x, b) where {C,L}
+    #= Turns out map() is better!
     return ntuple(Val{L}()) do i
         a = @inbounds BitIndices(C)[i]
+        convert(numeric_type(C), muladd(is_same_blade(a,b), x, data[i]))
+    end
+    =#
+    return map(Tuple(BitIndices(C))) do a
+        i = to_index(C, a)
         convert(numeric_type(C), muladd(is_same_blade(a,b), x, data[i]))
     end
 end
