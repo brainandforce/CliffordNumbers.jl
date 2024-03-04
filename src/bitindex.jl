@@ -99,7 +99,7 @@ BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
 #---Show method------------------------------------------------------------------------------------#
 
 function show(io::IO, b::BitIndex{Q}) where Q
-    print(io, "-"^signbit(b), BitIndex, "(", Q, iszero(UInt(b)) ? ")" : ", ")
+    print(io, "-"^signbit(b), BitIndex, "(", Q, iszero(Int(b)) ? ")" : ", ")
     iszero(UInt(b)) && return nothing
     found_first_vector = false
     for a in 1:min(dimension(Q), 8*sizeof(UInt) - 1)
