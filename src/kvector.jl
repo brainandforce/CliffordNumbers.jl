@@ -52,11 +52,13 @@ function getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
     return BitIndex{Q}(signbit(i-1), unsigned(hamming_number(K, i)))
 end
 
-function to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
-    i = findfirst(a -> is_same_blade(a, b), BitIndices(k))
+function to_index(C::Type{<:KVector{K,Q}}, b::BitIndex{Q}) where {K,Q}
+    i = findfirst(a -> is_same_blade(a, b), BitIndices(C))
     # Default to 1 as an index that's always valid
     return ifelse(isnothing(i), 1, i)
 end
+
+to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
 
 function getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
     return (@inbounds k.data[to_index(k, b)]) * sign(b) * (grade(b) === K)

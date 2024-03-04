@@ -46,7 +46,8 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 
 #---Clifford number indexing-----------------------------------------------------------------------#
 
-to_index(::CliffordNumber{Q}, i::BitIndex{Q}) where Q = (Int(i) % elements(Q) + 1)
+to_index(::Type{<:CliffordNumber{Q}}, i::BitIndex{Q}) where Q = (Int(i) % elements(Q) + 1)
+to_index(x::CliffordNumber{Q}, i::BitIndex{Q}) where Q = to_index(typeof(x), i)
 
 function getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
     return sign(b) * (@inbounds x.data[to_index(x, b)])

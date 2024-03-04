@@ -60,6 +60,7 @@ function getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P
     return BitIndex{Q}(signbit(n), unsigned(n))
 end
 
+to_index(::Type{<:Z2CliffordNumber{P,Q}}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
 to_index(::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
 
 function getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
