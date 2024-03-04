@@ -251,7 +251,7 @@ basis blades indexed by `a` and `b`.
 
 Returns `true` if the basis blades indexed by `a` and `b` may have a nonzero wedge product.
 """
-has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero(UInt(a) & UInt(b))
+has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero(UInt(a) << 1 & UInt(b) << 1)
 
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
