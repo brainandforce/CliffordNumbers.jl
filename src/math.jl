@@ -193,7 +193,7 @@ end
     =#
     return map(Tuple(BitIndices(C))) do a
         i = to_index(C, a)
-        convert(numeric_type(C), muladd(is_same_blade(a,b), x, data[i]))
+        convert(numeric_type(C), muladd(is_same_blade(a,b), x, (@inbounds data[i])))
     end
 end
 
