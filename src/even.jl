@@ -54,16 +54,16 @@ nonzero_grades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = P:2:dimension(Q)
 
 #---Indexing---------------------------------------------------------------------------------------#
 
-function getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
+@inline function getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
     @boundscheck checkbounds(b, i)
     n = number_of_parity(i, P)
     return BitIndex{Q}(signbit(n), unsigned(n))
 end
 
-to_index(::Type{<:Z2CliffordNumber{P,Q}}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
-to_index(::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
+@inline to_index(::Type{<:Z2CliffordNumber{P,Q}}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
+@inline to_index(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = to_index(typeof(x), b)
 
-function getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
+@inline function getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
     return sign(b) * (@inbounds x.data[to_index(x, b)]) * xor(iseven(grade(b)), P)
 end
 

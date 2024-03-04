@@ -20,7 +20,7 @@ struct BitIndex{Q<:QuadraticForm}
 end
 
 # Construct with the sign bit as a separate argument
-function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
+@inline function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
     return BitIndex{Q}(UInt(blade % elements(Q)) | signmask(UInt, signbit))
 end
 
