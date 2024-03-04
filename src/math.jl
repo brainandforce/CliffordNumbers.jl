@@ -123,6 +123,28 @@ end
 
 #---Geometric product-----------------------------------------------------------------------------#
 """
+    CliffordNumbers.geometric_product_type(::Type, ::Type)
+
+Returns the type of the result of the geometric product of the input types.
+"""
+@generated function geometric_product_type(
+    ::Type{C1},
+    ::Type{C2}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    c1_odd = all(isodd, nonzero_grades(C1))
+    c2_odd = all(isodd, nonzero_grades(C2))
+    c1_even = all(iseven, nonzero_grades(C1))
+    c2_even = all(iseven, nonzero_grades(C2))
+    P = (c1_odd && c2_even) || (c1_even && c2_odd)
+    T = promote_numeric_type(C1,C2)
+    if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
+        return :(CliffordNumber{Q,$T,elements(Q)})
+    else
+        return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
+    end
+end
+
+"""
     CliffordNumbers.elementwise_product(
         [::Type{C},]
         x::AbstractCliffordNumber{Q},
@@ -159,28 +181,6 @@ end
     condition::Bool = true
 ) where Q
     return elementwise_product(promote_type(typeof(x), typeof(y)), x, y, a, b, condition)
-end
-
-"""
-    CliffordNumbers.geometric_product_type(::Type, ::Type)
-
-Returns the type of the result of the geometric product of the input types.
-"""
-@generated function geometric_product_type(
-    ::Type{C1},
-    ::Type{C2}
-) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
-    c1_odd = all(isodd, nonzero_grades(C1))
-    c2_odd = all(isodd, nonzero_grades(C2))
-    c1_even = all(iseven, nonzero_grades(C1))
-    c2_even = all(iseven, nonzero_grades(C2))
-    P = (c1_odd && c2_even) || (c1_even && c2_odd)
-    T = promote_numeric_type(C1,C2)
-    if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
-        return :(CliffordNumber{Q,$T,elements(Q)})
-    else
-        return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
-    end
 end
 
 # Needs to be a separate function to maintain type stability
