@@ -161,6 +161,11 @@ end
     return elementwise_product(promote_type(typeof(x), typeof(y)), x, y, a, b, condition)
 end
 
+"""
+    CliffordNumbers.geometric_product_type(::Type, ::Type)
+
+Returns the type of the result of the geometric product of the input types.
+"""
 @generated function geometric_product_type(
     ::Type{C1},
     ::Type{C2}
@@ -275,7 +280,12 @@ Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Contractions-----------------------------------------------------------------------------------#
+"""
+    CliffordNumbers.contraction_type(::Type, ::Type)
 
+Returns the type of the contraction when performed on the input types. It only differs from
+`CliffordNumbers.geometric_product_type` when both inputs are `KVector`.
+"""
 function contraction_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     K = abs(K1 - K2) # this works in all cases, if K2 > K1 then the values are just zero
     return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
@@ -368,7 +378,12 @@ function hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumbe
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
+"""
+    CliffordNumbers.wedge_product_type(::Type, ::Type)
 
+Returns the type of the result of the wedge product of the input types. It only differs from
+`CliffordNumbers.geometric_product_type` when both inputs are `KVector`.
+"""
 function wedge_product_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     return KVector{K1+K2,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K1+K2)}
 end
