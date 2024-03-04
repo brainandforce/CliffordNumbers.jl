@@ -72,5 +72,5 @@ function show(io::IO, ::MIME"text/plain", x::AbstractCliffordNumber{Q}) where Q
     end
     # If we got through the whole process, just print the zero
     # We reference the actual element so we can print signed zero if needed
-    !ffn && print(io, x[BitIndex{Q}()])
+    !ffn && print(io, scalar(x))
 end
