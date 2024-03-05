@@ -12,6 +12,17 @@
     @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3))
     @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3), 1, 2, 3)
     @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
+    # Degenerate multiplications
+    QF = QuadraticForm{3,1,2}
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(APS, 1, 3), BitIndex(APS, 2, 3))
+    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 5), BitIndex(QF, 5))
+    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 1, 5))
+    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 2, 5))
+    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 5), BitIndex(QF, 1, 5))
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 6), BitIndex(QF, 5))
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 1, 5))
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 2, 5))
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 6), BitIndex(QF, 1, 5))
 end
 
 @testset "Transformed BitIndices" begin

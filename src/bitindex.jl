@@ -217,6 +217,23 @@ end
 signbit_of_mult(i) = signbit_of_mult(i,i)
 
 """
+    CliffordNumbers.nondegenerate_mult(a::T, b::T) where T<:BitIndex{QuadraticForm{P,Q,R}} -> Bool
+
+Returns `false` if the product of `a` and `b` is zero due to the squaring of a degenerate component,
+`true` otherwise. This function always returns `true` if `R === 0`.
+"""
+function nondegenerate_mult(
+    a::BitIndex{QuadraticForm{P,Q,R}},
+    b::BitIndex{QuadraticForm{P,Q,R}}
+) where {P,Q,R}
+    # This mask filters out the nondegenerate components, which are the highest bits
+    mask = -UInt(2)^(P+Q)
+    return iszero(UInt(a) & UInt(b) & mask)
+end
+
+nondegenerate_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q<:QuadraticForm{<:Any,<:Any,0} = true
+
+"""
     CliffordNumbers.sign_of_mult(a::T, b::T) where T<:BitIndex{QuadraticForm{P,Q,R}} -> Int8
 
 Returns an `Int8` that carries the sign associated with the multiplication of two basis blades of
