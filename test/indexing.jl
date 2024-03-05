@@ -11,6 +11,7 @@
     @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
     @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3))
     @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3), 1, 2, 3)
+    @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
 end
 
 @testset "Transformed BitIndices" begin

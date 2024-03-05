@@ -14,9 +14,10 @@ size(b::AbstractBitIndices) = size(typeof(b))
 # Conversion to tuple
 Base.Tuple(b::AbstractBitIndices) = ntuple(i -> b[i], Val(length(b)))
 
-#---Broadcasting-----------------------------------------------------------------------------------#
+#---Broadcast and map------------------------------------------------------------------------------#
 
 Broadcast.broadcastable(b::AbstractBitIndices) = Tuple(b)
+Base.map(f, b::AbstractBitIndices) = map(f, Tuple(b))
 
 #---Clifford number iteration----------------------------------------------------------------------#
 """
