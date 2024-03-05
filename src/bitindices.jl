@@ -121,6 +121,5 @@ end
 
 # Constructors can follow similar logic, just don't use similar_type
 function (T::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q
-    data = ntuple(i -> x[BitIndices(T)[i]], Val(length(T)))
-    return T(data)
+    return T(map(i -> x[i], BitIndices(T)))
 end
