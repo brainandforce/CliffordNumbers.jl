@@ -430,7 +430,8 @@ Returns the type of the result of the wedge product of the input types. It only 
 `CliffordNumbers.geometric_product_type` when both inputs are `KVector`.
 """
 function wedge_product_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
-    return KVector{K1+K2,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K1+K2)}
+    K = min(K1+K2, dimension(Q))
+    return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
 end
 
 function wedge_product_type(
