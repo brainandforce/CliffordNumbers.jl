@@ -53,9 +53,12 @@ nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 end
 
 @inline function to_index(C::Type{<:KVector{K,Q}}, b::BitIndex{Q}) where {K,Q}
-    i = findfirst(a -> is_same_blade(a, b), BitIndices(C))
-    # Default to 1 as an index that's always valid
-    return ifelse(isnothing(i), 1, i)
+    # Default to 1 as a valid index for any KVector instance
+    i = 1
+    for n in 1:length(C)
+        b === (@inbounds BitIndices(C)[n]) && (i = n)
+    end
+    return i
 end
 
 @inline to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
