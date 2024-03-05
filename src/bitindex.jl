@@ -24,8 +24,9 @@ end
     return BitIndex{Q}(UInt(blade % elements(Q)) | signmask(UInt, signbit))
 end
 
-Base.UInt(i::BitIndex) = getfield(i, :i)
-Base.Int(i::BitIndex) = Int(UInt(i) & ~signmask(Int))
+# UInt(i::BitIndex) strips the sign info. Use i.i to directly access the internal field
+Base.UInt(i::BitIndex) = i.i & ~signmask(Int)
+Base.Int(i::BitIndex) = Int(UInt(i))
 
 const GenericBitIndex = BitIndex{QuadraticForm}
 
@@ -114,20 +115,20 @@ end
 
 #---Other useful functions-------------------------------------------------------------------------#
 
-signbit(i::BitIndex) = !iszero(UInt(i) & signmask(UInt))
+signbit(i::BitIndex) = !iszero(i.i & signmask(UInt))
 sign(i::BitIndex) = Int8(-1)^signbit(i)
 
--(i::BitIndex) = typeof(i)(xor(signmask(UInt), UInt(i)))
-abs(i::BitIndex) = typeof(i)(UInt(i) & ~signmask(UInt))
+-(i::BitIndex) = typeof(i)(!signbit(i), UInt(i))
+abs(i::BitIndex) = typeof(i)(UInt(i))
 
-grade(i::BitIndex) = count_ones(UInt(i) & ~signmask(UInt))
+grade(i::BitIndex) = count_ones(UInt(i))
 
 """
     CliffordNumbers.is_same_blade(a::BitIndex{Q}, b::BitIndex{Q})
 
 Checks if `a` and `b` perform identical indexing up to sign.
 """
-is_same_blade(a::T, b::T) where T<:BitIndex = (UInt(a) << 1) == (UInt(b) << 1)
+is_same_blade(a::T, b::T) where T<:BitIndex = (a.i << 1) == (b.i << 1)
 is_same_blade(a::BitIndex, b::BitIndex) = false
 
 """
@@ -174,7 +175,7 @@ grade_involution(i::BitIndex) = typeof(i)(xor(signbit(i), isodd(grade(i))), UInt
 Calculates the Clifford conjugate of the basis blade indexed by `b` or the Clifford number `x`. This
 is equal to `grade_involution(reverse(x))`.
 """
-conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i)+1 & 2)), UInt(i))
+conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero((grade(i) + 1) & 2)), UInt(i))
 
 #---Multiplication tools---------------------------------------------------------------------------#
 """
@@ -196,7 +197,7 @@ function signbit_of_mult(a::Unsigned, b::Unsigned)
         sum += count_ones(a & abs(b))
         a = a >>> 1
     end
-    return !iszero(sum & 1)
+    return isodd(sum)
 end
 
 # Account for the sign bits of signed integers
@@ -228,7 +229,7 @@ function nondegenerate_mult(
 ) where {P,Q,R}
     # This mask filters out the nondegenerate components, which are the highest bits
     mask = -UInt(2)^(P+Q)
-    return iszero(UInt(a) & UInt(b) & mask)
+    return iszero(a.i & b.i & mask)
 end
 
 nondegenerate_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q<:QuadraticForm{<:Any,<:Any,0} = true
@@ -268,7 +269,7 @@ basis blades indexed by `a` and `b`.
 
 Returns `true` if the basis blades indexed by `a` and `b` may have a nonzero wedge product.
 """
-has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero(UInt(a) << 1 & UInt(b) << 1)
+has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero((a.i << 1) & (b.i << 1))
 
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))

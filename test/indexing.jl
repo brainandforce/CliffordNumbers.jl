@@ -1,17 +1,18 @@
-@testset "BitIndex and BitIndices" begin
+@testset "BitIndex" begin
     @test BitIndex(VGA(3), 1, 2) === BitIndex{VGA(3)}(false, UInt(3))
     @test BitIndex(VGA(3), 2, 1) === BitIndex{VGA(3)}(true, UInt(3))
     @test BitIndex(VGA(3), 1, 2) === -BitIndex(VGA(3), 2, 1)
     @test abs(BitIndex(VGA(3), 1, 2)) === BitIndex(VGA(3), 1, 2)
     @test abs(BitIndex(VGA(3), 2, 1)) === BitIndex(VGA(3), 1, 2)
-    aps_bivector_indices = [BitIndex(VGA(3), 1, 2), BitIndex(VGA(3), 1, 3), BitIndex(VGA(3), 2, 3)]
-    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == aps_bivector_indices
-    @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == aps_bivector_indices
-    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == BitIndices(KVector{2,VGA(3)}(4,2,0))
-    @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
-    @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3))
-    @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3), 1, 2, 3)
-    @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
+    # Euclidean multiplications
+    @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === false
+    @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 2), BitIndex(VGA(3), 1)) === true
+    @test CliffordNumbers.signbit_of_mult(-BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === true
+    @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 1), -BitIndex(VGA(3), 2)) === true
+    @test CliffordNumbers.signbit_of_mult(-BitIndex(VGA(3), 1), -BitIndex(VGA(3), 2)) === false
+    @test BitIndex(VGA(3), 1) * BitIndex(VGA(3), 2) === BitIndex(VGA(3), 1, 2)
+    @test BitIndex(VGA(3), 2) * BitIndex(VGA(3), 1) === BitIndex(VGA(3), 2, 1)
+    @test BitIndex(VGA(3), 2) * BitIndex(VGA(3), 1) === -BitIndex(VGA(3), 1, 2)
     # Degenerate multiplications
     QF = QuadraticForm{3,1,2}
     @test CliffordNumbers.nondegenerate_mult(BitIndex(APS, 1, 3), BitIndex(APS, 2, 3))
@@ -23,6 +24,17 @@
     @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 1, 5))
     @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 2, 5))
     @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 6), BitIndex(QF, 1, 5))
+end
+
+@testset "BitIndices" begin
+    aps_bivector_indices = [BitIndex(VGA(3), 1, 2), BitIndex(VGA(3), 1, 3), BitIndex(VGA(3), 2, 3)]
+    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == aps_bivector_indices
+    @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == aps_bivector_indices
+    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == BitIndices(KVector{2,VGA(3)}(4,2,0))
+    @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
+    @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3))
+    @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3), 1, 2, 3)
+    @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
 end
 
 @testset "Transformed BitIndices" begin
