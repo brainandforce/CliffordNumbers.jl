@@ -261,7 +261,7 @@ sign_of_mult(i) = sign_of_mult(i,i)
 Returns the `BitIndex` corresponding to the basis blade resulting from the geometric product of the
 basis blades indexed by `a` and `b`.
 """
-*(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(UInt(a), UInt(b)))
+@inline *(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(UInt(a), UInt(b)))
 
 """
     CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) -> Bool
