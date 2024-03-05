@@ -37,3 +37,28 @@ end
     @test promote_type(KVector{1,APS,Float64}, CliffordNumber{APS,Int}) ===
         CliffordNumber{APS,Float64,8}
 end
+
+@testset "Widening" begin
+    @test widen(KVector{2,APS,Int32,3}) === KVector{2,APS,Int,3}
+    @test widen(KVector{2,APS,Float16}(1, 2, 3)) === KVector{2,APS,Float32}(1, 2, 3)
+    @test widen_grade(KVector) === CliffordNumber
+    @test widen_grade(KVector{2}) === EvenCliffordNumber
+    @test widen_grade(KVector{2,APS}) === EvenCliffordNumber{APS}
+    @test widen_grade(KVector{2,APS,Int32}) === EvenCliffordNumber{APS,Int32}
+    @test widen_grade(KVector{2,APS,Int32,3}) === EvenCliffordNumber{APS,Int32,4}
+    @test widen_grade(KVector{1}) === OddCliffordNumber
+    @test widen_grade(KVector{1,APS}) === OddCliffordNumber{APS}
+    @test widen_grade(KVector{1,APS,Int32}) === OddCliffordNumber{APS,Int32}
+    @test widen_grade(KVector{1,APS,Int32,3}) === OddCliffordNumber{APS,Int32,4}
+    @test widen_grade(CliffordNumbers.Z2CliffordNumber) === CliffordNumber
+    @test widen_grade(EvenCliffordNumber) === CliffordNumber
+    @test widen_grade(OddCliffordNumber) === CliffordNumber
+    @test widen_grade(EvenCliffordNumber{APS}) === CliffordNumber{APS}
+    @test widen_grade(OddCliffordNumber{APS}) === CliffordNumber{APS}
+    @test widen_grade(EvenCliffordNumber{APS,Int32}) === CliffordNumber{APS,Int32}
+    @test widen_grade(OddCliffordNumber{APS,Int32}) === CliffordNumber{APS,Int32}
+    @test widen_grade(EvenCliffordNumber{APS,Int32,4}) === CliffordNumber{APS,Int32,8}
+    @test widen_grade(OddCliffordNumber{APS,Int32,4}) === CliffordNumber{APS,Int32,8}
+    @test widen_grade(KVector{2,APS,Int32}(1, 2, 3)) === EvenCliffordNumber{APS,Int32}(0, 1, 2, 3)
+    @test widen_grade(KVector{1,APS,Int}(4, 5, 6)) === OddCliffordNumber{APS,Int}(4, 5, 6, 0)
+end

@@ -84,3 +84,49 @@ end
     type promotion for CliffordNumber subtypes is defined.
 =#
 promote_rule(C1::Type{<:KVector}, C2::Type{<:Z2CliffordNumber}) = promote_rule(C2, C1)
+
+#---Widening types---------------------------------------------------------------------------------#
+"""
+    widen(C::Type{<:AbstractCliffordNumber})
+    widen(x::AbstractCliffordNumber)
+
+Construct a new type whose scalar type is widened. This behavior matches that of
+`widen(C::Type{Complex{T}})`, which results in widening of its scalar type `T`.
+
+For obtaining a representation of a Clifford number with an increased number of nonzero grades,
+use `widen_grade(T)`.
+"""
+Base.widen(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = similar_type(C, widen(T))
+
+"""
+    widen_grade(C::Type{<:AbstractCliffordNumber})
+    widen_grade(x::AbstractCliffordNumber)
+
+For type arguments, construct the next largest type that can hold all of the grades of `C`.
+`KVector{K,Q,T}` widens to `EvenCliffordNumber{Q,T}` or `OddCliffordNumber{Q,T}`, and
+`EvenCliffordNumber{Q,T}` and `OddCliffordNumber{Q,T}` widen to `CliffordNumber{Q,T}`, which is the
+widest type.
+
+For `AbstractCliffordNumber` arguments, the argument is converted to the result of
+`widen_grade(typeof(x))`.
+
+For widening the scalar type of an `AbstractCliffordNumber`, use `Base.widen(T)`.
+"""
+widen_grade(x::AbstractCliffordNumber) = convert(widen_grade(typeof(x)), x)
+
+widen_grade(C::Type{<:CliffordNumber}) = C
+
+widen_grade(::Type{Z2CliffordNumber}) = CliffordNumber
+widen_grade(::Type{Z2CliffordNumber{P}}) where {P} = CliffordNumber
+widen_grade(::Type{Z2CliffordNumber{P,Q}}) where {P,Q} = CliffordNumber{Q}
+widen_grade(::Type{Z2CliffordNumber{P,Q,T}}) where {P,Q,T} = CliffordNumber{Q,T}
+widen_grade(::Type{Z2CliffordNumber{P,Q,T,L}}) where {P,Q,T,L} = CliffordNumber{Q,T,elements(Q)}
+
+widen_grade(::Type{KVector}) = CliffordNumber
+widen_grade(::Type{KVector{K}}) where {K} = Z2CliffordNumber{isodd(K)}
+widen_grade(::Type{KVector{K,Q}}) where {K,Q} = Z2CliffordNumber{isodd(K),Q}
+widen_grade(::Type{KVector{K,Q,T}}) where {K,Q,T} = Z2CliffordNumber{isodd(K),Q,T}
+
+function widen_grade(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L}
+    return Z2CliffordNumber{isodd(K),Q,T,div(elements(Q), 2)}
+end

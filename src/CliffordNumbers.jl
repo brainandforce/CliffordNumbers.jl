@@ -50,6 +50,7 @@ include("kvector.jl")
 export KVector
 # Conversion and promotion tools
 include("promote.jl")
+export widen_grade
 include("convert.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
