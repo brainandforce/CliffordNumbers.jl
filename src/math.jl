@@ -215,14 +215,11 @@ Calculate the coefficient indexed by `i` from Clifford numbers `x` and `y`. The 
     i::BitIndex{Q},
     f = ((a,b) -> true)
 ) where Q
-    # get pairs of basis blades which contribute to the coefficients
     result = zero(promote_type(numeric_type(x), numeric_type(y)))
-    index_pairs = Iterators.filter(
-        t -> is_same_blade(prod(t), i),
-        Iterators.product(eachindex(x), eachindex(y))
-    )
-    for (a,b) in index_pairs
-        result += (@inbounds x[a]) * (@inbounds y[b]) * sign_of_mult(a,b) * f(a,b)::Bool
+    for j in BitIndices(x)
+        (a, b) = (j, i*j)
+        condition = nondegenerate_mult(a,b) * f(a,b)::Bool
+        result += x[a] * y[b] * condition
     end
     return result
 end
