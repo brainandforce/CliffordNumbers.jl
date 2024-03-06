@@ -11,13 +11,11 @@ end
 size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(length(C))
 size(b::AbstractBitIndices) = size(typeof(b))
 
+length(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = length(C)
+length(::T) where T<:AbstractBitIndices = length(T)
+
 # Conversion to tuple
-Base.Tuple(b::AbstractBitIndices) = ntuple(i -> b[i], Val(length(b)))
-
-#---Broadcast and map------------------------------------------------------------------------------#
-
-Broadcast.broadcastable(b::AbstractBitIndices) = Tuple(b)
-Base.map(f, b::AbstractBitIndices) = map(f, Tuple(b))
+# Base.Tuple(b::T) where T<:AbstractBitIndices = ntuple(i -> b[i], Val(length(T)))
 
 #---Clifford number iteration----------------------------------------------------------------------#
 """
@@ -67,6 +65,17 @@ function getindex(b::BitIndices{Q}, i::Integer) where Q
     return BitIndex{Q}(signbit(i-1), unsigned(i-1))
 end
 
+# Very efficient tuple generation
+@generated function Base.Tuple(::B) where B<:BitIndices
+    data = ntuple(i -> B()[i], Val(length(B)))
+    return :($data)
+end
+
+#---Broadcast and map for abstract types as well as this one---------------------------------------#
+
+Broadcast.broadcastable(b::AbstractBitIndices) = Tuple(b)
+Base.map(f, b::AbstractBitIndices) = map(f, Tuple(b))
+
 #---Range of valid indices for CliffordNumber------------------------------------------------------#
 
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
@@ -92,6 +101,8 @@ function getindex(b::TransformedBitIndices{Q,C}, i::Integer) where {Q,C}
     @boundscheck checkbounds(b, i)
     return b.f(BitIndices{Q,C}()[i])
 end
+
+Base.Tuple(b::TransformedBitIndices{Q,C}) where {Q,C} = map(b.f, BitIndices{Q,C}())
 
 #---Broadcasting implementation--------------------------------------------------------------------#
 
