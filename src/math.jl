@@ -59,12 +59,13 @@ Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = scalar(x)
 #---Sign changing operations-----------------------------------------------------------------------#
 
 for f in (:reverse, :grade_involution, :conj)
-    @eval begin
-        function $f(x::T) where T<:AbstractCliffordNumber
-            return T(ntuple(i -> x[$f(BitIndices(x)[i])], Val(length(T))))
-        end
-    end
+    @eval $f(x::T) where T<:AbstractCliffordNumber = x[$f.(BitIndices(T))]
 end
+
+# Faster implementations for KVector that don't require indexing
+reverse(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero(grade(x) & 2))
+grade_involution(x::T) where T<:KVector = T(x.data .* Int8(-1)^isodd(grade(x)))
+conj(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero((grade(x) + 1) & 2))
 
 ~(x::AbstractCliffordNumber) = reverse(x)
 
