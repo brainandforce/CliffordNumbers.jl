@@ -128,7 +128,7 @@ grade(i::BitIndex) = count_ones(UInt(i))
 
 Checks if `a` and `b` perform identical indexing up to sign.
 """
-is_same_blade(a::T, b::T) where T<:BitIndex = (a.i << 1) == (b.i << 1)
+is_same_blade(a::T, b::T) where T<:BitIndex = (a.i << 1) === (b.i << 1)
 is_same_blade(a::BitIndex, b::BitIndex) = false
 
 """
