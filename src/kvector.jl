@@ -56,7 +56,7 @@ end
     # Default to 1 as a valid index for any KVector instance
     i = 1
     for n in 1:length(C)
-        b === (@inbounds BitIndices(C)[n]) && (i = n)
+        is_same_blade(b, (@inbounds BitIndices(C)[n])) && (i = n)
     end
     return i
 end
