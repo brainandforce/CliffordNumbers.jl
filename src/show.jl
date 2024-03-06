@@ -36,7 +36,7 @@ function to_basis_str(b::BitIndex{Q}; label = nothing, pseudoscalar = nothing) w
     if isnothing(label) || isempty(label)
         if Q === QuadraticForm{3,0,0}
             label = "σ"
-        elseif Q === QuadraticForm{3,1,0} || QuadraticForm{1,3,0}
+        elseif Q === QuadraticForm{3,1,0} || Q === QuadraticForm{1,3,0}
             label = "γ"
         else
             label = "e"
