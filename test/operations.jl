@@ -8,6 +8,25 @@
     @test KVector{2,APS}(4, 2, 0) == CliffordNumber{APS,Float64}(0, 0, 0, 4, 0, 2, 0, 0)
 end
 
+@testset "Grade automorphisms" begin
+    k0 = KVector{0,APS}(1)
+    k1 = KVector{1,APS}(1, 2, 3)
+    k2 = KVector{2,APS,Float64}(1, 2, 3)
+    k3 = KVector{3,APS,Float64}(1)
+    @test reverse(k0) === KVector{0,APS}(1)
+    @test reverse(k1) === KVector{1,APS}(1, 2, 3)
+    @test reverse(k2) === KVector{2,APS,Float64}(-1, -2, -3)
+    @test reverse(k3) === KVector{3,APS,Float64}(-1)
+    @test grade_involution(k0) === KVector{0,APS}(1)
+    @test grade_involution(k1) === KVector{1,APS}(-1, -2, -3)
+    @test grade_involution(k2) === KVector{2,APS,Float64}(1, 2, 3)
+    @test grade_involution(k3) === KVector{3,APS,Float64}(-1)
+    @test conj(k0) === KVector{0,APS}(1)
+    @test conj(k1) === KVector{1,APS}(-1, -2, -3)
+    @test conj(k2) === KVector{2,APS,Float64}(-1, -2, -3)
+    @test conj(k3) === KVector{3,APS,Float64}(1)
+end
+
 @testset "Addition and subtraction" begin
     x = CliffordNumber{APS}(1, 2, 3, 4, 5, 6, 7, 8)
     y = CliffordNumber{APS,Float64}(9, -10, 11, -12, 13, 14, -15, 16)
