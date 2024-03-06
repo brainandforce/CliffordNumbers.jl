@@ -50,6 +50,12 @@ end
     @test EvenCliffordNumber{APS}(0.0, 0, 0, 0) === zero(EvenCliffordNumber{APS,Float64})
     @test EvenCliffordNumber{APS}(0, 0, 0, 0.0) === zero(EvenCliffordNumber{APS,Float64})
     @test KVector{1,APS}(0, 0.0, 0) === zero(KVector{1,APS,Float64})
+    # Barest constructors
+    @test CliffordNumber(KVector{2,APS}(1, 2, 3)) === CliffordNumber{APS}(0, 0, 0, 1, 0, 2, 3, 0)
+    @test EvenCliffordNumber(KVector{2,APS}(1, 2, 3)) === EvenCliffordNumber{APS}(0, 1, 2, 3)
+    @test OddCliffordNumber(KVector{2,APS}(1, 2, 3)) === OddCliffordNumber{APS}(0, 0, 0, 0)
+    @test EvenCliffordNumber(KVector{1,APS}(1, 2, 3)) === EvenCliffordNumber{APS}(0, 0, 0, 0)
+    @test OddCliffordNumber(KVector{1,APS}(1, 2, 3)) === OddCliffordNumber{APS}(1, 2, 3, 0)
 end
 
 @testset "Similar types" begin

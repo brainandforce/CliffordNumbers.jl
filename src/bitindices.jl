@@ -114,7 +114,7 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
 
 #---Indexing an AbstractCliffordNumber with BitIndices of a type-----------------------------------#
 
-# Tuple{Vararg{BitIndex{Q}}} should return a Tuple of the
+# Tuple{Vararg{BitIndex{Q}}} should return a Tuple of the coefficients
 getindex(x::AbstractCliffordNumber{Q}, b::Tuple{Vararg{BitIndex{Q}}}) where Q = map(i -> x[i], b)
 
 function getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C}) where {Q,C}
@@ -123,7 +123,8 @@ function getindex(x::AbstractCliffordNumber{Q}, b::AbstractBitIndices{Q,C}) wher
 end
 
 # Constructors can follow similar logic
-function (C::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q
+# The type bound is required here to get the expected dispatch behavior
+function (C::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q<:QuadraticForm
     return C(x[Tuple(BitIndices(C))])
 end
 
