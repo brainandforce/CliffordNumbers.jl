@@ -179,6 +179,35 @@ conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero((grade(i) + 1) & 2)), UInt
 
 #---Multiplication tools---------------------------------------------------------------------------#
 """
+    CliffordNumbers.signbit_of_square(b::BitIndex) -> Bool
+
+Returns the signbit associated with squaring the basis blade indexed by `b`.
+"""
+function signbit_of_square(b::BitIndex{QuadraticForm{P,Q,R}}) where {P,Q,R}
+    return xor(!iszero(grade(b) & 2), isodd(count_ones(UInt(b) & -2^P)))
+end
+
+signbit_of_square(b::BitIndex{<:QuadraticForm{<:Any,0,<:Any}}) = !iszero(grade(b) & 2)
+
+"""
+    CliffordNumbers.nondegenerate_square(b::BitIndex) -> Bool
+
+Returns `false` if squaring the basis blade `b` is zero due to a degenerate component, `true` 
+otherwise. For a nondegenerate metric, this is always `true`.
+"""
+nondegenerate_square(b::BitIndex{QuadraticForm{P,Q,R}}) where {P,Q,R} = iszero(UInt(b) & -2^(P+Q))
+nondegenerate_square(::BitIndex{<:QFNondegenerate}) = true
+
+"""
+    CliffordNumbers.sign_of_square(b::BitIndex) -> Int8
+
+Returns the sign associated with squaring the basis blade indexed by `b` using an `Int8` as proxy:
+positive signs return `Int8(1)`, negative signs return `Int8(-1)`, and zeros from degenerate
+components return `Int8(0)`.
+"""
+sign_of_square(b::BitIndex) = (Int8(-1)^signbit_of_square(b)) * nondegenerate_square(b)
+
+"""
     CliffordNumbers.signbit_of_mult(a::Integer, [b::Integer]) -> Bool
     CliffordNumbers.signbit_of_mult(a::BitIndex, [b::BitIndex]) -> Bool
 

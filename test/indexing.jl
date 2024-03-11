@@ -10,20 +10,33 @@
     @test CliffordNumbers.signbit_of_mult(-BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === true
     @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 1), -BitIndex(VGA(3), 2)) === true
     @test CliffordNumbers.signbit_of_mult(-BitIndex(VGA(3), 1), -BitIndex(VGA(3), 2)) === false
+    @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3))) === false
+    @test CliffordNumbers.sign_of_square(BitIndex(VGA(3))) > 0
+    @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3), 1)) === false
+    @test CliffordNumbers.sign_of_square(BitIndex(VGA(3), 1)) > 0
+    @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3), 1, 2)) === true
+    @test CliffordNumbers.sign_of_square(BitIndex(VGA(3), 1, 2)) < 0
+    @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3), 1, 2, 3)) === true
+    @test CliffordNumbers.sign_of_square(BitIndex(VGA(3), 1, 2, 3)) < 0
     @test BitIndex(VGA(3), 1) * BitIndex(VGA(3), 2) === BitIndex(VGA(3), 1, 2)
     @test BitIndex(VGA(3), 2) * BitIndex(VGA(3), 1) === BitIndex(VGA(3), 2, 1)
     @test BitIndex(VGA(3), 2) * BitIndex(VGA(3), 1) === -BitIndex(VGA(3), 1, 2)
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === true
+    @test CliffordNumbers.nondegenerate_square(BitIndex(VGA(3), 1, 2)) === true
     # Degenerate multiplications
     QF = QuadraticForm{3,1,2}
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(APS, 1, 3), BitIndex(APS, 2, 3))
-    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 5), BitIndex(QF, 5))
-    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 1, 5))
-    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 2, 5))
-    @test !CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 5), BitIndex(QF, 1, 5))
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 6), BitIndex(QF, 5))
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 1, 5))
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 2, 5))
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 6), BitIndex(QF, 1, 5))
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(APS, 1, 3), BitIndex(APS, 2, 3)) === true
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 5), BitIndex(QF, 5)) === false
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 1, 5)) === false
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 2, 5)) === false
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 5), BitIndex(QF, 1, 5)) === false
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 6), BitIndex(QF, 5)) === true
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 1, 5)) === true
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 6), BitIndex(QF, 2, 5)) === true
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 2, 6), BitIndex(QF, 1, 5)) === true
+    @test CliffordNumbers.nondegenerate_square(BitIndex(QF, 1, 3)) === true
+    @test CliffordNumbers.nondegenerate_square(BitIndex(QF, 1, 5)) === false
+    @test CliffordNumbers.nondegenerate_square(BitIndex(QF, 5, 6)) === false
 end
 
 @testset "BitIndices" begin
