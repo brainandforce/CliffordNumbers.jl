@@ -38,6 +38,17 @@ end
     @test x - y === CliffordNumber{APS}(-8.0, 12.0, -8.0, 16.0, -8.0, -8.0, 22.0, -8.0)
 end
 
+@testset "muladd" begin
+    e = EvenCliffordNumber{APS,Float32}(0, 4, 2, 0)
+    ee = EvenCliffordNumber{APS,Float64}(0, 4, 2, 0)
+    f = EvenCliffordNumber{APS,Float32}(0, 0, 6, 9)
+    ff = EvenCliffordNumber{APS,Float64}(0, 0, 6, 9)
+    @test muladd(2, ee, ff) === EvenCliffordNumber{APS,Float64}(0, 8, 10, 9)
+    @test muladd(2, ff, ee) === EvenCliffordNumber{APS,Float64}(0, 4, 14, 18)
+    @test muladd(2, e, f) === muladd(e, 2, f)
+    @test muladd(2, e, ff) == muladd(2, ee, f)
+end
+
 @testset "Geometric product" begin
     x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
     y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)

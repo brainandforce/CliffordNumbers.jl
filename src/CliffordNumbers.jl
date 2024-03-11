@@ -4,7 +4,7 @@ import Base: length, size, axes, getindex, to_index
 import Base: zero, one, oneunit
 import Base: signbit, sign
 import Base: reverse, conj, ~
-import Base: ==, +, -, *, /, //, abs, abs2, exp, ^
+import Base: ==, +, -, *, /, //, muladd, abs, abs2, exp, ^
 import Base: promote_rule, convert, similar
 import Base: summary, show
 

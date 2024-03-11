@@ -122,6 +122,31 @@ end
 
 (x::AbstractCliffordNumber)(y::BaseNumber) = x * y
 
+"""
+    muladd(x::Union{Real,Complex}, y::AbstractCliffordNumber{Q}, z::AbstractCliffordNumber{Q})
+    muladd(x::AbstractCliffordNumber{Q}, y::Union{Real,Complex}, z::AbstractCliffordNumber{Q})
+
+Multiplies a scalar with a Clifford number and adds another Clifford number using a more efficient
+operation than a juxtaposed multiply and add, if possible.
+"""
+function muladd(x::BaseNumber, y::T, z::T) where T<:AbstractCliffordNumber
+    return T(map((_y, _z) -> muladd(x, _y, _z), Tuple(y), Tuple(z)))
+end
+
+function muladd(x::T, y::BaseNumber, z::T) where T<:AbstractCliffordNumber
+    return T(map((_x, _z) -> muladd(_x, y, _z), Tuple(x), Tuple(z)))
+end
+
+function muladd(x::BaseNumber, y::AbstractCliffordNumber{Q}, z::AbstractCliffordNumber{Q}) where Q
+    (yy, zz) = promote(y, z)
+    return muladd(x, yy, zz)
+end
+
+function muladd(x::AbstractCliffordNumber{Q}, y::BaseNumber, z::AbstractCliffordNumber{Q}) where Q
+    (xx, zz) = promote(x, z)
+    return muladd(xx, y, zz)
+end
+
 #---Geometric product-----------------------------------------------------------------------------#
 """
     CliffordNumbers.geometric_product_type(::Type, ::Type)
