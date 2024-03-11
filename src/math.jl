@@ -242,7 +242,7 @@ return a `Bool`, and the product of the basis blades is excluded if it evaluates
     y::AbstractCliffordNumber{Q},
     f = ((a,b) -> true)
 ) where {Q,C<:AbstractCliffordNumber{Q}}
-    data = ntuple(_ -> zero(numeric_type(C)), Val(length(C)))
+    data = zero_tuple(C)
     for a in BitIndices(x), b in BitIndices(y)
         coeff = (@inbounds x[a]) * (@inbounds y[b]) * sign_of_mult(a,b) * f(a,b)::Bool
         data = raw_tuple_add(C, data, coeff, a*b)

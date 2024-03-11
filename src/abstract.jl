@@ -58,8 +58,23 @@ numeric_type(x) = numeric_type(typeof(x))
 Base.Tuple(x::AbstractCliffordNumber) = getfield(x, :data)::Tuple
 
 #---Additive and multiplicative identities---------------------------------------------------------#
-zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(_ -> ntuple(zero(T), Val(length(C))))
-zero(C::Type{<:AbstractCliffordNumber}) = C(ntuple(_ -> zero(Bool), Val(length(C))))
+"""
+    CliffordNumbers.zero_tuple(::Type{T}, ::Val{L}) -> NTuple{L,T}
+
+Generates a `Tuple` of length `L` with all elements being `zero(T)`.
+"""
+zero_tuple(::Type{T}, ::Val{L}) where {T,L} = ntuple(_ -> zero(T), Val(L))
+
+"""
+    CliffordNumbers.zero_tuple(::Type{C<:AbstractCliffordNumber})
+        -> NTuple{length(C),numeric_type(C)}
+
+Generates a `Tuple` that can be used to construct `zero(C)`.
+"""
+zero_tuple(::Type{C}) where C<:AbstractCliffordNumber = zero_tuple(numeric_type(C), Val(length(C)))
+
+zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(zero_tuple(C))
+zero(C::Type{<:AbstractCliffordNumber}) = C(zero_tuple(Bool, Val(length(C))))
 zero(x::AbstractCliffordNumber) = zero(typeof(x))
 
 # The default defintion assumes oneunit(T) = T(one(x))
