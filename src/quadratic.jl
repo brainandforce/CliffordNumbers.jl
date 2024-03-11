@@ -42,6 +42,28 @@ Clifford algebra isomorphic to the complex numbers.
 const QFComplex = QuadraticForm{0,1,0}
 
 """
+    CliffordNumbers.QFPositiveDefinite{P} (alias for QuadraticForm{P,0,0})
+
+A positive-definite quadratic form with `P` dimensions.
+"""
+const QFPositiveDefinite{P} = QuadraticForm{P,0,0}
+
+"""
+    CliffordNumbers.QFNondegenerate{P,Q} (alias for QuadraticForm{P,Q,0})
+
+Represents a non-degenerate quadratic form (one without dimensions which square to 0).
+"""
+const QFNondegenerate{P,Q} = QuadraticForm{P,Q,0}
+
+"""
+    CliffordNumbers.QFExterior{R} (alias for QuadraticForm{0,0,R})
+
+The quadratic form associated with an exterior algebra, which can be thought of as a Clifford 
+algebra where all dimensions are degenerate.
+"""
+const QFExterior{R} = QuadraticForm{0,0,R}
+
+"""
     APS
 
 The algebra of physical space, Cl(3,0,0). An alias for `QuadraticForm{3,0,0}`.
