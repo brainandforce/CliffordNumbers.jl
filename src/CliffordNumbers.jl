@@ -49,10 +49,10 @@ export EvenCliffordNumber, OddCliffordNumber
 include("kvector.jl")
 export KVector
 # Conversion and promotion tools
-include("promote.jl")
-export widen_grade
 include("convert.jl")
 export scalar_convert
+include("promote.jl")
+export widen_grade, scalar_promote
 # Fast multiplication kernels
 include("multiply.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances

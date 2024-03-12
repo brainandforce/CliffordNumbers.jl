@@ -49,6 +49,22 @@ end
         CliffordNumber{APS,Float64,8}
     @test promote_type(KVector{1,APS,Float64}, CliffordNumber{APS,Int}) ===
         CliffordNumber{APS,Float64,8}
+    # Scalar promotion
+    k = KVector{1,APS,Int16}(4, 2, 0)
+    kk = KVector{1,APS,Float32}(4, 2, 0)
+    l = KVector{2,APS}(0, 6, 9)
+    ll = KVector{2,APS,Float32}(0, 6, 9)
+    e = EvenCliffordNumber{APS}(1, 3, 3, 7)
+    ee = EvenCliffordNumber{APS,Float32}(1, 3, 3, 7)
+    @test scalar_promote() === tuple()
+    @test scalar_promote(k) === tuple(k)
+    @test scalar_promote(ee) === tuple(ee)
+    @test scalar_promote(Float16(0)) === tuple(Float16(0))
+    @test scalar_promote(k, l) === (KVector{1,APS}(4, 2, 0), l)
+    @test scalar_promote(k, 2) === (KVector{1,APS}(4, 2, 0), 2)
+    @test scalar_promote(k, l, ee) === (kk, ll, ee)
+    @test scalar_promote(k, ll, e) === (kk, ll, ee)
+    @test scalar_promote(kk, l, e) === (kk, ll, ee)
 end
 
 @testset "Widening" begin

@@ -85,6 +85,39 @@ end
 =#
 promote_rule(C1::Type{<:KVector}, C2::Type{<:Z2CliffordNumber}) = promote_rule(C2, C1)
 
+#---Promoting just the scalar types of an AbstractCliffordNumber-----------------------------------#
+"""
+    scalar_promote(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+
+Promotes the scalar types of `x` and `y` to a common type. This does not increase the number of
+represented grades of either `x` or `y`.
+"""
+scalar_promote() = ()
+scalar_promote(x::Number) = tuple(x)
+
+function scalar_promote(x::Number, y::Number)
+    @inline
+    T = promote_numeric_type(x, y)
+    return (scalar_convert(T, x), scalar_convert(T, y))
+end
+
+scalar_promote(x::T, y::T) where T = (x,y)
+scalar_promote(x::T, y::AbstractCliffordNumber{<:Any,T}) where T = (x,y)
+scalar_promote(x::AbstractCliffordNumber{<:Any,T}, y::T) where T = (x,y)
+
+function scalar_promote(
+    x::AbstractCliffordNumber{<:Any,T},
+    y::AbstractCliffordNumber{<:Any,T}
+) where T
+    return (x,y)
+end
+
+function scalar_promote(x::Number, y::Number, zs::Number...)
+    @inline
+    T = promote_numeric_type(x, y, zs...)
+    return scalar_convert.(T, (x, y, zs...))
+end
+
 #---Widening types---------------------------------------------------------------------------------#
 """
     widen(C::Type{<:AbstractCliffordNumber})
