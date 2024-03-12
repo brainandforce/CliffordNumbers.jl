@@ -130,6 +130,25 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
     return map((@inline b -> x[b]), B)
 end
 
+"""
+    CliffordNumbers.getindex_as_tuple(x::AbstractCliffordNumber{Q}, B::BitIndices{Q,C})
+
+An efficient method for indexing the elements of `x` into a tuple that can be used to construct a
+Clifford number of type `C`, or a similar type from `CliffordNumbers.similar_type`.
+"""
+@generated function getindex_as_tuple(x::AbstractCliffordNumber{Q}, ::BitIndices{Q,C}) where {Q,C}
+    inds = to_index.(x, BitIndices(C))
+    # The mask is needed for the KVector case.
+    # BitIndex objects that don't map to a tuple index just get to turned to index 1
+    mask = in.(BitIndices(C), tuple(BitIndices(x)))
+    return :(map(*, getindex.(tuple(Tuple(x)), $inds), $mask))
+end
+
+@inline function getindex(x::AbstractCliffordNumber{Q}, B::BitIndices{Q,C}) where {Q,C}
+    T = similar_type(C, numeric_type(x))
+    return T(getindex_as_tuple(x, B))
+end
+
 function getindex(x::AbstractCliffordNumber{Q}, B::AbstractBitIndices{Q,C}) where {Q,C}
     T = similar_type(C, numeric_type(x))
     return T(x[Tuple(B)])
@@ -138,10 +157,10 @@ end
 # Constructors can follow similar logic
 # The type bound is required here to get the expected dispatch behavior
 function (C::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q<:QuadraticForm
-    return C(x[Tuple(BitIndices(C))])
+    return C(getindex_as_tuple(x, BitIndices(C)))
 end
 
 function (C::Type{<:AbstractCliffordNumber})(x::AbstractCliffordNumber)
     T = similar_type(C, numeric_type(x), QuadraticForm(x))
-    return T(x[Tuple(BitIndices(T))])
+    return T(getindex_as_tuple(x, BitIndices(T)))
 end
