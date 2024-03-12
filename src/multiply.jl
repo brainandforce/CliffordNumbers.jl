@@ -17,7 +17,13 @@ bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = map(b -> -a*b, Tupl
 @inline bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q} = map(b -> -b*a, B)
 bitindex_shuffle( B::BitIndices{Q}, a::BitIndex{Q}) where Q = map(b -> -a*b, Tuple(B))
 
-function _ndmult(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+"""
+    CliffordNumbers.nondegenerate_mask(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
+
+Constructs a Boolean mask which is `false` for any multiplication that squares a degenerate blade;
+`true` otherwise.
+"""
+function nondegenerate_mask(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
     return map(b -> nondegenerate_mult(a, b), B)
 end
 
@@ -89,7 +95,7 @@ multiplications this may be best solved by simply converting KVector arguments u
     ex = :($z)
     for a in BitIndices(x)
         inds = bitindex_shuffle(a, BC)
-        mask = _ndmult(a, BC)
+        mask = nondegenerate_mask(a, BC)
         ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
     end
     return :($C($ex))
