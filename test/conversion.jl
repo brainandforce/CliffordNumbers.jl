@@ -15,6 +15,11 @@
     @test convert(EvenCliffordNumber, k2) === EvenCliffordNumber{APS}(0, 1, 2, 3)
     @test_throws InexactError convert(EvenCliffordNumber, k1)
     @test_throws InexactError convert(OddCliffordNumber, k2)
+    # Scalar conversion
+    @test scalar_convert(Int, k1) === k1
+    @test scalar_convert(Float32, k1) === KVector{1,APS,Float32}(1, 2, 3)
+    @test scalar_convert(Int, 2) === 2
+    @test scalar_convert(Float32, 2) === Float32(2)
 end
 
 @testset "Promotion" begin

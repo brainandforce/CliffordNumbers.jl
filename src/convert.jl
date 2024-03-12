@@ -20,3 +20,28 @@ end
 
 # k-vectors of grade 0 are scalars
 convert(::Type{T}, k::KVector{0}) where T<:BaseNumber = convert(T, only(k.data))
+
+#---Convert only the scalar portion of an AbstractCliffordNumber-----------------------------------#
+"""
+    scalar_convert(T::Type{<:Union{Real,Complex}}, x::AbstractCliffordNumber) -> T
+    scalar_convert(T::Type{<:Union{Real,Complex}}, x::Union{Real,Complex}) -> T
+
+If `x` is an `AbstractCliffordNumber`, converts the scalars of `x` to type `T`.
+
+If `x` is a `Real` or `Complex`, converts `x` to `T`.
+
+# Examples
+```julia-repl
+julia> scalar_convert(Float32, KVector{1,APS}(1, 2, 3))
+3-element KVector{1, VGA(3), Float32}:
+1.0σ₁ + 2.0σ₂ + 3.0σ
+
+julia> scalar_convert(Float32, 2)
+2.0f0
+```
+"""
+scalar_convert(::Type{T}, x::AbstractCliffordNumber) where T<:BaseNumber = similar_type(x, T)(x)
+scalar_convert(::Type{T}, x::AbstractCliffordNumber{<:Any,T}) where T<:BaseNumber = x
+
+scalar_convert(::Type{T}, x::BaseNumber) where T<:BaseNumber = convert(T, x)
+scalar_convert(::Type{T}, x::T) where T<:BaseNumber = x
