@@ -228,7 +228,7 @@ end
         x::AbstractCliffordNumber{Q},
         y::AbstractCliffordNumber{Q},
         i::BitIndex{Q}
-        [f = (a,b) -> true]
+        [f = Returns(true)]
     )
 
 Calculate the coefficient indexed by `i` from Clifford numbers `x` and `y`. The optional function
@@ -238,7 +238,7 @@ Calculate the coefficient indexed by `i` from Clifford numbers `x` and `y`. The 
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
     i::BitIndex{Q},
-    f = ((a,b) -> true)
+    f = Returns(true)
 ) where Q
     result = zero(promote_type(numeric_type(x), numeric_type(y)))
     for j in BitIndices(x)
@@ -254,7 +254,7 @@ end
         ::Type{T},
         x::AbstractCliffordNumber{Q},
         y::AbstractCliffordNumber{Q},
-        [f = ((a,b) -> true)]
+        [f = Returns(true)]
     )
 
 Sums the products of each pair of nonzero basis blades of `x` and `y`. This can be used to to
@@ -265,7 +265,7 @@ return a `Bool`, and the product of the basis blades is excluded if it evaluates
     ::Type{C},
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
-    f = ((a,b) -> true)
+    f = Returns(true)
 ) where {Q,C<:AbstractCliffordNumber{Q}}
     data = zero_tuple(C)
     for a in BitIndices(x), b in BitIndices(y)
@@ -280,7 +280,7 @@ end
     ::Type{C},
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
-    f = ((a,b) -> true)
+    f = Returns(true)
 ) where {Q,C<:AbstractCliffordNumber{Q}}
     return C(ntuple(i -> product_at_index(x, y, BitIndices(C)[i], f), Val(length(C))))
 end
@@ -289,7 +289,7 @@ end
     ::Type{T},
     x::AbstractCliffordNumber{Q},
     y::AbstractCliffordNumber{Q},
-    f = ((a,b) -> true)
+    f = Returns(true)
 ) where {Q,T<:AbstractCliffordNumber{Q}}
     # Tested against sum(); this is slightly better
     result = zero(T)

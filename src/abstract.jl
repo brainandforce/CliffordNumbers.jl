@@ -63,7 +63,7 @@ Base.Tuple(x::AbstractCliffordNumber) = getfield(x, :data)::Tuple
 
 Generates a `Tuple` of length `L` with all elements being `zero(T)`.
 """
-zero_tuple(::Type{T}, ::Val{L}) where {T,L} = ntuple(_ -> zero(T), Val(L))
+zero_tuple(::Type{T}, ::Val{L}) where {T,L} = ntuple(Returns(zero(T)), Val(L))
 
 """
     CliffordNumbers.zero_tuple(::Type{C<:AbstractCliffordNumber})
