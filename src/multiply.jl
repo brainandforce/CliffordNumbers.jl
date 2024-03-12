@@ -1,21 +1,44 @@
 #---Efficient multiplication kernels---------------------------------------------------------------#
 
+"""
+    CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
+    CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q})
+    
+    CliffordNumbers.bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q})
+    CliffordNumbers.bitindex_shuffle(B::BitIndices{Q}, a::BitIndex{Q})
+
+Performs the multiplication `-a * b` for each element of `B` for the above ordering, or `-b * a` for
+the below ordering, generating a reordered `NTuple` of `BitIndex{Q}` objects suitable for
+implementing a geometric product.
+"""
 @inline bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q} = map(b -> -a*b, B)
-bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = map(b -> a*b, Tuple(B))
+bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = map(b -> -a*b, Tuple(B))
+
+@inline bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q} = map(b -> -b*a, B)
+bitindex_shuffle( B::BitIndices{Q}, a::BitIndex{Q}) where Q = map(b -> -a*b, Tuple(B))
 
 function _ndmult(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
     return map(b -> nondegenerate_mult(a, b), B)
 end
 
-#=
-    Specialized kernel for multiplying two CliffordNumber or Z2CliffordNumber instances
-    
-    NOTE: this is much faster if the arguments are the same type
-    (CliffordNumber or Z2CliffordNumber; parity is irrelevant for the latter)
-    TODO: handle the case where the smaller argument comes first
+"""
+    CliffordNumbers.mul(
+        C::Type{<:AbstractCliffordNumber{Q,T}},
+        x::AbstractCliffordNumber{Q,T},
+        y::AbstractCliffordNumber{Q,T}
+    )
 
-    NOTE: this is much faster if the first input is smaller than the second input
-=#
+A fast geometric product implementation using generated functions for specific cases, and generic
+methods which either convert the arguments or fall back to other methods.
+
+# Notes (for internal use)
+
+Testing with `KVector` instances shows an extremely strong dependency on the multiplication order,
+with `x::KVector` and `y::CliffordNumber` being 10x faster than the opposite order.
+
+This could potentially be solved with kernels specific to those cases, but for sufficiently small
+multiplications this may be best solved by simply converting KVector arguments using `widen_grade`.
+"""
 @generated function mul(
     ::Type{C},
     x::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
@@ -26,8 +49,8 @@ end
     ex = :($z)
     for a in BitIndices(x)
         inds = bitindex_shuffle(a, BC)
-        nd = _ndmult(a, BC)
-        ex = :(map(muladd, x[$a] .* $nd, y[$inds], $ex))
+        mask = _ndmult(a, BC)
+        ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
     end
     return :(C($ex))
 end
