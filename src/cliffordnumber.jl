@@ -13,7 +13,7 @@ optimization when calculating the geometric product.
 struct CliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function CliffordNumber{Q,T,L}(x::Tuple) where {Q,T,L}
-        check_element_count(elements, Q, L, x)
+        check_element_count(elements(Q), Q, L, x)
         return new{Q,T,L}(x)
     end
 end
