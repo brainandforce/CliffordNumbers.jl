@@ -289,6 +289,12 @@ represent all nonzero basis blades of the result.
     return product_kernel(geometric_product_type(typeof(x), typeof(y)), x, y)
 end
 
+# KVector{0,Q} is just a scalar compatible with an AbstractCliffordNumber{Q}
+# TODO: this may be best in an eval block with all other products
+*(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = only(Tuple(k)) .* x
+*(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x .* only(Tuple(k))
+*(k::KVector{0,Q}, l::KVector{0,Q}) where Q = KVector{0,Q}(only(Tuple(k)) * only(Tuple(l)))
+
 @inline (x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q}) where Q = x * y
 
 #---Scalar products--------------------------------------------------------------------------------#
