@@ -52,6 +52,8 @@ export KVector
 include("promote.jl")
 export widen_grade
 include("convert.jl")
+# Fast multiplication kernels
+include("multiply.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
 export isscalar, ispseudoscalar, select_grade, scalar_product, normalize, left_contraction, 
