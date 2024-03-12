@@ -22,6 +22,23 @@ function _ndmult(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
 end
 
 """
+    CliffordNumbers.widen_for_mul(x::AbstractCliffordNumber)
+
+Widens `x` to an `EvenCliffordNumber`, `OddCliffordNumber`, or `CliffordNumber` as appropriate
+for the fast multiplication kernel.
+"""
+widen_grade_for_mul(x::Union{CliffordNumber,Z2CliffordNumber}) = x
+widen_grade_for_mul(k::KVector{K}) where K = Z2CliffordNumber{isodd(K)}(k)
+
+# Generic fallback for future user-defined types
+function widen_grade_for_mul(x::AbstractCliffordNumber)
+    all(iseven, nonzero_grades(x)) && return EvenCliffordNumber(x)
+    all(iodd, nonzero_grades(x)) && return OddCliffordNumber(x)
+    return CliffordNumber(x)
+end
+
+#---Geometric product------------------------------------------------------------------------------#
+"""
     CliffordNumbers.mul(
         C::Type{<:AbstractCliffordNumber{Q,T}},
         x::AbstractCliffordNumber{Q,T},
@@ -53,4 +70,13 @@ multiplications this may be best solved by simply converting KVector arguments u
         ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
     end
     return :(C($ex))
+end
+
+# More generic fallback to widen grades of k-vectors and other user-defined types
+function mul(
+    ::Type{C},
+    x::AbstractCliffordNumber{Q,T},
+    y::AbstractCliffordNumber{Q,T}
+) where {Q,T,C<:AbstractCliffordNumber{Q,T}}
+    return mul(C, widen_grade_for_mul(x), widen_grade_for_mul(y))
 end
