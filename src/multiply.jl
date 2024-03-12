@@ -39,14 +39,36 @@ end
 
 #---Geometric product------------------------------------------------------------------------------#
 """
-    CliffordNumbers.mul(
-        C::Type{<:AbstractCliffordNumber{Q,T}},
-        x::AbstractCliffordNumber{Q,T},
-        y::AbstractCliffordNumber{Q,T}
-    )
+    CliffordNumbers.geometric_product_type(::Type{S}, ::Type{T})
+
+Returns the type of the result of the geometric product of the input types.
+"""
+@generated function geometric_product_type(
+    ::Type{C1},
+    ::Type{C2}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    c1_odd = all(isodd, nonzero_grades(C1))
+    c2_odd = all(isodd, nonzero_grades(C2))
+    c1_even = all(iseven, nonzero_grades(C1))
+    c2_even = all(iseven, nonzero_grades(C2))
+    P = (c1_odd && c2_even) || (c1_even && c2_odd)
+    T = promote_numeric_type(C1,C2)
+    if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
+        return :(CliffordNumber{Q,$T,elements(Q)})
+    else
+        return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
+    end
+end
+
+"""
+    CliffordNumbers.mul(x::AbstractCliffordNumber{Q,T}, y::AbstractCliffordNumber{Q,T})
 
 A fast geometric product implementation using generated functions for specific cases, and generic
 methods which either convert the arguments or fall back to other methods.
+
+The arguments to this function should all agree in scalar type `T`. The `*` function, which exposes
+the fast geometric product implementation, promotes the scalar types of the arguments before
+utilizing this kernel.
 
 # Notes (for internal use)
 
@@ -57,10 +79,11 @@ This could potentially be solved with kernels specific to those cases, but for s
 multiplications this may be best solved by simply converting KVector arguments using `widen_grade`.
 """
 @generated function mul(
-    ::Type{C},
     x::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
     y::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}}
-) where {Q,T,C<:AbstractCliffordNumber{Q,T}}
+) where {Q,T}
+    C = geometric_product_type(x, y)
+    # Construct the 
     BC = Tuple(BitIndices(C))
     z = zero_tuple(C)
     ex = :($z)
@@ -69,14 +92,5 @@ multiplications this may be best solved by simply converting KVector arguments u
         mask = _ndmult(a, BC)
         ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
     end
-    return :(C($ex))
-end
-
-# More generic fallback to widen grades of k-vectors and other user-defined types
-function mul(
-    ::Type{C},
-    x::AbstractCliffordNumber{Q,T},
-    y::AbstractCliffordNumber{Q,T}
-) where {Q,T,C<:AbstractCliffordNumber{Q,T}}
-    return mul(C, widen_grade_for_mul(x), widen_grade_for_mul(y))
+    return :($C($ex))
 end
