@@ -127,7 +127,7 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
 
 # Indexing with an NTuple returns an NTuple of the coefficients at the BitIndex members
 @inline function getindex(x::AbstractCliffordNumber{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
-    return map(b -> x[b], B)
+    return map((@inline b -> x[b]), B)
 end
 
 function getindex(x::AbstractCliffordNumber{Q}, B::AbstractBitIndices{Q,C}) where {Q,C}
