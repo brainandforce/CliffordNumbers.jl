@@ -64,7 +64,7 @@ end
 @inline to_index(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = to_index(typeof(x), b)
 
 @inline function getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
-    return sign(b) * (@inbounds x.data[to_index(x, b)]) * xor(iseven(grade(b)), P)
+    return xor(iseven(grade(b)), P) * sign(b) * (@inbounds x.data[to_index(x, b)])
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#
