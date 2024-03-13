@@ -52,6 +52,17 @@ end
 @testset "Geometric product" begin
     x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
     y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
+    k1 = KVector{1,APS}(4, 2, 0)
+    k2 = KVector{2,APS}(4, 2, 0)
+    l1 = KVector{1,APS}(0, 6, 9)
+    l2 = KVector{2,APS}(0, 6, 9)
+    # Signs included explicilty for clarity
+    @test k1 * l1 === EvenCliffordNumber{APS}(+12, +24, +36, +18)
+    @test l1 * k1 === EvenCliffordNumber{APS}(+12, -24, -36, -18)
+    @test k1 * l1 === reverse(l1 * k1)
+    @test k2 * l2 === EvenCliffordNumber{APS}(-12, -18, +36, -24)
+    @test l2 * k2 === EvenCliffordNumber{APS}(-12, +18, -36, +24)
+    @test k2 * l2 === reverse(l2 * k2)
     @test x * y == CliffordNumber{APS}(6, 0, 0, 8, 0, 0, 0, 0)
     # When multiplying vectors, the reverse should have a negative bivector
     @test y * x == CliffordNumber{APS}(6, 0, 0, -8, 0, 0, 0, 0)
