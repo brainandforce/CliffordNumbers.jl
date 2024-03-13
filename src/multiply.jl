@@ -11,11 +11,16 @@ Performs the multiplication `-a * b` for each element of `B` for the above order
 the below ordering, generating a reordered `NTuple` of `BitIndex{Q}` objects suitable for
 implementing a geometric product.
 """
-@inline bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q} = map(b -> -a*b, B)
-bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = map(b -> -a*b, Tuple(B))
+@inline function bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+    return map(b -> reverse(a) * b, B)
+end
 
-@inline bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q} = map(b -> -b*a, B)
-bitindex_shuffle( B::BitIndices{Q}, a::BitIndex{Q}) where Q = map(b -> -a*b, Tuple(B))
+@inline function bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q}
+    return map(b -> b * reverse(a), B)
+end
+
+bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))
+bitindex_shuffle( B::BitIndices{Q}, a::BitIndex{Q}) where Q = bitindex_shuffle(Tuple(B), a)
 
 """
     CliffordNumbers.nondegenerate_mask(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
