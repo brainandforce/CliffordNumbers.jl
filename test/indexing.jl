@@ -1,28 +1,45 @@
 @testset "BitIndex" begin
+    a = BitIndex(VGA(3), 1)
+    b = BitIndex(VGA(3), 2)
+    c = BitIndex(VGA(3), 3)
     @test BitIndex(VGA(3), 1, 2) === BitIndex{VGA(3)}(false, UInt(3))
     @test BitIndex(VGA(3), 2, 1) === BitIndex{VGA(3)}(true, UInt(3))
     @test BitIndex(VGA(3), 1, 2) === -BitIndex(VGA(3), 2, 1)
     @test abs(BitIndex(VGA(3), 1, 2)) === BitIndex(VGA(3), 1, 2)
     @test abs(BitIndex(VGA(3), 2, 1)) === BitIndex(VGA(3), 1, 2)
     # Euclidean multiplications
-    @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === false
-    @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 2), BitIndex(VGA(3), 1)) === true
-    @test CliffordNumbers.signbit_of_mult(-BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === true
-    @test CliffordNumbers.signbit_of_mult(BitIndex(VGA(3), 1), -BitIndex(VGA(3), 2)) === true
-    @test CliffordNumbers.signbit_of_mult(-BitIndex(VGA(3), 1), -BitIndex(VGA(3), 2)) === false
+    @test CliffordNumbers.signbit_of_mult(a, b) === false
+    @test CliffordNumbers.signbit_of_mult(b, a) === true
+    @test CliffordNumbers.signbit_of_mult(-a, b) === true
+    @test CliffordNumbers.signbit_of_mult(a, -b) === true
+    @test CliffordNumbers.signbit_of_mult(-a, -b) === false
     @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3))) === false
     @test CliffordNumbers.sign_of_square(BitIndex(VGA(3))) > 0
-    @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3), 1)) === false
-    @test CliffordNumbers.sign_of_square(BitIndex(VGA(3), 1)) > 0
+    @test CliffordNumbers.signbit_of_square(a) === false
+    @test CliffordNumbers.sign_of_square(a) > 0
     @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3), 1, 2)) === true
     @test CliffordNumbers.sign_of_square(BitIndex(VGA(3), 1, 2)) < 0
     @test CliffordNumbers.signbit_of_square(BitIndex(VGA(3), 1, 2, 3)) === true
     @test CliffordNumbers.sign_of_square(BitIndex(VGA(3), 1, 2, 3)) < 0
-    @test BitIndex(VGA(3), 1) * BitIndex(VGA(3), 2) === BitIndex(VGA(3), 1, 2)
-    @test BitIndex(VGA(3), 2) * BitIndex(VGA(3), 1) === BitIndex(VGA(3), 2, 1)
-    @test BitIndex(VGA(3), 2) * BitIndex(VGA(3), 1) === -BitIndex(VGA(3), 1, 2)
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(VGA(3), 1), BitIndex(VGA(3), 2)) === true
-    @test CliffordNumbers.nondegenerate_square(BitIndex(VGA(3), 1, 2)) === true
+    @test a * b === BitIndex(VGA(3), 1, 2)
+    @test b * a === BitIndex(VGA(3), 2, 1)
+    @test b * a === -BitIndex(VGA(3), 1, 2)
+    @test CliffordNumbers.has_wedge(a, BitIndex(VGA(3))) === true
+    @test CliffordNumbers.has_wedge(a, b) === true
+    @test CliffordNumbers.has_wedge(b, a) === true
+    @test CliffordNumbers.has_wedge(a, a) === false
+    @test CliffordNumbers.has_wedge(a, a*b) === false
+    @test CliffordNumbers.has_wedge(a*b, a) === false
+    @test CliffordNumbers.has_wedge(a*b, b) === false
+    @test CliffordNumbers.has_wedge(a*b, a*b) === false
+    @test CliffordNumbers.has_wedge(a*b, b*a) === false
+    @test CliffordNumbers.has_wedge(a, b*c) === true
+    @test CliffordNumbers.has_wedge(a*b, c) === true
+    @test CliffordNumbers.has_wedge(a, b, c) === true
+    @test CliffordNumbers.has_wedge(a, b, b) === false
+    @test CliffordNumbers.has_wedge(a, b, c, b) === false
+    @test CliffordNumbers.nondegenerate_mult(a, b) === true
+    @test CliffordNumbers.nondegenerate_square(a*b) === true
     # Degenerate multiplications
     QF = QuadraticForm{3,1,2}
     @test CliffordNumbers.nondegenerate_mult(BitIndex(APS, 1, 3), BitIndex(APS, 2, 3)) === true

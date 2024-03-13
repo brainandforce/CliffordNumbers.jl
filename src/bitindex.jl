@@ -294,11 +294,19 @@ basis blades indexed by `a` and `b`.
 @inline *(a::T, b::T) where T<:BitIndex = T(signbit_of_mult(a,b), xor(UInt(a), UInt(b)))
 
 """
-    CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) -> Bool
+    CliffordNumbers.has_wedge(a::BitIndex{Q}, b::BitIndex{Q}, [c::BitIndex{Q}...]) -> Bool
 
-Returns `true` if the basis blades indexed by `a` and `b` may have a nonzero wedge product.
+Returns `true` if the basis blades indexed by `a`, `b`, or any other blades `c...` have a nonzero
+wedge product; `false` otherwise. This is determined by comparing all bits of the arguments (except
+the sign bit) to identify any matching basis blades using bitwise AND.
 """
 has_wedge(a::BitIndex{Q}, b::BitIndex{Q}) where Q = iszero((a.i << 1) & (b.i << 1))
+
+function has_wedge(a::I, b::I, C::I...) where {Q,I<:BitIndex{Q}}
+    # The sign of multiplication is irrelevant
+    ab = I(xor(UInt(a), UInt(b)))
+    return has_wedge(a, b) && has_wedge(ab, first(C), C[2:end]...)
+end
 
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
