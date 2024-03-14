@@ -1,5 +1,4 @@
 #---Efficient multiplication kernels---------------------------------------------------------------#
-
 """
     CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
     CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q})
@@ -48,12 +47,99 @@ function widen_grade_for_mul(x::AbstractCliffordNumber)
     return CliffordNumber(x)
 end
 
+#---Grade filters----------------------------------------------------------------------------------#
+"""
+    CliffordNumbers.GradeFilter{S}
+
+A type that can be used to filter certain products of blades in a geometric product multiplication.
+The type parameter `S` must be a `Symbol`. The single instance of `GradeFilter{S}` is a callable
+object which implements a function that takes two or more `BitIndex{Q}` objects `a` and `b` and
+returns `false` if the product of the blades indexed is zero.
+
+To implement a grade filter for a product function `f`, define the following method:
+    (::GradeFilter{:f})(::BitIndex{Q}, ::BitIndex{Q})
+    # Or if the definition allows for more arguments
+    (::GradeFilter{:f})(::BitIndex{Q}...) where Q
+"""
+struct GradeFilter{S}
+    GradeFilter{S}() where S = (@assert S isa Symbol "Type parameter must be a Symbol."; new())
+end
+
+(::GradeFilter{S})(args...) where S = error("This filter has not been implemented.")
+
+(::GradeFilter{:*})(args::BitIndex{Q}...) where Q = true
+
+(::GradeFilter{:∧})(args::BitIndex{Q}...) where Q = has_wedge(args...)
+
+(::GradeFilter{:⨼})(a::BitIndex{Q}, b::BitIndex{Q}) where Q = (grade(b) - grade(a)) == grade(a*b)
+(::GradeFilter{:⨽})(a::BitIndex{Q}, b::BitIndex{Q}) where Q = (grade(a) - grade(b)) == grade(a*b)
+
+function (::GradeFilter{:dot})(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+    return abs(grade(a) - grade(b)) == grade(a*b)
+end
+
+const ContractionGradeFilters = Union{GradeFilter{:⨼},GradeFilter{:⨽},GradeFilter{:dot}}
+
+#---Product return types---------------------------------------------------------------------------#
+"""
+    CliffordNumbers.product_return_type(::Type{X}, ::Type{Y}, [::GradeFilter{S}])
+
+Returns a suitable type for representing the product of Clifford numbers of types `X` and `Y`. The
+`GradeFilter{S}` argument allows for the return type to be changed depending on the type of product.
+Without specialization on `S`, a type suitable for the geometric product is returned.
+"""
+@generated function product_return_type(
+    ::Type{C1},
+    ::Type{C2},
+    ::GradeFilter{<:Any}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    c1_odd = all(isodd, nonzero_grades(C1))
+    c2_odd = all(isodd, nonzero_grades(C2))
+    c1_even = all(iseven, nonzero_grades(C1))
+    c2_even = all(iseven, nonzero_grades(C2))
+    # Parity: true for odd multivectors, false for even multivectors
+    P = (c1_odd && c2_even) || (c1_even && c2_odd)
+    T = promote_numeric_type(C1,C2)
+    if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
+        return :(CliffordNumber{Q,$T,elements(Q)})
+    else
+        return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
+    end
+end
+
+function product_return_type(
+    X::Type{<:KVector{K1,Q}},
+    Y::Type{<:KVector{K2,Q}},
+    ::GradeFilter{:wedge}
+) where {Q,K1,K2}
+    K = min(K1 + K2, dimension(Q))
+    return KVector{K, Q, promote_numeric_type(X, Y), binomial(dimension(Q), k)}
+end
+
+function product_return_type(
+    X::Type{<:KVector{K1,Q}},
+    Y::Type{<:KVector{K2,Q}},
+    ::ContractionGradeFilters
+) where {Q,K1,K2}
+    K = abs(K1 - K2)
+    return KVector{K, Q, promote_numeric_type(X, Y), binomial(dimension(Q), k)}
+end
+
+function product_return_type(
+    x::AbstractCliffordNumber,
+    y::AbstractCliffordNumber,
+    F::GradeFilter = GradeFilter{:*}()
+)
+    return product_return_type(typeof(x), typeof(y), F)
+end
+
 #---Geometric product------------------------------------------------------------------------------#
 """
     CliffordNumbers.geometric_product_type(::Type{S}, ::Type{T})
 
 Returns the type of the result of the geometric product of the input types.
 """
+#=
 @generated function geometric_product_type(
     ::Type{C1},
     ::Type{C2}
@@ -69,6 +155,14 @@ Returns the type of the result of the geometric product of the input types.
     else
         return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
     end
+end
+=#
+
+function geometric_product_type(
+    ::Type{C1},
+    ::Type{C2}
+) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
+    return product_return_type(C1, C2, GradeFilter{:*}())
 end
 
 """
