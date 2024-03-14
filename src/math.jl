@@ -592,19 +592,29 @@ exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
 ^(k::Union{KVector,OddCliffordNumber}, n::Integer) = convert(exponential_type(k), k)^n
 
 """
-    CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = 12)
+    CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = Val(16))
 
 Calculates the exponential of `x` using a Taylor expansion up to the specified order. In most cases,
 12 is as sufficient number.
+
+# Notes
+
+16 iterations is currently used because the number of loop iterations is not currently a performance
+bottleneck.
 """
-function exp_taylor(x::AbstractCliffordNumber, order::Val{N} = Val(12)) where N
-    s = nextpow(2, abs(x))
+function exp_taylor(x::AbstractCliffordNumber, order::Val{N} = Val(16)) where N
     T = exponential_type(x)
+    s = nextpow(2, abs(x))
     y = convert(T, x) / s
-    result = zero(T)
-    for n in 0:N
-        result += y^n / factorial(n)
+    # x^0 == one(T)
+    result = term = one(T)
+    # Don't use ^ or factorial() here: ^ is significantly slower.
+    for n in 1:N
+        # Generate the next term from the previous
+        term = (y * term) / n
+        result = result + term
     end
+    # TODO: Base.power_by_squaring doesn't inline; do this last step faster
     return result^s
 end
 
@@ -617,7 +627,7 @@ For special cases where m squares to a scalar, the following shortcuts can be us
 `exp(x)`:
   * When x^2 < 0: `exp(x) === cos(abs(x)) + x * sin(abs(x)) / abs(x)`
   * When x^2 > 0: `exp(x) === cosh(abs(x)) + x * sinh(abs(x)) / abs(x)`
-  * When x^2 === 0: `exp(x) == 1 + x`
+  * When x^2 == 0: `exp(x) == 1 + x`
 
 See also: [`exppi`](@ref), [`exptau`](@ref).
 """
