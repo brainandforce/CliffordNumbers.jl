@@ -597,11 +597,13 @@ exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
 Calculates the exponential of `x` using a Taylor expansion up to the specified order. In most cases,
 12 is as sufficient number.
 """
-function exp_taylor(x::AbstractCliffordNumber, order = 12)
+function exp_taylor(x::AbstractCliffordNumber, order::Val{N} = Val(12)) where N
     s = nextpow(2, abs(x))
-    result = zero(exponential_type(x))
-    for n in 0:order
-        result += (x/s)^n / factorial(n)
+    T = exponential_type(x)
+    y = convert(T, x)
+    result = zero(T)
+    for n in 0:N
+        result += (y/s)^n / factorial(n)
     end
     return result^s
 end
