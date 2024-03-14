@@ -109,12 +109,12 @@ end
 
 for op in (:*, :/, ://)
     @eval begin
-       function $op(x::AbstractCliffordNumber, y::BaseNumber)
-            data = $op.(x.data, y)
+        @inline function $op(x::AbstractCliffordNumber, y::BaseNumber)
+            data = map(_x -> $op(_x, y), Tuple(x))
             return similar_type(typeof(x), eltype(data))(data)
         end
-        function $op(x::BaseNumber, y::AbstractCliffordNumber)
-            data = $op.(x, y.data)
+        @inline function $op(x::BaseNumber, y::AbstractCliffordNumber)
+            data = map(_y -> $op(x, _y), Tuple(y))
             return similar_type(typeof(y), eltype(data))(data)
         end
     end
@@ -618,13 +618,13 @@ function exp_taylor(x::AbstractCliffordNumber, order::Val{N} = Val(16)) where N
     # TODO: calculate s from abs2(x)?
     s = nextpow(2, abs(x))
     y = convert(T, x) / s
-    # x^0 == one(T)
     result = term = one(T)
     # Don't use ^ or factorial() here: ^ is significantly slower.
     for n in 1:N
         # Generate the next term from the previous
-        term = (y * term) / n
-        result = result + term
+        # It appears the multiplication here is not getting inlined
+        term *= y / n
+        result += term
     end
     # TODO: Base.power_by_squaring doesn't inline; do this last step faster
     return result^s
