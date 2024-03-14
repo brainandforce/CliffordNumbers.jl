@@ -587,9 +587,9 @@ end
 
 exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
 
-# KVector{K} promotes incorrectly for odd k due to broken type inference, see this issue:
+# Odd grade Clifford numbers promote incorrectly due to broken type inference, see this issue:
 # https://github.com/JuliaLang/julia/issues/53504
-^(k::KVector, n::Integer) = convert(exponential_type(k), k)^n
+^(k::Union{KVector,OddCliffordNumber}, n::Integer) = convert(exponential_type(k), k)^n
 
 """
     CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = 12)
