@@ -36,6 +36,9 @@ end
     @test x + y == CliffordNumber{APS}(10, -8, 14, -8, 18, 20, -8, 24)
     @test -x === CliffordNumber{APS}(-1, -2, -3, -4, -5, -6, -7, -8)
     @test x - y === CliffordNumber{APS}(-8.0, 12.0, -8.0, 16.0, -8.0, -8.0, 22.0, -8.0)
+    @test 1 + KVector{0,APS}(1) === KVector{0,APS}(2)
+    @test 1 + KVector{1,APS}(0, 0, 0) === CliffordNumber{APS}(1)
+    @test 1 + OddCliffordNumber{APS}(0, 0, 0, 0) === CliffordNumber{APS}(1)
 end
 
 @testset "muladd" begin

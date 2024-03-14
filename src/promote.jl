@@ -52,6 +52,10 @@ end
     end
 end
 
+function promote_rule(C::Type{<:KVector{K,Q,T}}, ::Type{N}) where{K,Q,T,N<:BaseNumber}
+    return promote_type(C, KVector{0,Q,N,1})
+end
+
 function promote_rule(::Type{<:KVector{<:Any,Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
     return CliffordNumber{Q,promote_type(T,N),elements(Q)}
 end
@@ -77,6 +81,10 @@ end
     else
         return :(Z2CliffordNumber{P,Q,promote_type(S,T),div(elements(Q), 2)})
     end
+end
+
+function promote_rule(C::Type{<:Z2CliffordNumber{P,Q,T}}, ::Type{N}) where {P,Q,T,N<:BaseNumber}
+    return promote_type(C, KVector{0,Q,N,1})
 end
 
 #= TODO:
