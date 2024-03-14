@@ -18,7 +18,7 @@ struct Z2CliffordNumber{P,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordN
     data::NTuple{L,T}
     function Z2CliffordNumber{P,Q,T,L}(x::Tuple) where {P,Q,T,L}
         @assert P isa Bool "The first type parameter must be a Bool (got $P)."
-        check_element_count(div(elements(Q), 2), Q, L, x)
+        check_element_count(div(elements(Q), 2), L, x)
         return new(x)
     end
 end

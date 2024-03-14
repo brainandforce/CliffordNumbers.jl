@@ -10,7 +10,7 @@ struct KVector{K,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T
     data::NTuple{L,T}
     function KVector{K,Q,T,L}(x::Tuple) where {K,Q,T,L}
         @assert 0 <= K <= dimension(Q) "K can only range from 0 to $(dimension(Q)) (got $K)."
-        check_element_count(binomial(dimension(Q), K), Q, L, x)
+        check_element_count(binomial(dimension(Q), K), L, x)
         return new{K,Q,T,L}(x)
     end
 end

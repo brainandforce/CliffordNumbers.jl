@@ -119,15 +119,15 @@ for type (must be an `Int`) and value (must be equal to `sz`).
 
 This function returns nothing, but throws an `AssertionError` for failed checks.
 """
-@inline function check_element_count(sz, Q::Type{QuadraticForm{X,Y,Z}}, data) where {X,Y,Z}
-    @assert length(data) == sz "Expected $(f(Q)) scalars from input, got $(length(data))"
+@inline function check_element_count(sz, data)
+    @assert length(data) == sz "Expected $sz scalars from input, got $(length(data))"
     return nothing
 end
 
-@inline function check_element_count(sz, Q::Type{QuadraticForm{X,Y,Z}}, L, data) where {X,Y,Z}
+@inline function check_element_count(sz, L, data)
     @assert L isa Int "Length type parameter must be an Int (got $(typeof(L)))."
-    @assert L == sz "Length type parameter must equal $(f(Q)) (got $L)."
-    check_element_count(sz, Q, data)
+    @assert L == sz "Length type parameter must equal $sz (got $L)."
+    check_element_count(sz, data)
 end
 
 #---Printed representations------------------------------------------------------------------------#
