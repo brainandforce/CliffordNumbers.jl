@@ -458,8 +458,9 @@ Note that the wedge product, in general, is *not* equal to the commutator produc
 product), which may be invoked with the `commutator` function or the `×` operator.
 """
 @inline function wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    T = wedge_product_type(typeof(x), typeof(y))
-    return product_kernel(T, x, y, has_wedge)
+    C = product_return_type(x, y, GradeFilter{:∧}())
+    (px, py) = scalar_promote(widen_grade_for_mul(x), widen_grade_for_mul(y))
+    return C(mul(px, py, GradeFilter{:∧}()))
 end
 
 @inline wedge(x::Real, y::AbstractCliffordNumber) = x * y

@@ -76,16 +76,23 @@ end
 end
 
 @testset "Wedge product" begin
-    x = CliffordNumber{APS}(0, 2, 0, 0, 0, 0, 0, 0)
-    y = CliffordNumber{APS}(0, 3, 4, 0, 0, 0, 0, 0)
+    x = KVector{1,APS}(1, 0, 0)
+    y = KVector{1,APS}(0, 1, 0)
+    z = KVector{1,APS}(0, 0, 1)
     k1 = KVector{1,APS}(3, 4, 0)
     k2 = KVector{2,APS}(4, 2, 0)
     five = 5 * one(CliffordNumber{APS})
     # Self wedges should be zero
     @test iszero(x ∧ x)
     @test iszero(y ∧ y)
+    @test iszero(z ∧ z)
     # Reversing the order should flip the sign for vectors
     @test x ∧ y == -(y ∧ x)
+    @test x ∧ z == -(z ∧ x)
+    @test y ∧ z == -(z ∧ y)
+    @test x ∧ y ∧ z == -(z ∧ y ∧ x)
+    @test iszero(x ∧ y ∧ x)
+    @test iszero(x ∧ y ∧ z ∧ x)
     @test KVector{1,APS}(x) ∧ KVector{1,APS}(y) == -(KVector{1,APS}(y) ∧ KVector{1,APS}(x))
     # Ensure the behavior of scalars (both CliffordNumber and normal) are correct
     @test 5 ∧ x == 5 * x

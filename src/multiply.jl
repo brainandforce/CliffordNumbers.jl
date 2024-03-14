@@ -197,9 +197,12 @@ kernel just returns the geometric product.
     C = product_return_type(x, y, F())
     ex = :($(zero_tuple(C)))
     for a in BitIndices(x)
-        inds = bitindex_shuffle(a, Tuple(BitIndices(C)))
-        mask = mul_mask(F(), a, Tuple(BitIndices(C)))
-        ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
+        inds = bitindex_shuffle(a, BitIndices(C))
+        mask = mul_mask(F(), a, inds)
+        # Don't append operations that won't actually do anything
+        if any(mask)
+            ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
+        end
     end
     return :($C($ex))
 end
