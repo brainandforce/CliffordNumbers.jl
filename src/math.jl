@@ -474,8 +474,7 @@ const ∧ = wedge
     commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
-Calculates the commutator (or antisymmetric) product, equal to `1//2 * (x*y - y*x)`,
-or equivalently, `1//2 * (x*y - reverse(x*y))`.
+Calculates the commutator (or antisymmetric) product, equal to `1//2 * (x*y - y*x)`.
 
 Note that the commutator product, in general, is *not* equal to the wedge product, which may be
 invoked with the `wedge` function or the `∧` operator.
@@ -486,8 +485,7 @@ Because of the rational `1//2` factor in the product, inputs with scalar types s
 will be promoted to `Rational` subtypes.
 """
 function commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    z = x*y
-    return 1//2 * (z - reverse(z))
+    return 1//2 * (x*y - y*x)
 end
 
 const × = commutator
@@ -495,8 +493,7 @@ const × = commutator
 """
     anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
-Calculates the anticommutator (or symmetric) product, equal to `1//2 * (x*y + y*x)`, or
-equivalently, `1//2 * (x*y + reverse(x*y))`.
+Calculates the anticommutator (or symmetric) product, equal to `1//2 * (x*y + y*x)`.
 
 Note that the dot product, in general, is *not* equal to the anticommutator product, which may be
 invoked with `dot`. In some cases, the preferred operators might be the left and right contractions,
@@ -508,8 +505,7 @@ Because of the rational `1//2` factor in the product, inputs with scalar types s
 will be promoted to `Rational` subtypes.
 """
 function anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    z = x*y
-    return 1//2 * (z + reverse(z))
+    return 1//2 * (x*y + y*x)
 end
 
 const ⨰ = anticommutator
