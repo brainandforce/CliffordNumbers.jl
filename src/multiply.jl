@@ -132,10 +132,12 @@ end
 function product_return_type(
     X::Type{<:KVector{K1,Q}},
     Y::Type{<:KVector{K2,Q}},
-    ::GradeFilter{:wedge}
+    ::GradeFilter{:∧}
 ) where {Q,K1,K2}
+    # TODO: do we need this minimizing behavior?
+    # Maybe we can let K exceed the expected value and return a zero-element multivector.
     K = min(K1 + K2, dimension(Q))
-    return KVector{K, Q, promote_numeric_type(X, Y), binomial(dimension(Q), k)}
+    return KVector{K, Q, promote_numeric_type(X, Y), binomial(dimension(Q), K)}
 end
 
 function product_return_type(
