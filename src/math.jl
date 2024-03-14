@@ -299,15 +299,20 @@ end
 
 #---Scalar products--------------------------------------------------------------------------------#
 """
-    scalar_product(x::CliffordNumber{Q,T1}, y::CliffordNumber{Q,T2}) -> promote_type(T1,T2)
+    scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
 """
 function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     # Only iterate through a minimal set of indices, known to be nonzero
+    T = promote_numeric_type(x, y)
+    result = zero(T)
     inds = eachindex(promote_type(typeof(x), typeof(y)))
-    return sum(x[i] * y[i] * sign_of_mult(i) for i in inds)
+    for i in inds
+        result += T(x[i] * y[i] * sign_of_square(i))
+    end
+    return result
 end
 
 """
@@ -315,14 +320,20 @@ end
 
 Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
 """
-abs2(x::AbstractCliffordNumber) = scalar_product(x, ~x)
+function abs2(x::AbstractCliffordNumber)
+    result = zero(numeric_type(x))
+    for i in eachindex(x)
+        result += x[i] * x[i]
+    end
+    return result
+end
 
 """
     abs2(x::CliffordNumber{Q,T}) -> Union{Real,Complex}
 
 Calculates the norm of `x`, equal to `sqrt(scalar_product(x, ~x))`.
 """
-abs(x::AbstractCliffordNumber) = sqrt(abs2(x))
+abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
 
 """
     normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
@@ -604,6 +615,7 @@ bottleneck.
 """
 function exp_taylor(x::AbstractCliffordNumber, order::Val{N} = Val(16)) where N
     T = exponential_type(x)
+    # TODO: calculate s from abs2(x)?
     s = nextpow(2, abs(x))
     y = convert(T, x) / s
     # x^0 == one(T)
