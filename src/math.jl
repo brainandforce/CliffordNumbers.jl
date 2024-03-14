@@ -10,6 +10,7 @@ function isscalar(x::AbstractCliffordNumber)
     return all(iszero, x[i] for i in inds)
 end
 
+isscalar(x::Union{CliffordNumber,EvenCliffordNumber}) = all(iszero, Tuple(x)[2:end])
 isscalar(x::OddCliffordNumber) = iszero(x)
 isscalar(x::KVector) = iszero(x)
 isscalar(::KVector{0}) = true
@@ -71,7 +72,7 @@ conj(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero((grade(x) + 1) & 2))
 
 #---Addition, negation, and subtraction------------------------------------------------------------#
 
-+(x::T, y::T) where T<:AbstractCliffordNumber = T(Tuple(x) .+ Tuple(y))
++(x::T, y::T) where T<:AbstractCliffordNumber = T(map(+, Tuple(x), Tuple(y)))
 
 function +(x::AbstractCliffordNumber, y::BaseNumber)
     T = promote_type(typeof(x), typeof(y))
@@ -322,8 +323,8 @@ Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
 """
 function abs2(x::AbstractCliffordNumber)
     result = zero(numeric_type(x))
-    for i in eachindex(x)
-        result += x[i] * x[i]
+    for i in eachindex(Tuple(x))
+        result += Tuple(x)[i] * Tuple(x)[i]
     end
     return result
 end
@@ -613,22 +614,42 @@ Calculates the exponential of `x` using a Taylor expansion up to the specified o
 16 iterations is currently used because the number of loop iterations is not currently a performance
 bottleneck.
 """
-function exp_taylor(x::AbstractCliffordNumber, order::Val{N} = Val(16)) where N
+@generated function exp_taylor(x::AbstractCliffordNumber, ::Val{N} = Val(16)) where N
     T = exponential_type(x)
-    # TODO: calculate s from abs2(x)?
-    s = nextpow(2, abs(x))
-    y = convert(T, x) / s
-    result = term = one(T)
-    # Don't use ^ or factorial() here: ^ is significantly slower.
-    for n in 1:N
-        # Generate the next term from the previous
-        # It appears the multiplication here is not getting inlined
-        term *= y / n
-        result += term
+    ex = quote
+        # Initial term and result come from the zero exponent
+        result = term = one($T)
+        # Scale down the magnitude of x to prevent overflow
+        # Use a power of 2 to simplify the later exponentiation
+        # TODO: do this with abs2 instead of abs?
+        r = div(exponent(2*abs2(x) + 1), 2)
+        # Promote the argument to the final return type
+        y = convert($T, x / (2^r))
     end
-    # TODO: Base.power_by_squaring doesn't inline; do this last step faster
-    return result^s
+    # Unroll the iterations (16 seems to be enough for Float64, 12 for Float32)
+    for n in 1:N
+        ex = quote
+            $ex
+            # Use fast multiplication kernel directly
+            y_scaled = y * convert(numeric_type($T), 1 // $n)
+            term = mul(term, y_scaled)
+            # Add the term from this loop to the final result
+            result = result + term
+        end
+    end
+    return quote
+        $ex
+        # Use the identity exp(x) = exp(x/s)^s
+        for _ in 1:r
+            result = mul(result, result)
+        end
+        return result
+    end
 end
+
+# We can get away with fewer iterations for Float32 and Float16
+exp_taylor(x::AbstractCliffordNumber{<:Any,Float32}) = exp_taylor(x, Val(12))
+exp_taylor(x::AbstractCliffordNumber{<:Any,Float16}) = exp_taylor(x, Val(8))
 
 """
     exp(x::AbstractCliffordNumber{Q})
@@ -645,12 +666,13 @@ See also: [`exppi`](@ref), [`exptau`](@ref).
 """
 function exp(x::AbstractCliffordNumber)
     T = exponential_type(x)
-    sq = x*x
+    Tx = convert(T, x)
+    sq = mul(Tx, Tx)
     if isscalar(sq)
-        Tx = convert(T, x)
-        scalar(sq) < 0 && return cos(abs(x)) + Tx * sin(abs(x)) / abs(x)
-        scalar(sq) > 0 && return cosh(abs(x)) + Tx * sinh(abs(x)) / abs(x)
-        return 1 + Tx
+        mag = abs(x)
+        scalar(sq) < 0 && return T(cos(mag))  + Tx * (sin(mag) / mag)
+        scalar(sq) > 0 && return T(cosh(mag)) + Tx * (sinh(mag) / mag)
+        return one(T) + Tx
     end
     return exp_taylor(x)
 end
@@ -665,13 +687,14 @@ See also: [`exp`](@ref), [`exptau`](@ref).
 """
 function exppi(x::AbstractCliffordNumber)
     T = exponential_type(x)
-    sq = x*x
+    Tx = convert(T, x)
+    sq = mul(Tx, Tx)
     if isscalar(sq)
-        Tx = convert(T, x)
-        scalar(sq) < 0 && return cospi(abs(x)) + Tx * sinpi(abs(x)) / abs(x)
+        mag = abs(x)
+        scalar(sq) < 0 && return T(cospi(mag))  + Tx * (sinpi(mag) / mag)
         # TODO: is this really more accurate?
-        scalar(sq) > 0 && return cosh(π*abs(x)) + Tx * sinh(π*abs(x)) / abs(x)
-        return 1 + x
+        scalar(sq) > 0 && return T(cosh(π*mag)) + Tx * (sinh(π*mag) / mag)
+        return one(T) + Tx
     end
     # TODO: compare this to the regular Taylor expansion result
     return exp_taylor(π*x)
