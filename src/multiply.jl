@@ -182,17 +182,14 @@ The arguments to this function should all agree in scalar type `T`. The `*` func
 the fast geometric product implementation, promotes the scalar types of the arguments before
 utilizing this kernel.
 
-# Notes (for internal use)
-
-Testing with `KVector` instances shows an extremely strong dependency on the multiplication order,
-with `x::KVector` and `y::CliffordNumber` being 10x faster than the opposite order.
-
-This could potentially be solved with kernels specific to those cases, but for sufficiently small
-multiplications this may be best solved by simply converting KVector arguments using `widen_grade`.
+The `GradeFilter` `F` allows for some blade multiplications to be excluded if they meet certain
+criteria. This is useful for implementing products besides the geometric product, such as the wedge
+product, which excludes multiplications between blades with shared vectors. Without a filter, this
+kernel just returns the geometric product.
 """
 @generated function mul(
-    x::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
-    y::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
+    x::AbstractCliffordNumber{Q,T},
+    y::AbstractCliffordNumber{Q,T},
     F::GradeFilter = GradeFilter{:*}()
 ) where {Q,T}
     C = product_return_type(x, y, F())
@@ -201,6 +198,36 @@ multiplications this may be best solved by simply converting KVector arguments u
         inds = bitindex_shuffle(a, Tuple(BitIndices(C)))
         mask = mul_mask(F(), a, Tuple(BitIndices(C)))
         ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
+    end
+    return :($C($ex))
+end
+
+#=
+    TODO: possibly more specialized kernels for KVector types.
+
+    If we use the kernel above with the first argument being a KVector and the second being a
+    CliffordNumber or Z2CliffordNumber, it's a bit slower, but not horribly so. But in the opposite
+    case, it's *very* slow! It's also slow if both arguments are KVectors.
+
+    This is likely because of the compiler being unable to unroll and inline hamming_number(), as
+    the number of loops depends on the input. To solve this, we just have to avoid indexing the
+    KVector.
+
+    However, in the APS case, it seems like the kernel below is still significantly slower than just
+    converting the arguments to Z2CliffordNumber and proceeding.
+=#
+
+@generated function mul(
+    x::AbstractCliffordNumber{Q,T},
+    y::KVector{K,Q,T},
+    F::GradeFilter = GradeFilter{:*}()
+) where {K,Q,T}
+    C = product_return_type(x, y, F())
+    ex = :($(zero_tuple(C)))
+    for b in BitIndices(y)
+        inds = bitindex_shuffle(BitIndices(C), b)
+        mask = mul_mask(F(), BitIndices(C), b)
+        ex = :(map(muladd, x[$inds], y[$b] .* $mask, $ex))
     end
     return :($C($ex))
 end
