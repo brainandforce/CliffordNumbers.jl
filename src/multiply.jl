@@ -231,8 +231,11 @@ end
     ex = :($(zero_tuple(C)))
     for b in BitIndices(y)
         inds = bitindex_shuffle(BitIndices(C), b)
-        mask = mul_mask(F(), BitIndices(C), b)
-        ex = :(map(muladd, x[$inds], y[$b] .* $mask, $ex))
+        mask = mul_mask(F(), inds, b)
+        # Don't append operations that won't actually do anything
+        if any(mask)
+            ex = :(map(muladd, x[$inds], y[$b] .* $mask, $ex))
+        end
     end
     return :($C($ex))
 end
