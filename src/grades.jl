@@ -57,7 +57,10 @@ end
 
 Returns `true` if the grades represented in S are also represented in T; `false` otherwise.
 """
-function has_grades_of(S::Type{<:AbstractCliffordNumber}, T::Type{<:AbstractCliffordNumber})
+function has_grades_of(
+    ::Type{S},
+    ::Type{T}
+) where {S<:AbstractCliffordNumber,T<:AbstractCliffordNumber}
     return all(x in nonzero_grades(T) for x in nonzero_grades(S))
 end
 
