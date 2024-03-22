@@ -1,5 +1,5 @@
 """
-    CliffordNumbers.Z2CliffordNumber{P,Q,T,L}
+    CliffordNumbers.Z2CliffordNumber{P,Q,T,L} <: AbstractCliffordNumber{Q,T}
 
 A Clifford number whose only nonzero grades are even or odd. Clifford numbers of this form naturally
 arise as versors, the geometric product of 1-vectors.
@@ -23,7 +23,22 @@ struct Z2CliffordNumber{P,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordN
     end
 end
 
+"""
+    EvenCliffordNumber{P,Q,T,L} (alias for CliffordNumbers.Z2CliffordNumber{false,Q,T,L})
+
+A Clifford number whose only nonzero grades are even. These are the natural choice of representation
+for rotors and motors (Euclidean isometries preserving orientation, or "proper" isometries), as well
+as their composition with dilations.
+"""
 const EvenCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{false,Q,T,L}
+
+"""
+    OddCliffordNumber{P,Q,T,L} (alias for CliffordNumbers.Z2CliffordNumber{true,Q,T,L})
+
+A Clifford number whose only nonzero grades are odd. These are the natural choice of representation
+for reflections, as well as their compositions with rotors and motors (Euclidean isometries 
+preserving orientation, or "proper" isometries), as well as their composition with dilations.
+"""
 const OddCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{true,Q,T,L}
 
 #---Constructors-----------------------------------------------------------------------------------#
