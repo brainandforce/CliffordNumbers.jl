@@ -2,7 +2,7 @@
 
 This package exports a variety of types that represents elements of Clifford algebras.
 
-## `AbstractCliffordNumber{Q,T}`
+## `AbstractCliffordNumber{Q,T}` and subtypes
 
 The `AbstractCliffordNumber{Q,T}` type is the supertype for all implmentations of Clifford numbers.
 `Q` is a `QuadraticForm`, which describes the number of dimensions with positive, negative, and zero
@@ -30,7 +30,7 @@ ones described below.
 CliffordNumbers.CliffordNumber
 ```
 
-### `EvenCliffordNumber{Q,T,L}` and `OddCliffordNumber{Q,T,L}`
+### `EvenCliffordNumber{Q,T,L}` and `OddCliffordNumber{Q,T,L}`: even and odd graded elements
 
 These types represent Clifford numbers of exclusively even or odd grade, respectively.
 
@@ -44,7 +44,7 @@ CliffordNumbers.OddCliffordNumber
 CliffordNumbers.Z2CliffordNumber
 ```
 
-### `KVector{K,Q,T,L}`
+### `KVector{K,Q,T,L}`: elements of homogeneous grade
 
 This type represents a k-vector, or a Clifford number of homogeneous grade, with the parameter `K`
 indicating the grade.
@@ -124,6 +124,8 @@ ERROR: InexactError: ...
 !!! danger
     This is an extremely important point: **construction of a Clifford number type with fewer grades
     than the input performs a grade projection operation.** Conversion *will* throw an error if the
-    result is not exactly representable. This is ***not*** how other subtypes of `Number` defined by
-    Julia Base behave, as the conversion operation is identical to the constructor.
+    result is not exactly representable. 
+    
+    **This is not how other subtypes of `Number` defined by Julia Base behave**, as their conversion
+    operations are generally defined to be identical to the constructor.
     

@@ -18,7 +18,7 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Types" => "types.md",
+        "Clifford number types" => "numeric.md",
         "Operations" => "operations.md",
         "API" => "api.md"
     ],
