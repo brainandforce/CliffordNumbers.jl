@@ -8,10 +8,6 @@ The `AbstractCliffordNumber{Q,T}` type is the supertype for all implmentations o
 `Q` is a `QuadraticForm`, which describes the number of dimensions with positive, negative, and zero
 square, and `T` is a `Union{Real,Complex}` type of the coefficients.
 
-```@docs; canonical=false
-CliffordNumbers.AbstractCliffordNumber
-```
-
 !!! note "Future `StaticCliffordNumber{Q,T,L}` type
     We may introduce a new abstract type, `StaticCliffordNumber{Q,T,L}`, for static implementations,
     like all of the ones provided by this package. These should be implemented as fixed length data
@@ -26,10 +22,6 @@ While this type is useful if working with objects that mix even and odd grades (
 projectors or left minimal ideals), it is often more efficient to work with a smaller type, like the
 ones described below.
 
-```@docs; canonical=false
-CliffordNumbers.CliffordNumber
-```
-
 ### `EvenCliffordNumber{Q,T,L}` and `OddCliffordNumber{Q,T,L}`: even and odd graded elements
 
 These types represent Clifford numbers of exclusively even or odd grade, respectively.
@@ -37,12 +29,6 @@ These types represent Clifford numbers of exclusively even or odd grade, respect
 Internally, these are the same type: they alias `CliffordNumbers.Z2CliffordNumber{P,Q,T,L}`, where
 `P` is a Boolean parameter which is `false` for `EvenCliffordNumber` and `true` for
 `OddCliffordNumber`.
-
-```@docs; canonical=false
-CliffordNumbers.EvenCliffordNumber
-CliffordNumbers.OddCliffordNumber
-CliffordNumbers.Z2CliffordNumber
-```
 
 ### `KVector{K,Q,T,L}`: elements of homogeneous grade
 
@@ -62,10 +48,6 @@ optimized so that operations with it are simply converted to scalar operations.
     also k-blades, but this is not generally true: as a counterexample, $e_1 e_2 + e_3 e_4$ is not
     representable as a k-blade. However, all k-blades are k-vectors.
 
-```@docs; canonical=false
-CliffordNumbers.KVector
-```
-
 !!! note
     In the future, we may consider adding a `DualKVector` or `PseudoKVector` type to more easily
     represent pseudoscalars, pseudovectors, and related objects.
@@ -83,10 +65,6 @@ argument to be promoted to a common type. Promote rules have been defined so tha
 a scalar promotion and a grade promotion. No function currently promotes only the grades of the
 inputs.
 
-```@docs; canonical=false
-CliffordNumbers.scalar_promote
-```
-
 The `widen` function in Julia Base widens an `Number` type to a type that can represent the result
 of addition or subtraction with the the input type without overflowing or losing precision. This
 functionality is passed through to Clifford numbers, but it only affects the scalar type, not the
@@ -97,9 +75,6 @@ converting `KVector` to `EvenCliffordNumber` or `OddCliffordNumber` depending on
 converting those to `CliffordNumber`. New `AbstractCliffordNumber` subtypes should define this if
 they intend to promote to types other than `CliffordNumber`.
 
-```@docs; canonical=false
-CliffordNumbers.widen_grade
-```
 
 ## Construction and conversion
 
@@ -128,4 +103,3 @@ ERROR: InexactError: ...
     
     **This is not how other subtypes of `Number` defined by Julia Base behave**, as their conversion
     operations are generally defined to be identical to the constructor.
-    
