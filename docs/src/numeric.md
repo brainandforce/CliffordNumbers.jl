@@ -75,8 +75,9 @@ converting `KVector` to `EvenCliffordNumber` or `OddCliffordNumber` depending on
 converting those to `CliffordNumber`. New `AbstractCliffordNumber` subtypes should define this if
 they intend to promote to types other than `CliffordNumber`.
 
-
 ## Construction and conversion
+
+### From other Clifford numbers
 
 Clifford numbers can be constructed from other CliffordNumbers. This implicitly performs a grade
 projection operation, so this construction will always succeed, even if some of the basis blades of
@@ -98,11 +99,18 @@ ERROR: InexactError: ...
 
 !!! danger
     This is an extremely important point: **construction of a Clifford number type with fewer grades
-    than the input performs a grade projection operation.** Conversion *will* throw an error if the
-    result is not exactly representable. 
+    than the input performs a grade projection operation without throwing an error.** However,
+    *conversion* will throw an error if the grades of the input value are not present in the input
+    type.
     
     **This is not how other subtypes of `Number` defined by Julia Base behave**, as their conversion
-    operations are generally defined to be identical to the constructor.
+    operations are generally defined to be identical to the constructor, and always throw the same
+    error for a given pair of type and value.
+
+Construction and conversion of Clifford numbers from other Clifford numbers the only time that the
+quadratic form type parameter can be omitted.
+
+### Scalar conversion
 
 It may be desirable to convert the scalar type of an argument. The function `scalar_convert(T, x)`
 takes a type `T<:Union{Real,Complex}` and any Clifford number `x` and converts its scalar type to
