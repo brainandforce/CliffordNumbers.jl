@@ -103,3 +103,7 @@ ERROR: InexactError: ...
     
     **This is not how other subtypes of `Number` defined by Julia Base behave**, as their conversion
     operations are generally defined to be identical to the constructor.
+
+It may be desirable to convert the scalar type of an argument. The function `scalar_convert(T, x)`
+takes a type `T<:Union{Real,Complex}` and any Clifford number `x` and converts its scalar type to
+`T`. If `x` is a `Real` or `Complex`, it just converts `x` to an instance of `T`.
