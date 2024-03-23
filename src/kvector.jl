@@ -96,3 +96,8 @@ end
 #---Show methods-----------------------------------------------------------------------------------#
 
 short_typename(::Type{<:KVector{K,Q,T}}) where {K,Q,T} = KVector{K,Q,T}
+
+#---Special Z2CliffordNumber constructor-----------------------------------------------------------#
+
+# Automatically infer if we want an even or odd Clifford number
+Z2CliffordNumber(x::KVector{K}) where K = Z2CliffordNumber{isodd(K)}(x)

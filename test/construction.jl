@@ -42,6 +42,8 @@ end
 end
 
 @testset "Constructors" begin
+    k1 = KVector{1,APS}(1, 2, 3)
+    k2 = KVector{2,APS}(1, 2, 3)
     @test CliffordNumber{APS}(1337) === CliffordNumber{APS}(1337, 0, 0, 0, 0, 0, 0, 0)
     @test EvenCliffordNumber{APS}(1337) === EvenCliffordNumber{APS}(1337, 0, 0, 0)
     # Mixed types in input
@@ -51,11 +53,13 @@ end
     @test EvenCliffordNumber{APS}(0, 0, 0, 0.0) === zero(EvenCliffordNumber{APS,Float64})
     @test KVector{1,APS}(0, 0.0, 0) === zero(KVector{1,APS,Float64})
     # Barest constructors
-    @test CliffordNumber(KVector{2,APS}(1, 2, 3)) === CliffordNumber{APS}(0, 0, 0, 1, 0, 2, 3, 0)
-    @test EvenCliffordNumber(KVector{2,APS}(1, 2, 3)) === EvenCliffordNumber{APS}(0, 1, 2, 3)
-    @test OddCliffordNumber(KVector{2,APS}(1, 2, 3)) === OddCliffordNumber{APS}(0, 0, 0, 0)
-    @test EvenCliffordNumber(KVector{1,APS}(1, 2, 3)) === EvenCliffordNumber{APS}(0, 0, 0, 0)
-    @test OddCliffordNumber(KVector{1,APS}(1, 2, 3)) === OddCliffordNumber{APS}(1, 2, 3, 0)
+    @test CliffordNumber(k2) === CliffordNumber{APS}(0, 0, 0, 1, 0, 2, 3, 0)
+    @test EvenCliffordNumber(k2) === EvenCliffordNumber{APS}(0, 1, 2, 3)
+    @test OddCliffordNumber(k2) === OddCliffordNumber{APS}(0, 0, 0, 0)
+    @test EvenCliffordNumber(k1) === EvenCliffordNumber{APS}(0, 0, 0, 0)
+    @test OddCliffordNumber(k1) === OddCliffordNumber{APS}(1, 2, 3, 0)
+    @test CliffordNumbers.Z2CliffordNumber(k1) === OddCliffordNumber{APS}(1, 2, 3, 0)
+    @test CliffordNumbers.Z2CliffordNumber(k2) === EvenCliffordNumber{APS}(0, 1, 2, 3)
 end
 
 @testset "Similar types" begin
