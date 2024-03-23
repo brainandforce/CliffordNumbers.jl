@@ -529,11 +529,11 @@ const ⨰ = anticommutator
     dual(x::CliffordNumber) -> CliffordNumber
 
 Calculates the dual of `x`, which is equal to the left contraction of `x` with the inverse of the
-pseudoscalar. However, 
+pseudoscalar.
 
 Note that the dual has some properties that depend on the dimension and quadratic form:
-  * The inverse of the unit pseudoscalar depends on the dimension of the space. Therefore, the
-periodicity of 
+  * The inverse of the unit pseudoscalar is equal to its reverse, meaning that the sign may be
+positive or negative depending on the total number of dimensions in the space.
   * If the metric is degenerate, the dual is not unique.
 """
 function dual(x::CliffordNumber{Q}) where Q

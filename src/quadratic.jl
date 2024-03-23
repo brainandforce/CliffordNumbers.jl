@@ -9,12 +9,32 @@ By convention, this type is used as a tag, and is never instantiated.
 struct QuadraticForm{P,Q,R}
 end
 
+"""
+    dimension(::Type{QuadraticForm{P,Q,R}}) -> P + Q + R
+
+Returns the number of dimensions associated with a Clifford algebra.
+
+Note that this may not be the same as the number of dimensions being modeled by the algebra: for
+instance, projective geometric algebras have one more dimension than the space they are modeling.
+"""
 dimension(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (P + Q + R)
+
+"""
+    elements(Q::Type{QuadraticForm}) -> 2^dimension(Q)
+
+Returns the number of basis elements associated with `Q`.
+"""
+elements(Q::Type{<:QuadraticForm}) = 2^dimension(Q)
+
+"""
+    grades(Q::Type{QuadraticForm}) -> 0:dimension(Q)
+
+Returns the number of grades associated with `Q`.
+"""
+grades(Q::Type{<:QuadraticForm}) = 0:dimension(Q)
+
 isdegenerate(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = !iszero(R)
 iseuclidean(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (iszero(Q) && iszero(R))
-
-elements(Q::Type{<:QuadraticForm}) = 2^dimension(Q)
-grades(Q::Type{<:QuadraticForm}) = 0:dimension(Q)
 
 """
     sign(::Type{QuadraticForm{P,Q,R}}, i::Integer) -> Int8

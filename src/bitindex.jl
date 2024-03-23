@@ -121,6 +121,12 @@ sign(i::BitIndex) = Int8(-1)^signbit(i)
 -(i::BitIndex) = typeof(i)(!signbit(i), UInt(i))
 abs(i::BitIndex) = typeof(i)(UInt(i))
 
+"""
+    grade(i::BitIndex) -> Int
+
+Returns the grade of the basis blade represented by `i`, which ranges from 0 to the dimension of the
+space represented by `i` (equal to `dimension(QuadraticForm(i))`).
+"""
 grade(i::BitIndex) = count_ones(UInt(i))
 
 """
