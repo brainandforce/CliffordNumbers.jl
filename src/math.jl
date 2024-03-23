@@ -20,6 +20,13 @@ isscalar(::BaseNumber) = true
 scalar(x::AbstractCliffordNumber) = x[scalar_index(x)]
 
 """
+    real(x::CliffordNumber{Q,T<:Real}) = T
+
+Return the real (scalar) portion of a real Clifford number. 
+"""
+Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = scalar(x)
+
+"""
     ispseudoscalar(m::AbstractCliffordNumber)
 
 Determines whether the Clifford number `x` is a pseudoscalar, meaning that all of its blades with
@@ -41,21 +48,6 @@ end
 # Define equality with scalar values in terms of scalar operations above
 ==(x::AbstractCliffordNumber, y::BaseNumber) = isscalar(x) && (scalar(x) == y)
 ==(x::BaseNumber, y::AbstractCliffordNumber) = isscalar(y) && (x == scalar(y))
-
-#---Grade selection--------------------------------------------------------------------------------#
-"""
-    select_grade(x::CliffordNumber, g::Integer)
-
-Returns a multivector similar to `x` where all elements not of grade `g` are equal to zero.
-"""
-select_grade(x::CliffordNumber, g::Integer) = typeof(x)(i -> x[i] * (count_ones(i) == g))
-
-"""
-    real(x::CliffordNumber{Q,T<:Real}) = T
-
-Return the real (scalar) portion of a real Clifford number. 
-"""
-Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = scalar(x)
 
 #---Sign changing operations-----------------------------------------------------------------------#
 
