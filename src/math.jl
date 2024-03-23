@@ -17,14 +17,14 @@ isscalar(::KVector{0}) = true
 isscalar(::AbstractCliffordNumber{QuadraticForm{0,0,0}}) = true
 isscalar(::BaseNumber) = true
 
+"""
+    scalar(x::AbstractCliffordNumber{Q,T}) -> T
+
+Returns the scalar portion of `x` as its scalar type. This is equivalent to `x[scalar_index(x)]`.
+
+To retain Clifford number semantics, use the `KVector{0}` constructor.
+"""
 scalar(x::AbstractCliffordNumber) = x[scalar_index(x)]
-
-"""
-    real(x::CliffordNumber{Q,T<:Real}) = T
-
-Return the real (scalar) portion of a real Clifford number. 
-"""
-Base.real(x::AbstractCliffordNumber{Q,<:Real}) where Q = scalar(x)
 
 """
     ispseudoscalar(m::AbstractCliffordNumber)
