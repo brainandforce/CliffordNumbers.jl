@@ -1,6 +1,8 @@
 using CliffordNumbers
 using Documenter
 
+import CliffordNumbers.BaseNumber
+
 DocMeta.setdocmeta!(CliffordNumbers, :DocTestSetup, :(using CliffordNumbers); recursive=true)
 
 is_ci_env = (get(ENV, "CI", nothing) == true)
@@ -20,7 +22,13 @@ makedocs(;
         "Home" => "index.md",
         "Clifford number types" => "numeric.md",
         "Operations" => "operations.md",
-        "API" => "api.md"
+        "API" => Any[
+            "CliffordNumbers" => "api/clifford.md",
+            "Indexing" => "api/indexing.md",
+            "Math" => "api/indexing.md",
+            "Quadratic forms" => "api/quadratic.md",
+            "Internals" => "api/internal.md",
+        ]
     ],
 )
 
