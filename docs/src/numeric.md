@@ -8,7 +8,7 @@ The `AbstractCliffordNumber{Q,T}` type is the supertype for all implmentations o
 `Q` is a `QuadraticForm`, which describes the number of dimensions with positive, negative, and zero
 square, and `T` is a `Union{Real,Complex}` type of the coefficients.
 
-!!! note "Future `StaticCliffordNumber{Q,T,L}` type
+!!! note "Future `StaticCliffordNumber{Q,T,L}` type"
     We may introduce a new abstract type, `StaticCliffordNumber{Q,T,L}`, for static implementations,
     like all of the ones provided by this package. These should be implemented as fixed length data
     structures (ideally an `NTuple{L,T}`).
