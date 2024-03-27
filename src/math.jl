@@ -57,12 +57,12 @@ function isapprox(
     nans::Bool = false,
     norm = abs
 )
-    (tx, ty) = Tuple.(promote(x, y))
     # This mirrors the implementation for `AbstractArray`
     d = abs(x - y)
     if isfinite(d)
         return d <= max(atol, rtol*max(norm(x), norm(y)))
     else
+        (tx, ty) = Tuple.(promote(x, y))
         return all(isapprox.(tx, ty; atol, rtol, nans, norm))
     end
     #= TODO:
