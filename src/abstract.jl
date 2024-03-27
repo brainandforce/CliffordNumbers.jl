@@ -174,8 +174,8 @@ end
 
 #---Printed representations------------------------------------------------------------------------#
 """
-    CliffordNumbers.short_name(T::Type{<:AbstractCliffordNumber})
-    CliffordNumbers.short_name(x::AbstractCliffordNumber})
+    CliffordNumbers.short_typename(T::Type{<:AbstractCliffordNumber})
+    CliffordNumbers.short_typename(x::AbstractCliffordNumber})
     
 Returns a type with a shorter name than `T`, but still constructs `T`. This is achieved by removing
 dependent type parameters; often this includes the length parameter.
