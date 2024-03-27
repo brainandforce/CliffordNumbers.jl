@@ -28,6 +28,13 @@ Base.widen(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T}
 CliffordNumbers.widen_grade
 ```
 
+## Real and complex algebras
+
+```@docs
+Base.real(::AbstractCliffordNumber)
+Base.complex(::AbstractCliffordNumber)
+```
+
 ## Scalar and pseudoscalar components
 
 ```@docs

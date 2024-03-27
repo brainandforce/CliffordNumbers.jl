@@ -41,6 +41,16 @@ end
     @test_throws InexactError oneunit(OddCliffordNumber{APS})
 end
 
+@testset "Real and complex components" begin
+    x = EvenCliffordNumber{APS}(0, 4, 2, 0)
+    y = OddCliffordNumber{APS}(0, 6, 9, 0)
+    @test real(x) === x
+    @test complex(x) === EvenCliffordNumber{APS,Complex{Int}}(0, 4, 2, 0)
+    @test real(complex(y)) === y
+    @test complex(y, y) === OddCliffordNumber{APS}(0, 6+6im, 9+9im, 0)
+    @test complex(x, y) === CliffordNumber{APS}(0, 0, 6im, 4, 9im, 2, 0, 0)
+end
+
 @testset "Constructors" begin
     k1 = KVector{1,APS}(1, 2, 3)
     k2 = KVector{2,APS}(1, 2, 3)

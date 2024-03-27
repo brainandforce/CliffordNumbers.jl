@@ -105,6 +105,48 @@ similar_type(x, Q::Type{<:QuadraticForm}) = similar_type(x, numeric_type(x), Q)
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
 
+#---real() and complex()---------------------------------------------------------------------------#
+"""
+    real(x::AbstractCliffordNumber{Q,T})
+
+Gets the real portion of each coefficient of `x`. For `T<:Real` this operation does nothing; for
+`T<:Complex{S}` this an `AbstractCliffordNumber{Q,S}`.
+
+Note that this does not return the scalar (grade 0) coefficient of `x`. Use `real(scalar(x))` to
+obtain this result.
+"""
+function Base.real(x::AbstractCliffordNumber)
+    T = similar_type(x, real(numeric_type(x)))
+    return T(real.(Tuple(x)))
+end
+
+Base.real(x::AbstractCliffordNumber{<:Any,<:Real}) = x
+
+"""
+    complex(x::AbstractCliffordNumber, [y::AbstractCliffordNumber = zero(typeof(x))])
+
+For a single argument `x`, converts the type of each coefficient to a suitable complex type.
+
+For two arguments `x` and `y`, which are both real Clifford numbers, performs the sum `x + y*im`,
+constructing a complex Clifford number.
+
+Note that this operation does not isolate a scalar (grade 0) coefficient of `x` or `y`. Use
+`complex(scalar(x), [scalar(y)])` to obtain this result.
+"""
+function Base.complex(x::AbstractCliffordNumber)
+    C = similar_type(x, complex(numeric_type(x)))
+    return C(complex.(Tuple(x)))
+end
+
+Base.real(x::AbstractCliffordNumber{<:Any,<:Complex}) = x
+
+function Base.complex(x::T, y::T) where T<:AbstractCliffordNumber{<:QuadraticForm,<:Real}
+    C = similar_type(x, complex(numeric_type(x)))
+    return C(complex.(Tuple(x), Tuple(y)))
+end
+
+Base.complex(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = complex(promote(x, y)...)
+
 #---Error checking---------------------------------------------------------------------------------#
 """
     CliffordNumbers.check_element_count(sz, Q::Type{<:QuadraticForm}, [L], data)
