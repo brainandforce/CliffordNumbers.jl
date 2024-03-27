@@ -47,30 +47,36 @@ function to_basis_str(b::BitIndex{Q}; label = nothing, pseudoscalar = nothing) w
     )
 end
 
+print_clifford_coefficient(io::IO, c::Number, ffn::Bool) = print(io, " + "^ffn, '(', c, ')')
+
+function print_clifford_coefficient(io::IO, c::Real, ffn::Bool)
+    sign_str = " "^ffn * ifelse(sign(c) >= 0, "+"^ffn, "-") * " "^ffn
+    print(io, sign_str, abs(c), "*"^(c isa Bool))
+end
+
 # Generic pretty-print method for all AbstractCliffordNumber instances
 function show(io::IO, ::MIME"text/plain", x::AbstractCliffordNumber{Q}) where Q
     summary(io, x)
-    # Flag to mark when we've *found the first nonzero* element
+    # Flag to mark when we've *found the first nonzero (ffn)* element
     ffn = false
-    # Print the scalar component first
-    if !iszero(scalar(x))
-        print(io, scalar(x))
+    s = scalar(x)
+    # Print the scalar component first, if it's nonzero
+    if !iszero(s)
+        print(io, s)
         ffn = true
     end
-    # Loop through all the grades
+    # Loop through all the nonzero grades
     for n in 1:dimension(Q)
         # Group together all indices corresponding to the given grade
         for i in Iterators.filter(i -> grade(i) == n, BitIndices(x))
             if !iszero(x[i])
-                print(
-                    io, " "^ffn, (sign(x[i]) > 0 ? "+"^ffn : "-"), " "^ffn, abs(x[i]), 
-                    "*"^(x[i] isa Bool), to_basis_str(i)
-                )
+                print_clifford_coefficient(io, x[i], ffn)
+                print(io, to_basis_str(i))
                 ffn = true
             end
         end
     end
     # If we got through the whole process, just print the zero
     # We reference the actual element so we can print signed zero if needed
-    !ffn && print(io, scalar(x))
+    ffn || print(io, s)
 end
