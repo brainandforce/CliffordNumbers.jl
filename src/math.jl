@@ -39,7 +39,7 @@ end
 
 ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
 
-#---Equality---------------------------------------------------------------------------------------#
+#---Equality and approximate equality--------------------------------------------------------------#
 
 function ==(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return all(x[i] == y[i] for i in BitIndices(promote_type(typeof(x), typeof(y))))
@@ -48,6 +48,28 @@ end
 # Define equality with scalar values in terms of scalar operations above
 ==(x::AbstractCliffordNumber, y::BaseNumber) = isscalar(x) && (scalar(x) == y)
 ==(x::BaseNumber, y::AbstractCliffordNumber) = isscalar(y) && (x == scalar(y))
+
+function isapprox(
+    x::AbstractCliffordNumber,
+    y::AbstractCliffordNumber;
+    atol::Real = 0,
+    rtol::Real = Base.rtoldefault(numeric_type(x), numeric_type(y), atol),
+    nans::Bool = false,
+    norm = abs
+)
+    (tx, ty) = Tuple.(promote(x, y))
+    # This mirrors the implementation for `AbstractArray`
+    d = abs(x - y)
+    if isfinite(d)
+        return d <= max(atol, rtol*max(norm(x), norm(y)))
+    else
+        return all(isapprox.(tx, ty; atol, rtol, nans, norm))
+    end
+    #= TODO:
+    If we strip away the `isfinite` if block to simplify the function, we get *worse* performance!
+    This is probably due to the closure bug, but why does the if block avoid the problem?
+    =#
+end
 
 #---Sign changing operations-----------------------------------------------------------------------#
 
