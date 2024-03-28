@@ -138,7 +138,7 @@ function Base.complex(x::AbstractCliffordNumber)
     return C(complex.(Tuple(x)))
 end
 
-Base.real(x::AbstractCliffordNumber{<:Any,<:Complex}) = x
+Base.complex(x::AbstractCliffordNumber{<:Any,<:Complex}) = x
 
 function Base.complex(x::T, y::T) where T<:AbstractCliffordNumber{<:QuadraticForm,<:Real}
     C = similar_type(x, complex(numeric_type(x)))
