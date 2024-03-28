@@ -278,4 +278,9 @@ const STAPWest = Signature(5, 0b11100, 0b00001, -1)
 const STAP = STAPWest
 @doc (@doc STAPWest) STAP
 
+function Base.show(io::IO, s::Signature)
+    isVGA(s) && print(io, VGA, tuple(dimension(s)))
+    println(io, Signature, (s.dimensions, s.negative, s.degenerate, s.first_index))
+end
+
 end
