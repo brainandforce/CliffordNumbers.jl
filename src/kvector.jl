@@ -23,9 +23,6 @@ KVector{K,Q}(x::Tuple{Vararg{T}}) where {K,Q,T<:BaseNumber} = KVector{K,Q,T}(x)
 # Automatically convert arguments to a common type
 KVector{K,Q}(x::Tuple{Vararg{BaseNumber}}) where {K,Q} = KVector{K,Q}(promote(x...))
 
-# Allow varargs arguments
-(::Type{T})(x::Vararg{BaseNumber}) where T<:KVector = T(x)
-
 #---Number of elements-----------------------------------------------------------------------------#
 
 length(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L} = L

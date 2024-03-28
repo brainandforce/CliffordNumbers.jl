@@ -54,9 +54,6 @@ function Z2CliffordNumber{P,Q}(x::Tuple{Vararg{BaseNumber}}) where {P,Q}
     return Z2CliffordNumber{P,Q}(promote(x...))
 end
 
-# Allow varargs arguments
-(::Type{T})(x::Vararg{BaseNumber}) where {P,Q,T<:Z2CliffordNumber{P,Q}} = T(x)
-
 # Convert real/complex numbers to CliffordNumber
 (::Type{T})(x::BaseNumber) where {T<:Z2CliffordNumber} = T(ntuple(i -> x*isone(i), Val(length(T))))
 

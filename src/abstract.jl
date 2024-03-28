@@ -26,6 +26,10 @@ this defined automatically.
 abstract type AbstractCliffordNumber{Q<:QuadraticForm,T<:BaseNumber} <: Number
 end
 
+#---Default varargs constructors for types---------------------------------------------------------#
+
+(::Type{T})(x::Vararg{BaseNumber}) where {Q,T<:AbstractCliffordNumber{Q}} = T(x)
+
 #---Get type parameters----------------------------------------------------------------------------#
 
 QuadraticForm(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q

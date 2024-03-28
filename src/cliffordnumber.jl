@@ -26,9 +26,6 @@ CliffordNumber{Q}(x::Tuple{Vararg{T}}) where {Q,T<:BaseNumber} = CliffordNumber{
 # Automatically convert arguments to a common type
 CliffordNumber{Q}(x::Tuple{Vararg{BaseNumber}}) where Q = CliffordNumber{Q}(promote(x...))
 
-# Allow varargs arguments
-(::Type{T})(x::Vararg{BaseNumber}) where {T<:CliffordNumber} = T(x)
-
 # Convert real/complex numbers to CliffordNumber
 (::Type{T})(x::BaseNumber) where T<:CliffordNumber = T(ntuple(i -> x*isone(i), Val(length(T))))
 
