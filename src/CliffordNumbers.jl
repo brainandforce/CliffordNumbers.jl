@@ -24,6 +24,9 @@ include("hamming.jl")
 include("quadratic.jl")
 export QuadraticForm, APS, STA, VGA, PGA, CGA
 export dimension, elements, grades
+# New module for metric signatures
+include("metrics.jl")
+export Metrics
 # Abstract supertype for all Clifford numbers
 include("abstract.jl")
 export AbstractCliffordNumber
