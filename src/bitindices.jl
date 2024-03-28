@@ -19,7 +19,7 @@ length(::T) where T<:AbstractBitIndices = length(T)
 
 #---Clifford number iteration----------------------------------------------------------------------#
 """
-    BitIndices{Q<:QuadraticForm,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
+    BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
 
 Represents a range of valid `BitIndex` objects for the nonzero components of a given multivector 
 with quadratic form `Q`.
@@ -156,7 +156,10 @@ end
 
 # Constructors can follow similar logic
 # The type bound is required here to get the expected dispatch behavior
-function (C::Type{<:AbstractCliffordNumber{Q}})(x::AbstractCliffordNumber{Q}) where Q<:QuadraticForm
+function (C::Type{<:AbstractCliffordNumber{Q1}})(x::AbstractCliffordNumber{Q2}) where {Q1,Q2}
+    @assert Q1 === Q2 string(
+        "Cannot construct a Clifford number from another Clifford number of a different algebra."
+    )
     return C(getindex_as_tuple(x, BitIndices(C)))
 end
 

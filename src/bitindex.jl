@@ -9,12 +9,12 @@ signmask(x::Integer, signbit::Bool = true) = bitreverse(typeof(x)(signbit))
 signmask(signbit::Bool = true) = signmask(UInt, signbit)
 
 """
-    BitIndex{Q<:QuadraticForm}
+    BitIndex{Q}
 
 A representation of an index corresponding to a basis blade of the geometric algebra with quadratic
 form `Q`.
 """
-struct BitIndex{Q<:QuadraticForm}
+struct BitIndex{Q}
     i::UInt
     BitIndex{Q}(i::Unsigned) where Q = new(UInt(i % elements(Q)) | (UInt(i) & signmask(i)))
 end
@@ -84,7 +84,7 @@ function _bitindex(Q::Type{<:QuadraticForm}, t::NTuple)
 end
 
 """
-    BitIndex(Q::Type{<:QuadraticForm}, i::Integer...)
+    BitIndex(::Type{Q}, i::Integer...)
     BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
 
 Constructs a `BitIndex{Q}` from a list of integers that represent the basis 1-vectors of the space.
@@ -94,7 +94,7 @@ This package uses a lexicographic convention for basis blades: in the algebra of
 basis bivectors are {e₁e₂, e₁e₃, e₂e₃}. The sign of the `BitIndex{Q}` is negative when the parity of
 the basis vector permutation is odd.
 """
-BitIndex(::Type{Q}, i::Integer...) where Q<:QuadraticForm = _bitindex(Q, promote(i...))
+BitIndex(::Type{Q}, i::Integer...) where Q = _bitindex(Q, promote(i...))
 BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
 
 #---Show method------------------------------------------------------------------------------------#
@@ -142,7 +142,7 @@ is_same_blade(a::BitIndex, b::BitIndex) = false
 
 Constructs the `BitIndex` used to obtain the scalar (grade zero) portion of `x`.
 """
-scalar_index(::Type{Q}) where Q<:QuadraticForm = BitIndex{Q}(false, UInt(0))
+scalar_index(::Type{Q}) where Q = BitIndex{Q}(false, UInt(0))
 scalar_index(x) = scalar_index(QuadraticForm(x))
 
 """
@@ -150,7 +150,7 @@ scalar_index(x) = scalar_index(QuadraticForm(x))
 
 Constructs the `BitIndex` used to obtain the pseudoscalar (highest grade) portion of `x`.
 """
-pseudoscalar_index(::Type{Q}) where Q<:QuadraticForm = BitIndex{Q}(false, typemax(UInt))
+pseudoscalar_index(::Type{Q}) where Q = BitIndex{Q}(false, typemax(UInt))
 pseudoscalar_index(x) = pseudoscalar_index(QuadraticForm(x))
 
 #---Grade dependent sign inversion-----------------------------------------------------------------#

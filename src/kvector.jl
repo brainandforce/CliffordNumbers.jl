@@ -6,7 +6,7 @@ a k-vector.
 
 k-vectors have `binomial(dimension(Q), K)` components.
 """
-struct KVector{K,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
+struct KVector{K,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function KVector{K,Q,T,L}(x::Tuple) where {K,Q,T,L}
         @assert 0 <= K <= dimension(Q) "K can only range from 0 to $(dimension(Q)) (got $K)."
@@ -66,10 +66,10 @@ end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
 
-one(C::Type{Q}) where Q<:QuadraticForm = KVector{0,Q}(numeric_type(C)(true))
+one(C::Type{Q}) where Q = KVector{0,Q}(numeric_type(C)(true))
 one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(Q)
 
-pseudoscalar(::Type{Q}) where Q<:QuadraticForm = KVector{dimension(Q),Q}(true)
+pseudoscalar(::Type{Q}) where Q = KVector{dimension(Q),Q}(true)
 
 function pseudoscalar(C::Type{<:AbstractCliffordNumber{Q}}) where Q
     return KVector{dimension(Q),Q}(numeric_type(C)(true))

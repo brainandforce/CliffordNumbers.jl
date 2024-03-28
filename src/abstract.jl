@@ -23,7 +23,7 @@ with each basis blade represented by `C`.
 `getfield(x, :data)::Tuple`, so any type declared with a `NTuple` field named `data` should have
 this defined automatically.
 """
-abstract type AbstractCliffordNumber{Q<:QuadraticForm,T<:BaseNumber} <: Number
+abstract type AbstractCliffordNumber{Q,T<:BaseNumber} <: Number
 end
 
 #---Default varargs constructors for types---------------------------------------------------------#
