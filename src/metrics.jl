@@ -60,11 +60,18 @@ struct Signature <: AbstractSignature
     end
 end
 
+"""
+    dimension(s::Signature) -> Int8
+
+Returns the total number of dimensions associated with `s`.
+"""
+dimension(s::Signature) = signed(s.dimensions)
+
 Base.has_offset_axes(::Signature) = true
 Base.IndexStyle(::Type{<:Signature}) = IndexLinear()
 
-Base.size(s::Signature) = tuple(s.dimensions)
-Base.axes(s::Signature) = tuple(s.first_index .+ (0:s.dimensions-1))
+Base.size(s::Signature) = tuple(dimension(s))
+Base.axes(s::Signature) = tuple(s.first_index .+ (0:dimension(s) - 1))
 
 function Base.getindex(s::Signature, i::Int)
     @boundscheck checkbounds(s, i)
