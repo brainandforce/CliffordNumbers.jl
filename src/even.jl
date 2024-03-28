@@ -14,7 +14,7 @@ This type is not exported, and usually you will want to refer to the following a
     const EvenCliffordNumber{Q,T,L} = Z2CliffordNumber{false,Q,T,L}
     const OddCliffordNumber{Q,T,L} = Z2CliffordNumber{true,Q,T,L}
 """
-struct Z2CliffordNumber{P,Q<:QuadraticForm,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
+struct Z2CliffordNumber{P,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function Z2CliffordNumber{P,Q,T,L}(x::Tuple) where {P,Q,T,L}
         @assert P isa Bool "The first type parameter must be a Bool (got $P)."
@@ -30,7 +30,7 @@ A Clifford number whose only nonzero grades are even. These are the natural choi
 for rotors and motors (Euclidean isometries preserving orientation, or "proper" isometries), as well
 as their composition with dilations.
 """
-const EvenCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{false,Q,T,L}
+const EvenCliffordNumber{Q,T<:BaseNumber,L} = Z2CliffordNumber{false,Q,T,L}
 
 """
     OddCliffordNumber{P,Q,T,L} (alias for CliffordNumbers.Z2CliffordNumber{true,Q,T,L})
@@ -39,7 +39,7 @@ A Clifford number whose only nonzero grades are odd. These are the natural choic
 for reflections, as well as their compositions with rotors and motors (Euclidean isometries 
 preserving orientation, or "proper" isometries), as well as their composition with dilations.
 """
-const OddCliffordNumber{Q<:QuadraticForm,T<:BaseNumber,L} = Z2CliffordNumber{true,Q,T,L}
+const OddCliffordNumber{Q,T<:BaseNumber,L} = Z2CliffordNumber{true,Q,T,L}
 
 #---Constructors-----------------------------------------------------------------------------------#
 
@@ -86,7 +86,7 @@ one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 #---Similar types----------------------------------------------------------------------------------#
 
 function similar_type(
-    ::Type{<:Z2CliffordNumber{P,<:QuadraticForm}},
+    ::Type{<:Z2CliffordNumber{P}},
     T::Type{<:BaseNumber}, 
     Q::Type{<:QuadraticForm}
 ) where P
