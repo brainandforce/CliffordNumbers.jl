@@ -3,14 +3,41 @@ module Metrics
 """
     Metrics.AbstractSignature <: AbstractVector{Int8}
 
-Supertype for all data types that represent metric signatures. This includes the generic `Siganture`
+Supertype for all data types that represent metric signatures. This includes the generic `Signature`
 type as well as other specialized types.
 
 Metric signatures can be interpreted as the signs of the diagonal elements of the metric tensor. All
-elements are either -1, 0, or 1. All Clifford algebras necessarily admit an orthonormal metric.
+elements are either -1, 0, or 1. All nondegenerate Clifford algebras admit an orthonormal basis 
+corresponding to the metric.
 """
 abstract type AbstractSignature <: AbstractVector{Int8}
 end
+
+Base.IndexStyle(::Type{<:AbstractSignature}) = IndexLinear()
+Base.has_offset_axes(::AbstractSignature) = true
+
+"""
+    dimension(s::AbstractSignature) -> Int8
+
+Returns the total number of dimensions associated with `s`. The default implementation returns
+`signed(s.dimensions)`.
+
+The total number of basis blades is equal to to the size of the power set of all basis vectors, and
+is equal to `2^dimension(s)`.
+"""
+dimension(s::AbstractSignature) = signed(s.dimensions)
+
+Base.size(s::AbstractSignature) = tuple(dimension(s))
+Base.axes(s::AbstractSignature) = tuple(firstindex(s) .+ (0:dimension(s) - 1))
+
+"""
+    blade_symbol(s::AbstractSignature)
+
+Provides the symbol associated to represent basis 1-blades of the geometric algebra with signature
+`s`. This defaults to `'e'`, but for `APS` it is `'σ'` and for Lorentzian geometric algebras it is
+`'γ'`.
+"""
+blade_symbol(s::AbstractSignature) = 'e'
 
 #---Metric tensor associated with an orthonormal basis---------------------------------------------#
 """
@@ -24,7 +51,7 @@ end
 
 Contains information about the metric associated with a Clifford algebra or Clifford number. This
 type is constructed to be as generic as possible; other subtypes of `Metrics.AbstractSignature` may
-provide firmer guarantees on behavior.
+provide firmer guarantees on behavior, such as `VGA`.
 
 The number which the dimensions square to is stored in a pair of `UInt` fields. The `negative` field
 consists of 1 bits for dimensions that square to a negative number, and 0 bits for those squaring
@@ -60,119 +87,71 @@ struct Signature <: AbstractSignature
     end
 end
 
-"""
-    dimension(s::Signature) -> Int8
-
-Returns the total number of dimensions associated with `s`.
-"""
-dimension(s::Signature) = signed(s.dimensions)
-
-Base.has_offset_axes(::Signature) = true
-Base.IndexStyle(::Type{<:Signature}) = IndexLinear()
-
-Base.size(s::Signature) = tuple(dimension(s))
-Base.axes(s::Signature) = tuple(s.first_index .+ (0:dimension(s) - 1))
+firstindex(s::Signature) = Int(s.first_index)
 
 function Base.getindex(s::Signature, i::Int)
     @boundscheck checkbounds(s, i)
-    mask = UInt(2)^(i - s.first_index)
+    mask = UInt(2)^(i - firstindex(s))
     negative_bit = !iszero(s.negative & mask)
     degenerate_bit = !iszero(s.degenerate & mask)
     return Int8(-1)^negative_bit * !degenerate_bit
 end
 
 """
-    VGA(dimensions::Integer) -> Signature
+    is_degenerate(s::AbstractSignature)
 
-Constructs an `Signature` object representing a VGA (vanilla geometric algebra) with the 
-given number of dimensions.
+Returns `true` if any basis elements of `s` square to 0.
+    
+This does not imply that no elements of the associated Clifford algebra square to 0.
 """
-VGA(dimensions::Integer) = Signature(dimensions, UInt(0), UInt(0),  1)
+is_degenerate(s::Signature) = !iszero(s.degenerate)
 
 """
-    isVGA(s::Signature) -> Bool
+    is_positive_definite(s::AbstractSignature)
+
+Returns `true` if all basis 1-blades of `s` square to a positive value.
+"""
+is_positive_definite(s::Signature) = iszero(s.negative) && !is_degenerate(s)
+
+function Base.show(io::IO, s::Signature)
+    println(io, Signature, (s.dimensions, s.negative, s.degenerate, s.first_index))
+end
+
+#---Common algebras--------------------------------------------------------------------------------#
+"""
+    VGA <: Metrics.AbstractSignature
+
+Represents the signature associated with a vanilla geometric algebra (VGA), a positive-definite 
+geometric algebra which models space without any projective dimensions.
+"""
+struct VGA <: AbstractSignature
+    dimensions::UInt
+end
+
+is_degenerate(::VGA) = false
+is_positive_definite(::VGA) = true
+
+Base.has_offset_axes(::VGA) = false
+Base.firstindex(::VGA) = 1
+
+Base.getindex(s::VGA, i::Int) = (@boundscheck checkbounds(s, i); return Int8(1))
+
+"""
+    isVGA(s::AbstractSignature) -> Bool
 
 Determines if `m` represents a VGA (vanilla geometric algebra). This is accomplished by checking
 that all dimensions square to +1, and that the first index is 1: if the first index is less than 1,
 it may be assumed that the first dimensions are projective dimensions in a larger modeling space.
+
+Instances of `VGA` will always return `true`.
 """
-isVGA(s::Signature) = iszero(s.negative) && iszero(s.degenerate) && isone(firstindex(s))
-
-"""
-    PGA(modeled_dims::Integer) -> Signature
-
-Constructs an `Signature` object representing a PGA (projective geometric algebra) with the
-given number of modeled dimensions. The constructed algebra will contain the number of modeled 
-dimensions plus one degenerate (zero-squaring) dimension.
-"""
-PGA(modeled_dims::Integer) = Signature(modeled_dims + 1, 0b0, 0b1, 0)
-
-"""
-    CGA(modeled_dims::Integer) -> Signature
-
-Constructs an `Signature` object representing a CGA (conformal geometric algebra) with the
-given number of modeled dimensions. The constructed algebra will contain the number of modeled 
-dimensions plus one positive-squaring dimension (with index 0) and one negative-squaring dimension
-(with index -1).
-"""
-CGA(modeled_dims::Integer) = Signature(modeled_dims + 2, 0b1, 0b0, -1)
-
-"""
-    LGA(spatial_dims::Integer, time_signbit::Bool) -> Signature
-
-Constructs an `Signature` object representing an LGA (Lorentzian geometric algebra) with the
-given number of positive-squaring spatial dimensions.
-
-If `time_signbit` is `true`, the spatial dimensions will square to a positive value and the temporal
-dimension will square to a negative value; this will be reversed for a `false` input.
-
-By convention, LGAs use the symbol `γ` for their basis blades (related to the standard symbol for
-the Dirac matrices).
-"""
-function LGA(spatial_dims::Integer, time_signbit::Bool)
-    return Signature(spatial_dims + 1, ifelse(time_signbit, 0b1, ~0b1), 0b0, 0)
-end
-
-"""
-    LGAEast(spatial_dims::Integer)
-
-Generates a Lorentzian geometric algebra with the East Coast sign convention (spatial dimensions 
-square positive, temporal dimensions square negative). This is equivalent to
-[`LGA(spatial_dims, true)`](@ref LGA).
-
-For the spacetime algebra with this convention, use [`STAEast`](@ref).
-
-For the opposite sign convention, use [`LGAWest`](@ref).
-"""
-LGAEast(spatial_dims::Integer) = LGA(spatial_dims, true)
-
-"""
-    LGAWest(spatial_dims::Integer)
-
-Generates a Lorentzian geometric algebra with the West Coast sign convention (spatial dimensions 
-square negative, temporal dimensions square positive). This is equivalent to
-[`LGA(spatial_dims, false)`](@ref LGA).
-
-For the spacetime algebra with this convention, use [`STAWest`](@ref).
-
-For the opposite sign convention, use [`LGAEast`](@ref).
-"""
-LGAWest(spatial_dims::Integer) = LGA(spatial_dims, false)
-
-"""
-    Exterior(dimensions::Integer) -> Signature
-
-Constructs an `Signature` object representing an exterior algebra. Exterior algebras are 
-totally degenerate Clifford algebras: all dimensions square to 0.
-"""
-Exterior(dimensions::Integer) = Signature(dimensions, 0, ~zero(UInt), 1)
-
-#---Common algebras--------------------------------------------------------------------------------#
+isVGA(s::VGA) = true
+isVGA(s::AbstractSignature) = is_positive_definite(s) && isone(firstindex(s))
 
 # TODO: perhaps cut down on some of the aliases here
 
 """
-    VGA2D (alias for Signature(2, 0b00, 0b00, 1) or VGA(2))
+    VGA2D (alias for VGA(2))
 
 The algebra of 2D space. The even subalgebra of this algebra is isomorphic to ℂ, the complex
 numbers.
@@ -180,7 +159,7 @@ numbers.
 const VGA2D = VGA(2)
 
 """
-    VGA3D (alias for Signature(2, 0b000, 0b000, 1) or VGA(3))
+    VGA3D (alias for VGA(3))
     const APS = VGA3D
 
 The algebra of physical space, a 3D VGA which is commonly used (explicitly and implicitly) to model
@@ -194,14 +173,34 @@ const APS = VGA3D
 @doc (@doc VGA3D) APS
 
 """
-    PGA2D (alias for Signature(3, 0b000, 0b001, 0) or PGA(2))
+    PGA <: Metrics.AbstractSignature
+
+Represents the signature associated with a PGA (projective geometric algebra) with the given number 
+of modeled dimensions. The constructed algebra will contain the number of modeled dimensions plus
+one degenerate (zero-squaring) dimension represented by e₀. This degenerate dimension corresponds
+with the n∞ null vector in CGA (conformal geometric algebra).
+"""
+struct PGA <: AbstractSignature
+    dimensions::UInt
+end
+
+dimension(s::PGA) = signed(s.dimensions + 1)
+is_degenerate(::PGA) = true
+is_positive_definite(::PGA) = false
+
+Base.firstindex(::PGA) = 0
+
+Base.getindex(s::PGA, i::Int) = (@boundscheck checkbounds(s, i); return Int8(!iszero(i)))
+
+"""
+    PGA2D (alias for PGA(2))
 
 The projective geometric algebra of 2D space, which represents points and lines on the plane.
 """
 const PGA2D = PGA(2)
 
 """
-    PGA3D (alias for Signature(4, 0b0000, 0b0001, 0) or PGA(3))
+    PGA3D (alias for PGA(3))
 
 The projective geometric algebra of 3D space, which represents points, lines, and planes in a
 3D space.
@@ -209,10 +208,37 @@ The projective geometric algebra of 3D space, which represents points, lines, an
 const PGA3D = PGA(3)
 
 """
-    CGA2D (alias for Signature(4, 0b0001, 0b0000, 0) or CGA(2))
+    CGA <: Metrics.AbstractSignature
+
+Represents the signature of a CGA (conformal geometric algebra) with the given number of modeled 
+dimensions. The constructed algebra will contain the number of modeled dimensions plus one
+positive-squaring dimension and one negative-squaring dimension.
+
+There are two common choices of vector basis for the extra dimensions added when working with CGA.
+The most straightforward one is e₊ and e₋, which square to +1 and -1, respectively, and this is what
+is used internally, with the negative-squaring dimension being the first one.
+
+However, there is another commonly used basis: define null vectors n₀ = (e₋ - e₊)/2 and
+n∞ = e₋ - e₊,  which represent the origin point and the point at infinity, respectively. n∞
+corresponds to e₀ in PGA (projective geometric algebra).
+"""
+struct CGA
+    dimensions::UInt
+end
+
+dimension(s::CGA) = signed(s.dimensions + 2)
+is_degenerate(::CGA) = false
+is_positive_definite(::CGA) = false
+
+Base.firstindex(::CGA) = -1
+
+Base.getindex(s::CGA, i::Int) = (@boundscheck checkbounds(s, i); return Int8(-1)^(i < 0))
+
+"""
+    CGA2D (alias for CGA(2))
 
 The conformal geometric algebra of 2D space, which represents points, lines, and circles on the 
-plane. This algebra constitutes a framework for Euclidean geometry.
+plane. This algebra constitutes a framework for compass and straightedge constructions.
 
 This algebra is isomorphic to [`STAEast`](@ref), and this isomorphism is the reason why the default 
 convention for spacetime algebras in this package is the West Coast (mostly negative) convention.
@@ -220,7 +246,52 @@ convention for spacetime algebras in this package is the West Coast (mostly nega
 const CGA2D = CGA(2)
 
 """
-    STAEast (alias for Signature(4, 0b0001, 0b0000, 0) or LGAEast(3))
+    CGA3D (alias for CGA(3))
+
+The conformal geometric algebra of 3D space, which represents points, lines, and planes, as well as
+circles and spheres. This algebra constitutes a framework for extending compass and straightedge 
+constructions to 3 dimensions.
+"""
+const CGA3D = CGA(3)
+
+"""
+    LGA{C} <: Metrics.AbstractSignature
+
+Represents the signature of a Lorentzian geometric algebra (LGA), an algebra which models a given
+number of spatial dimensions associated with a single time dimension at index 0.
+
+The type parameter `C` corresponds to the sign bit associated with the square of the spatial
+1-blades. For convenience, the following aliases are defined:
+
+    const LGAEast = LGA{false}
+    const LGAWest = LGA{true}
+
+The names correspond to the "East Coast" and "West Coast" conventions for the metric signature of
+spacetime, with the East Coast convention having positive squares for spatial 1-blades and the West
+Coast convention having negative squares for spatial 1-blades.
+"""
+struct LGA{C}
+    dimension::UInt
+end
+
+const LGAEast = LGA{false}
+const LGAWest = LGA{true}
+
+dimension(s::CGA) = signed(s.dimensions + 1)
+is_degenerate(::CGA) = false
+is_positive_definite(::CGA) = false
+
+Base.firstindex(::CGA) = 0
+
+blade_symbol(::LGA) = 'γ'
+
+function Base.getindex(s::LGA{C}, i::Int) where C
+    @boundscheck checkbounds(s, i)
+    return Int8(-1)^xor(C, iszero(i))
+end
+
+"""
+    STAEast (alias for LGAEast(3))
 
 The spacetime algebra using the East Coast sign convention (spatial dimensions square positive,
 temporal dimensions square negative), with the temporal dimension at index 0.
@@ -231,7 +302,7 @@ This convention is *not* the default STA convention, since this signature is ide
 const STAEast = LGAEast(3)
 
 """
-    STAWest (alias for Signature(4, 0b0001, 0b0000, 0) or LGAWest(3))
+    STAWest (alias for LGAWest(3))
     const STA = STAWest
 
 The spacetime algebra using the West Coast sign convention (spatial dimensions square negative,
@@ -246,12 +317,27 @@ const STA = STAWest
 @doc (@doc STAWest) STA
 
 """
-    CGA3D (alias for Signature(5, 0b00001, 0b00000, 0) or CGA(3))
+    Exterior <: Metrics.AbstractSignature
 
-The conformal geometric algebra of 3D space, which represents points, lines, planes, circles, and
-spheres in 3D space. This algebra extends Euclidean geometry to 3 dimensions.
+Represents a signature corresponding to an exterior algebra. In an exterior algebra, all 1-blades
+square to 0.
+
+Unlike `VGA`, `PGA`, `CGA`, and `LGA`, the first index is not assumed when constructing this object,
+and can be manually specified.
 """
-const CGA3D = CGA(3)
+struct Exterior
+    dimensions::UInt
+    first_index::Int8
+end
+
+Exterior(dimensions) = Exterior(dimensions, 1)
+
+is_degenerate(::PGA) = true
+is_positive_definite(::PGA) = false
+
+Base.firstindex(s::Exterior) = s.first_index
+
+Base.getindex(s::Exterior, i::Int) = (@boundscheck checkbounds(s, i); return Int8(0))
 
 """
     STAPEast (alias for Signature(5, 0b00010, 0b00001, -1))
@@ -277,10 +363,5 @@ see [`STA`](@ref).
 const STAPWest = Signature(5, 0b11100, 0b00001, -1)
 const STAP = STAPWest
 @doc (@doc STAPWest) STAP
-
-function Base.show(io::IO, s::Signature)
-    isVGA(s) && print(io, VGA, tuple(dimension(s)))
-    println(io, Signature, (s.dimensions, s.negative, s.degenerate, s.first_index))
-end
 
 end
