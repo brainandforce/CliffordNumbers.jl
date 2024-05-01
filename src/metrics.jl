@@ -87,7 +87,7 @@ struct Signature <: AbstractSignature
     end
 end
 
-firstindex(s::Signature) = Int(s.first_index)
+Base.firstindex(s::Signature) = Int(s.first_index)
 
 function Base.getindex(s::Signature, i::Int)
     @boundscheck checkbounds(s, i)
@@ -277,11 +277,11 @@ end
 const LGAEast = LGA{false}
 const LGAWest = LGA{true}
 
-dimension(s::CGA) = signed(s.dimensions + 1)
-is_degenerate(::CGA) = false
-is_positive_definite(::CGA) = false
+dimension(s::LGA) = signed(s.dimensions + 1)
+is_degenerate(::LGA) = false
+is_positive_definite(::LGA) = false
 
-Base.firstindex(::CGA) = 0
+Base.firstindex(::LGA) = 0
 
 blade_symbol(::LGA) = 'γ'
 
@@ -332,8 +332,8 @@ end
 
 Exterior(dimensions) = Exterior(dimensions, 1)
 
-is_degenerate(::PGA) = true
-is_positive_definite(::PGA) = false
+is_degenerate(::Exterior) = true
+is_positive_definite(::Exterior) = false
 
 Base.firstindex(s::Exterior) = s.first_index
 
