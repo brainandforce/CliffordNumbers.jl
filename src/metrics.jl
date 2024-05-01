@@ -382,4 +382,7 @@ export dimension, blade_count, grades, is_degenerate, is_positive_definite
 export VGA, PGA, CGA, LGA, LGAEast, LGAWest
 export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, STAPEast, STAPWest
 
+Base.show(io::IO, s::Union{VGA,PGA,CGA,LGA}) = print(io, typeof(s), '(', signed(s.dimensions), ')')
+Base.show(io::IO, s::Exterior) = print(io, typeof(s), tuple(signed(s.dimensions), s.first_index))
+
 end
