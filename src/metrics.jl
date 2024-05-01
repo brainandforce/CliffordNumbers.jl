@@ -28,11 +28,11 @@ is equal to `2^dimension(s)`.
 dimension(s::AbstractSignature) = signed(s.dimensions)
 
 """
-    basis_blades(s::AbstractSignature) -> Int64
+    blade_count(s::AbstractSignature) -> Int64
 
 Returns the total number of blades associated with `s`, which is equal to `2^dimension(s)`.
 """
-basis_blades(s::AbstractSignature) = 2^dimension(s)
+blade_count(s::AbstractSignature) = 2^dimension(s)
 
 """
     grades(s::AbstractSignature) -> UnitRange{Int8}
@@ -378,7 +378,7 @@ const STAPWest = Signature(5, 0b11100, 0b00001, -1)
 const STAP = STAPWest
 @doc (@doc STAPWest) STAP
 
-export dimension, basis_blades, grades, is_degenerate, is_positive_definite
+export dimension, blade_count, grades, is_degenerate, is_positive_definite
 export VGA, PGA, CGA, LGA, LGAEast, LGAWest
 export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, STAPEast, STAPWest
 
