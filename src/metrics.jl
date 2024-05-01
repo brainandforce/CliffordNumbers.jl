@@ -236,7 +236,7 @@ However, there is another commonly used basis: define null vectors n₀ = (e₋ 
 n∞ = e₋ - e₊,  which represent the origin point and the point at infinity, respectively. n∞
 corresponds to e₀ in PGA (projective geometric algebra).
 """
-struct CGA
+struct CGA <: AbstractSignature
     dimensions::UInt
 end
 
@@ -284,7 +284,7 @@ The names correspond to the "East Coast" and "West Coast" conventions for the me
 spacetime, with the East Coast convention having positive squares for spatial 1-blades and the West
 Coast convention having negative squares for spatial 1-blades.
 """
-struct LGA{C}
+struct LGA{C} <: AbstractSignature
     dimension::UInt
 end
 
@@ -339,7 +339,7 @@ square to 0, and the geometric product is equivalent ot the wedge product.
 Unlike `VGA`, `PGA`, `CGA`, and `LGA`, the first index is not assumed when constructing this object,
 and can be manually specified. If it is not specified, it defaults to 1.
 """
-struct Exterior
+struct Exterior <: AbstractSignature
     dimensions::UInt
     first_index::Int8
 end
