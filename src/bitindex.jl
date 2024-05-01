@@ -98,7 +98,7 @@ end
     BitIndex(x, i::Integer...) = BitIndex(signature(x), i...)
 
 Constructs a `BitIndex{Q}` from a list of integers that represent the basis 1-vectors of the space.
-`Q` can be determined from the `QuadraticForm` associated with `x`, whether it be a type or object.
+For objects `x` that are not metric signatures, `Q` is equal to `signature(x)`.
 
 This package uses a lexicographic convention for basis blades: in the algebra of physical space, the
 basis bivectors are {e₁e₂, e₁e₃, e₂e₃}. The sign of the `BitIndex{Q}` is negative when the parity of
@@ -150,7 +150,7 @@ abs(i::BitIndex) = typeof(i)(UInt(i))
     grade(i::BitIndex) -> Int
 
 Returns the grade of the basis blade represented by `i`, which ranges from 0 to the dimension of the
-space represented by `i` (equal to `dimension(QuadraticForm(i))`).
+space represented by `i` (equal to `dimension(signature(i))`).
 """
 grade(i::BitIndex) = count_ones(UInt(i))
 

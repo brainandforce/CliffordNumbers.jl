@@ -154,7 +154,7 @@ end
 
 Base.complex(x::AbstractCliffordNumber{<:Any,<:Complex}) = x
 
-function Base.complex(x::T, y::T) where T<:AbstractCliffordNumber{<:QuadraticForm,<:Real}
+function Base.complex(x::T, y::T) where T<:AbstractCliffordNumber{<:Any,<:Real}
     C = similar_type(x, complex(numeric_type(x)))
     return C(complex.(Tuple(x), Tuple(y)))
 end
@@ -163,7 +163,7 @@ Base.complex(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = complex(pro
 
 #---Error checking---------------------------------------------------------------------------------#
 """
-    CliffordNumbers.check_element_count(sz, Q::Type{<:QuadraticForm}, [L], data)
+    CliffordNumbers.check_element_count(sz, [L], data)
 
 Ensures that the number of elements in `data` is the same as the result of `f(Q)`, where `f` is a
 function that generates the expected number of elements for the type. This function is used in the

@@ -19,8 +19,8 @@ end
 RepresentedGrades(x::AbstractCliffordNumber) = RepresentedGrades{typeof(x)}()
 RepresentedGrades(C::Type{<:AbstractCliffordNumber}) = RepresentedGrades(zero(C))
 
-size(::RepresentedGrades{C}) where C = tuple(dimension(QuadraticForm(C)) + 1)
-axes(::RepresentedGrades{C}) where C = tuple(0:dimension(QuadraticForm(C)))
+size(::RepresentedGrades{C}) where C = tuple(dimension(signature(C)) + 1)
+axes(::RepresentedGrades{C}) where C = tuple(0:dimension(signature(C)))
 
 """
     nonzero_grades(::Type{<:AbstractCliffordNumber})
