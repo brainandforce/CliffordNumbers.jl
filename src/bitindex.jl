@@ -16,12 +16,12 @@ form `Q`.
 """
 struct BitIndex{Q}
     i::UInt
-    BitIndex{Q}(i::Unsigned) where Q = new(UInt(i % elements(Q)) | (UInt(i) & signmask(i)))
+    BitIndex{Q}(i::Unsigned) where Q = new(UInt(i % blade_count(Q)) | (UInt(i) & signmask(i)))
 end
 
 # Construct with the sign bit as a separate argument
 @inline function BitIndex{Q}(signbit::Bool, blade::Unsigned) where Q
-    return BitIndex{Q}(UInt(blade % elements(Q)) | signmask(UInt, signbit))
+    return BitIndex{Q}(UInt(blade % blade_count(Q)) | signmask(UInt, signbit))
 end
 
 # UInt(i::BitIndex) strips the sign info. Use i.i to directly access the internal field
@@ -73,7 +73,7 @@ function _sort_with_parity(t::NTuple{L}) where L
 end
 
 function _bitindex(Q::Type{<:QuadraticForm}, t::NTuple)
-    @assert all(in(1:elements(Q)), t) "1-vector indices are between 1 and $(elements(Q))."
+    @assert all(in(1:blade_count(Q)), t) "1-vector indices are between 1 and $(blade_count(Q))."
     (t, parity) = _sort_with_parity(t)
     i = signmask(UInt, parity)
     for x in t
@@ -88,7 +88,7 @@ function _bitindex(S::Metrics.AbstractSignature, t::NTuple)
     (t, parity) = _sort_with_parity(t)
     i = signmask(UInt, parity)
     for x in t
-        i = xor(i, 2^(x-1))
+        i = xor(i, 2^(x - firstindex(S)))
     end
     return BitIndex{S}(i)
 end

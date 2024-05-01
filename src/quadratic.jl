@@ -20,11 +20,11 @@ instance, projective geometric algebras have one more dimension than the space t
 dimension(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (P + Q + R)
 
 """
-    elements(Q::Type{QuadraticForm}) -> 2^dimension(Q)
+    blade_count(Q::Type{<:QuadraticForm}) -> 2^dimension(Q)
 
-Returns the number of basis elements associated with `Q`.
+Returns the number of basis blades associated with `Q`.
 """
-elements(Q::Type{<:QuadraticForm}) = 2^dimension(Q)
+blade_count(Q::Type{<:QuadraticForm}) = 2^dimension(Q)
 
 """
     grades(Q::Type{QuadraticForm}) -> 0:dimension(Q)
@@ -33,8 +33,8 @@ Returns the number of grades associated with `Q`.
 """
 grades(Q::Type{<:QuadraticForm}) = 0:dimension(Q)
 
-isdegenerate(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = !iszero(R)
-iseuclidean(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (iszero(Q) && iszero(R))
+is_degenerate(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = !iszero(R)
+is_positive_definite(::Type{QuadraticForm{P,Q,R}}) where {P,Q,R} = (iszero(Q) && iszero(R))
 
 """
     sign(::Type{QuadraticForm{P,Q,R}}, i::Integer) -> Int8

@@ -123,9 +123,9 @@ Without specialization on `S`, a type suitable for the geometric product is retu
     P = (c1_odd && c2_even) || (c1_even && c2_odd)
     T = promote_numeric_type(C1,C2)
     if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
-        return :(CliffordNumber{Q,$T,elements(Q)})
+        return :(CliffordNumber{Q,$T,blade_count(Q)})
     else
-        return :(Z2CliffordNumber{$P,Q,$T,div(elements(Q), 2)})
+        return :(Z2CliffordNumber{$P,Q,$T,div(blade_count(Q), 2)})
     end
 end
 

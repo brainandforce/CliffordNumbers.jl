@@ -551,7 +551,7 @@ positive or negative depending on the total number of dimensions in the space.
   * If the metric is degenerate, the dual is not unique.
 """
 function dual(x::CliffordNumber{Q}) where Q
-    isdegenerate(Q) && error("Cannot calculate the dual in a degenerate metric.")
+    is_degenerate(Q) && error("Cannot calculate the dual in a degenerate metric.")
     return CliffordNumber{Q}(ntuple(i -> x[dual(BitIndices(Q)[i])], Val(length(x))))
 end
 
@@ -562,7 +562,7 @@ Calculates the undual of `x`, which is equal to the left contraction of `x` with
 This function can be used to reverse the behavior of `dual()`.
 """
 function undual(x::CliffordNumber{Q}) where Q
-    isdegenerate(Q) && error("Cannot calculate the ;undual in a degenerate metric.")
+    is_degenerate(Q) && error("Cannot calculate the ;undual in a degenerate metric.")
     return CliffordNumber{Q}(ntuple(i -> x[undual(BitIndices(Q)[i])], Val(length(x))))
 end
 
@@ -605,9 +605,9 @@ the nonzero grades of the input are even, a `CliffordNumber` otherwise.
 @generated function exponential_type(::Type{C}) where {Q,C<:AbstractCliffordNumber{Q}}
     T = typeof(exp(zero(numeric_type(C))))
     if all(iseven, nonzero_grades(C))
-        return :(EvenCliffordNumber{Q,$T,div(elements(Q), 2)})
+        return :(EvenCliffordNumber{Q,$T,div(blade_count(Q), 2)})
     else
-        return :(CliffordNumber{Q,$T,elements(Q)})
+        return :(CliffordNumber{Q,$T,blade_count(Q)})
     end
 end
 
