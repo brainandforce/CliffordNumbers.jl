@@ -100,20 +100,21 @@ oneunit(::Union{T,Type{T}}) where T<:AbstractCliffordNumber = convert(T, one(T))
     CliffordNumbers.similar_type(
         C::Type{<:AbstractCliffordNumber},
         [N::Type{<:BaseNumber} = numeric_type(C)],
-        [Q::Type{<:QuadraticForm} = QuadraticForm(C)]
+        [Q::Val = Val(signature(C))]
     ) -> Type{<:AbstractCliffordNumber{Q,N}}
 
-Constructs a type similar to `T` but with numeric type `N` and quadratic form `Q`.
+Constructs a type similar to `T` but with numeric type `N` and quadratic form `Q`. The quadratic
+form must be wrapped in a `Val` to preserve type stability.
 
 This function must be defined with all its arguments for each concrete type subtyping
 `AbstractCliffordNumber`.
 """
-function similar_type(x::AbstractCliffordNumber, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
+function similar_type(x::AbstractCliffordNumber, T::Type{<:BaseNumber}, Q::Val)
     return similar_type(typeof(x), T, Q)
 end
 
-similar_type(x, T::Type{<:BaseNumber}) = similar_type(x, T, QuadraticForm(x))
-similar_type(x, Q::Type{<:QuadraticForm}) = similar_type(x, numeric_type(x), Q)
+similar_type(x, T::Type{<:BaseNumber}) = similar_type(x, T, Val(signature(x)))
+similar_type(x, Q::Val) = similar_type(x, numeric_type(x), Q)
 
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))

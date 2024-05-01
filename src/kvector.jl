@@ -77,16 +77,11 @@ end
 
 #---Similar types----------------------------------------------------------------------------------#
 
-function similar_type(::Type{<:KVector{K}}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm}) where K
+function similar_type(::Type{<:KVector{K}}, ::Type{T}, ::Val{Q}) where {K,Q,T<:BaseNumber}
     return KVector{K,Q,T,binomial(dimension(Q),K)}
 end
 
-function similar_type(
-    ::Type{<:KVector},
-    T::Type{<:BaseNumber},
-    Q::Type{<:QuadraticForm}, 
-    ::Val{K}
-) where K
+function similar_type(::Type{<:KVector}, ::Type{T}, ::Val{Q}, ::Val{K}) where {K,Q,T<:BaseNumber}
     return KVector{K,Q,T,binomial(dimension(Q),K)}
 end
 

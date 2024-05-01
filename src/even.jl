@@ -85,11 +85,7 @@ one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 
-function similar_type(
-    ::Type{<:Z2CliffordNumber{P}},
-    T::Type{<:BaseNumber}, 
-    Q::Type{<:QuadraticForm}
-) where P
+function similar_type(::Type{<:Z2CliffordNumber{P}}, ::Type{T}, ::Val{Q}) where {P,Q,T<:BaseNumber}
     return Z2CliffordNumber{P,Q,T,div(blade_count(Q),2)}
 end
 

@@ -166,6 +166,6 @@ function (C::Type{<:AbstractCliffordNumber{Q1}})(x::AbstractCliffordNumber{Q2}) 
 end
 
 function (C::Type{<:AbstractCliffordNumber})(x::AbstractCliffordNumber)
-    T = similar_type(C, numeric_type(x), QuadraticForm(x))
+    T = similar_type(C, numeric_type(x), Val(signature(x)))
     return T(getindex_as_tuple(x, BitIndices(T)))
 end
