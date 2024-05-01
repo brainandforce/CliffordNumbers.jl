@@ -32,7 +32,7 @@ dimension(s::AbstractSignature) = signed(s.dimensions)
 
 Returns the total number of blades associated with `s`, which is equal to `2^dimension(s)`.
 """
-basis_blades(s::AbstractSignature) = 2^dimensions(s)
+basis_blades(s::AbstractSignature) = 2^dimension(s)
 
 """
     grades(s::AbstractSignature) -> UnitRange{Int8}
@@ -291,7 +291,7 @@ end
 const LGAEast = LGA{false}
 const LGAWest = LGA{true}
 
-dimension(s::LGA) = signed(s.dimensions + 1)
+dimension(s::LGA) = signed(s.dimension + 1)
 is_degenerate(::LGA) = false
 is_positive_definite(::LGA) = false
 
