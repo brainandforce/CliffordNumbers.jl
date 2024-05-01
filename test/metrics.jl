@@ -5,7 +5,7 @@
     @test size(Metrics.VGA(3)) === tuple(3)
     @test axes(Metrics.VGA(3)) === tuple(1:3,)
     @test all(isone, Metrics.VGA(3))
-    @test Metrics.basis_blades(Metrics.VGA(3)) == 8
+    @test Metrics.blade_count(Metrics.VGA(3)) == 8
     @test !Metrics.is_degenerate(Metrics.VGA(3))
     @test Metrics.is_positive_definite(Metrics.VGA(3))
     # Projective GAs
@@ -15,6 +15,7 @@
     @test axes(Metrics.PGA(3)) === tuple(0:3)
     @test iszero(first(Metrics.PGA(3)))
     @test all(isone, Metrics.PGA(3)[1:3])
+    @test Metrics.blade_count(Metrics.PGA(3)) == 16
     @test Metrics.is_degenerate(Metrics.PGA(3))
     @test !Metrics.is_positive_definite(Metrics.PGA(3))
     # Conformal GAs
@@ -25,6 +26,7 @@
     @test eachindex(Metrics.CGA(3)) === -1:3
     @test Metrics.CGA(3)[-1] === Int8(-1)
     @test all(isone, Metrics.CGA(3)[0:3])
+    @test Metrics.blade_count(Metrics.CGA(3)) == 32
     @test !Metrics.is_degenerate(Metrics.CGA(3))
     @test !Metrics.is_positive_definite(Metrics.CGA(3))
     # Lorentzian GAs
@@ -40,8 +42,12 @@
     @test Metrics.STAWest[0] === Int8(+1)
     @test all(isequal(Int8(+1)), Metrics.STAEast[1:3])
     @test all(isequal(Int8(-1)), Metrics.STAWest[1:3])
-    @test !Metrics.is_degenerate(Metrics.STA)
-    @test !Metrics.is_positive_definite(Metrics.STA)
+    @test Metrics.blade_count(Metrics.STAEast) == 16
+    @test Metrics.blade_count(Metrics.STAWest) == 16
+    @test !Metrics.is_degenerate(Metrics.STAEast)
+    @test !Metrics.is_degenerate(Metrics.STAWest)
+    @test !Metrics.is_positive_definite(Metrics.STAEast)
+    @test !Metrics.is_positive_definite(Metrics.STAWest)
     @test Metrics.blade_symbol(Metrics.STA) === 'γ'
     # Exterior algebras
     @test Metrics.Exterior(6, 1) === Metrics.Exterior(6)
