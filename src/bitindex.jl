@@ -149,12 +149,13 @@ is_same_blade(a::T, b::T) where T<:BitIndex = (a.i << 1) === (b.i << 1)
 is_same_blade(a::BitIndex, b::BitIndex) = false
 
 """
-    scalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}()
+    scalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}
 
 Constructs the `BitIndex` used to obtain the scalar (grade zero) portion of `x`.
 """
 scalar_index(::Type{Q}) where Q = BitIndex{Q}(false, UInt(0))
-scalar_index(x) = scalar_index(QuadraticForm(x))
+scalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}(false, UInt(0))
+scalar_index(x::AbstractCliffordNumber) = scalar_index(typeof(x))
 
 """
     pseudoscalar_index(x::AbstractCliffordNumber{Q}) -> BitIndex{Q}
@@ -162,7 +163,8 @@ scalar_index(x) = scalar_index(QuadraticForm(x))
 Constructs the `BitIndex` used to obtain the pseudoscalar (highest grade) portion of `x`.
 """
 pseudoscalar_index(::Type{Q}) where Q = BitIndex{Q}(false, typemax(UInt))
-pseudoscalar_index(x) = pseudoscalar_index(QuadraticForm(x))
+pseudoscalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}(false, typemax(UInt))
+pseudoscalar_index(x::AbstractCliffordNumber) = pseudoscalar_index(typeof(x))
 
 #---Grade dependent sign inversion-----------------------------------------------------------------#
 """
