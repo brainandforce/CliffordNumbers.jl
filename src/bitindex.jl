@@ -83,7 +83,7 @@ function _bitindex(Q::Type{<:QuadraticForm}, t::NTuple)
     return BitIndex{Q}(i)
 end
 
-function _bitindex(S::Metrics.AbstractSignature, t::NTuple)
+function _bitindex(::Val{S}, t::NTuple) where S
     @assert all(in(eachindex(S)), t) "Some of the indices are not valid for the given signature."
     (t, parity) = _sort_with_parity(t)
     i = signmask(UInt, parity)
@@ -104,13 +104,13 @@ This package uses a lexicographic convention for basis blades: in the algebra of
 basis bivectors are {e₁e₂, e₁e₃, e₂e₃}. The sign of the `BitIndex{Q}` is negative when the parity of
 the basis vector permutation is odd.
 """
-BitIndex(::Type{Q}, i::Integer...) where Q = _bitindex(Q, promote(i...))
-BitIndex(S::Metrics.AbstractSignature, i::Integer...) = _bitindex(S, promote(i...))
-BitIndex(x, i::Integer...) = BitIndex(signature(x), i...)
+BitIndex(::Type{Q}, i::Integer...) where Q<:QuadraticForm = _bitindex(Q, promote(i...))
+BitIndex(S::Val, i::Integer...) = _bitindex(S, promote(i...))
+BitIndex(x, i::Integer...) = BitIndex(Val(signature(x)), i...)
 
 #---Show method------------------------------------------------------------------------------------#
 
-function show(io::IO, b::BitIndex{Q}) where Q
+function show(io::IO, b::BitIndex{Q}) where Q<:QuadraticForm
     print(io, "-"^signbit(b), BitIndex, "(", Q, iszero(Int(b)) ? ")" : ", ")
     iszero(UInt(b)) && return nothing
     found_first_vector = false
@@ -118,6 +118,20 @@ function show(io::IO, b::BitIndex{Q}) where Q
         if !iszero(UInt(b) & 2^(a-1))
             found_first_vector && print(io, ", ")
             print(io, a)
+            found_first_vector = true
+        end
+    end
+    print(io, ")")
+end
+
+function show(io::IO, b::BitIndex{Q}) where Q
+    print(io, "-"^signbit(b), BitIndex, "(Val(", Q, ")", iszero(Int(b)) ? ")" : ", ")
+    iszero(UInt(b)) && return nothing
+    found_first_vector = false
+    for a in 1:min(dimension(Q), 8*sizeof(UInt) - 1)
+        if !iszero(UInt(b) & 2^(a-1))
+            found_first_vector && print(io, ", ")
+            print(io, eachindex(Q)[a])
             found_first_vector = true
         end
     end
