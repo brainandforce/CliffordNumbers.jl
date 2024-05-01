@@ -42,7 +42,7 @@
     @test CliffordNumbers.nondegenerate_square(a*b) === true
     # Degenerate multiplications
     QF = QuadraticForm{3,1,2}
-    @test CliffordNumbers.nondegenerate_mult(BitIndex(APS, 1, 3), BitIndex(APS, 2, 3)) === true
+    @test CliffordNumbers.nondegenerate_mult(BitIndex(VGA(3), 1, 3), BitIndex(VGA(3), 2, 3)) === true
     @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 5), BitIndex(QF, 5)) === false
     @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 1, 5)) === false
     @test CliffordNumbers.nondegenerate_mult(BitIndex(QF, 1, 5), BitIndex(QF, 2, 5)) === false
@@ -57,9 +57,9 @@
 end
 
 @testset "BitIndices" begin
-    aps_bivector_indices = [BitIndex(VGA(3), 1, 2), BitIndex(VGA(3), 1, 3), BitIndex(VGA(3), 2, 3)]
-    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == aps_bivector_indices
-    @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == aps_bivector_indices
+    APS_bivector_indices = [BitIndex(VGA(3), 1, 2), BitIndex(VGA(3), 1, 3), BitIndex(VGA(3), 2, 3)]
+    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == APS_bivector_indices
+    @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == APS_bivector_indices
     @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == BitIndices(KVector{2,VGA(3)}(4,2,0))
     @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
     @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(VGA(3))
