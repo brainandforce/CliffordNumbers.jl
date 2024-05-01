@@ -27,6 +27,20 @@ is equal to `2^dimension(s)`.
 """
 dimension(s::AbstractSignature) = signed(s.dimensions)
 
+"""
+    basis_blades(s::AbstractSignature) -> Int64
+
+Returns the total number of blades associated with `s`, which is equal to `2^dimension(s)`.
+"""
+basis_blades(s::AbstractSignature) = 2^dimensions(s)
+
+"""
+    grades(s::AbstractSignature) -> UnitRange{Int8}
+
+Returns the total number of grades associated with `s`, which is equal to `0:dimension(s)`.
+"""
+grades(s::AbstractSignature) = zero(Int8):dimensions(s)
+
 Base.size(s::AbstractSignature) = tuple(dimension(s))
 Base.axes(s::AbstractSignature) = tuple(firstindex(s) .+ (0:dimension(s) - 1))
 
@@ -363,5 +377,9 @@ see [`STA`](@ref).
 const STAPWest = Signature(5, 0b11100, 0b00001, -1)
 const STAP = STAPWest
 @doc (@doc STAPWest) STAP
+
+export dimension, basis_blades, grades, is_degenerate, is_positive_definite
+export VGA, PGA, CGA, LGA, LGAEast, LGAWest
+export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, STAPEast, STAPWest
 
 end
