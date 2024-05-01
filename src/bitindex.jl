@@ -211,6 +211,19 @@ is equal to `grade_involution(reverse(x))`.
 conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero((grade(i) + 1) & 2)), UInt(i))
 
 #---Multiplication tools---------------------------------------------------------------------------#
+
+function positive_square_bits(S::Metrics.AbstractSignature)
+    return sum((S[x] === Int8(+1)) * UInt(2)^(x - firstindex(S)) for x in eachindex(S))
+end
+
+function negative_square_bits(S::Metrics.AbstractSignature)
+    return sum((S[x] === Int8(-1)) * UInt(2)^(x - firstindex(S)) for x in eachindex(S))
+end
+
+function zero_square_bits(S::Metrics.AbstractSignature)
+    return sum((S[x] === Int8(0)) * UInt(2)^(x - firstindex(S)) for x in eachindex(S))
+end
+
 """
     CliffordNumbers.signbit_of_square(b::BitIndex) -> Bool
 
@@ -222,6 +235,10 @@ end
 
 signbit_of_square(b::BitIndex{<:QuadraticForm{<:Any,0,<:Any}}) = !iszero(grade(b) & 2)
 
+function signbit_of_square(b::BitIndex{Q}) where Q
+    return xor(!iszero(grade(b) & 2), isodd(count_ones(UInt(b) & !positive_square_bits(b))))
+end
+
 """
     CliffordNumbers.nondegenerate_square(b::BitIndex) -> Bool
 
@@ -230,6 +247,8 @@ otherwise. For a nondegenerate metric, this is always `true`.
 """
 nondegenerate_square(b::BitIndex{QuadraticForm{P,Q,R}}) where {P,Q,R} = iszero(UInt(b) & -2^(P+Q))
 nondegenerate_square(::BitIndex{<:QFNondegenerate}) = true
+
+nondegenerate_square(b::BitIndex{Q}) where Q = iszero(UInt(b) & !zero_square_bits(Q))
 
 """
     CliffordNumbers.sign_of_square(b::BitIndex) -> Int8
@@ -277,6 +296,11 @@ function signbit_of_mult(
     return xor(base_signbit, !isevil(UInt(a) & UInt(b) & q))
 end
 
+function signbit_of_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+    base_signbit = xor(signbit_of_mult(UInt(a), UInt(b)), signbit(a), signbit(b))
+    return xor(base_signbit, isodious(UInt(a) & UInt(b) & negative_square_bits(Q)))
+end
+
 signbit_of_mult(i) = signbit_of_mult(i,i)
 
 """
@@ -291,10 +315,14 @@ function nondegenerate_mult(
 ) where {P,Q,R}
     # This mask filters out the nondegenerate components, which are the highest bits
     mask = -UInt(2)^(P+Q)
-    return iszero(a.i & b.i & mask)
+    return iszero(UInt(a) & UInt(b) & mask)
 end
 
 nondegenerate_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q<:QuadraticForm{<:Any,<:Any,0} = true
+
+function nondegenerate_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+    return iszero(UInt(a) & UInt(b) & zero_square_bits(Q))
+end
 
 """
     CliffordNumbers.sign_of_mult(a::T, b::T) where T<:BitIndex{QuadraticForm{P,Q,R}} -> Int8
@@ -315,6 +343,11 @@ function sign_of_mult(
 end
 
 sign_of_mult(a::GenericBitIndex, b::GenericBitIndex) = Int8(-1)^signbit_of_mult(a,b)
+
+function sign_of_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+    return Int8(-1)^signbit_of_mult(a,b) * !nondegenerate_mult(a,b)
+end
+
 sign_of_mult(i) = sign_of_mult(i,i)
 
 #---Multiplication and duals-----------------------------------------------------------------------#
