@@ -20,13 +20,14 @@ const BaseNumber = Union{Real,Complex}
 
 # Contains tools for working with Hamming weights of integers
 include("hamming.jl")
-# Tools for defining quadratic forms/metric signatures (convention may not be great)
-include("quadratic.jl")
-export QuadraticForm, APS, STA, VGA, PGA, CGA
-export dimension, elements, grades
 # New module for metric signatures
 include("metrics.jl")
 export Metrics
+import .Metrics: dimension, blade_count, grades, is_degenerate, is_positive_definite
+# Tools for defining quadratic forms/metric signatures (convention may not be great)
+include("quadratic.jl")
+export QuadraticForm, APS, STA, VGA, PGA, CGA
+export dimension, blade_count, grades
 # Abstract supertype for all Clifford numbers
 include("abstract.jl")
 export AbstractCliffordNumber

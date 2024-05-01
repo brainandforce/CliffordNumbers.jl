@@ -24,7 +24,7 @@ function promote_rule(
     ::Type{<:AbstractCliffordNumber{Q,S}},
     ::Type{<:AbstractCliffordNumber{Q,T}}
 ) where {Q,S,T}
-    return CliffordNumber{Q,promote_type(S,T),elements(Q)}
+    return CliffordNumber{Q,promote_type(S,T),blade_count(Q)}
 end
 
 # Promote rule for BaseNumber types (real, complex)
@@ -46,9 +46,9 @@ end
     ::Type{<:KVector{K2,Q,T2}}
 ) where {K1,K2,Q,T1,T2}
     if xor(iseven(K1), iseven(K2))
-        return :(CliffordNumber{Q,promote_type(T1,T2),elements(Q)})
+        return :(CliffordNumber{Q,promote_type(T1,T2),blade_count(Q)})
     else
-        return :(Z2CliffordNumber{isodd(K1),Q,promote_type(T1,T2),div(elements(Q),2)})
+        return :(Z2CliffordNumber{isodd(K1),Q,promote_type(T1,T2),div(blade_count(Q),2)})
     end
 end
 
@@ -57,7 +57,7 @@ function promote_rule(C::Type{<:KVector{K,Q,T}}, ::Type{N}) where{K,Q,T,N<:BaseN
 end
 
 function promote_rule(::Type{<:KVector{<:Any,Q,T}}, ::Type{N}) where {Q,T,N<:BaseNumber}
-    return CliffordNumber{Q,promote_type(T,N),elements(Q)}
+    return CliffordNumber{Q,promote_type(T,N),blade_count(Q)}
 end
 
 # 0-vectors are scalars, but keep CliffordNumbers semantics.
@@ -77,9 +77,9 @@ end
     ::Type{<:KVector{K,Q,T}}
 ) where {P,K,Q,S,T}
     if xor(P, isodd(K))
-        return :(CliffordNumber{Q,promote_type(S,T),elements(Q)})
+        return :(CliffordNumber{Q,promote_type(S,T),blade_count(Q)})
     else
-        return :(Z2CliffordNumber{P,Q,promote_type(S,T),div(elements(Q), 2)})
+        return :(Z2CliffordNumber{P,Q,promote_type(S,T),div(blade_count(Q), 2)})
     end
 end
 
@@ -161,7 +161,7 @@ widen_grade(::Type{Z2CliffordNumber}) = CliffordNumber
 widen_grade(::Type{Z2CliffordNumber{P}}) where {P} = CliffordNumber
 widen_grade(::Type{Z2CliffordNumber{P,Q}}) where {P,Q} = CliffordNumber{Q}
 widen_grade(::Type{Z2CliffordNumber{P,Q,T}}) where {P,Q,T} = CliffordNumber{Q,T}
-widen_grade(::Type{Z2CliffordNumber{P,Q,T,L}}) where {P,Q,T,L} = CliffordNumber{Q,T,elements(Q)}
+widen_grade(::Type{Z2CliffordNumber{P,Q,T,L}}) where {P,Q,T,L} = CliffordNumber{Q,T,blade_count(Q)}
 
 widen_grade(::Type{KVector}) = CliffordNumber
 widen_grade(::Type{KVector{K}}) where {K} = Z2CliffordNumber{isodd(K)}
@@ -169,5 +169,5 @@ widen_grade(::Type{KVector{K,Q}}) where {K,Q} = Z2CliffordNumber{isodd(K),Q}
 widen_grade(::Type{KVector{K,Q,T}}) where {K,Q,T} = Z2CliffordNumber{isodd(K),Q,T}
 
 function widen_grade(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L}
-    return Z2CliffordNumber{isodd(K),Q,T,div(elements(Q), 2)}
+    return Z2CliffordNumber{isodd(K),Q,T,div(blade_count(Q), 2)}
 end

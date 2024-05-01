@@ -18,7 +18,7 @@ struct Z2CliffordNumber{P,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function Z2CliffordNumber{P,Q,T,L}(x::Tuple) where {P,Q,T,L}
         @assert P isa Bool "The first type parameter must be a Bool (got $P)."
-        check_element_count(div(elements(Q), 2), L, x)
+        check_element_count(div(blade_count(Q), 2), L, x)
         return new(x)
     end
 end
@@ -59,7 +59,7 @@ end
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-length(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(elements(Q), 2)
+length(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(blade_count(Q), 2)
 length(x::Z2CliffordNumber) = length(typeof(x))
 
 nonzero_grades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = P:2:dimension(Q)
@@ -90,7 +90,7 @@ function similar_type(
     T::Type{<:BaseNumber}, 
     Q::Type{<:QuadraticForm}
 ) where P
-    return Z2CliffordNumber{P,Q,T,div(elements(Q),2)}
+    return Z2CliffordNumber{P,Q,T,div(blade_count(Q),2)}
 end
 
 #---Show methods-----------------------------------------------------------------------------------#

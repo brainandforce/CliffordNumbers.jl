@@ -13,7 +13,7 @@ optimization when calculating the geometric product.
 struct CliffordNumber{Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function CliffordNumber{Q,T,L}(x::Tuple) where {Q,T,L}
-        check_element_count(elements(Q), L, x)
+        check_element_count(blade_count(Q), L, x)
         return new{Q,T,L}(x)
     end
 end
@@ -31,7 +31,7 @@ CliffordNumber{Q}(x::Tuple{Vararg{BaseNumber}}) where Q = CliffordNumber{Q}(prom
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-length(::Type{<:CliffordNumber{Q}}) where Q = elements(Q)
+length(::Type{<:CliffordNumber{Q}}) where Q = blade_count(Q)
 length(m::CliffordNumber) = length(typeof(m))
 
 nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
@@ -43,7 +43,7 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 
 #---Clifford number indexing-----------------------------------------------------------------------#
 
-@inline to_index(::Type{<:CliffordNumber{Q}}, i::BitIndex{Q}) where Q = (Int(i) % elements(Q) + 1)
+@inline to_index(::Type{<:CliffordNumber{Q}}, i::BitIndex{Q}) where Q = (Int(i) % blade_count(Q) + 1)
 @inline to_index(x::CliffordNumber{Q}, i::BitIndex{Q}) where Q = to_index(typeof(x), i)
 
 @inline function getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
@@ -61,7 +61,7 @@ one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 #---Similar types----------------------------------------------------------------------------------#
 
 function similar_type(::Type{<:CliffordNumber}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
-    return CliffordNumber{Q,T,elements(Q)}
+    return CliffordNumber{Q,T,blade_count(Q)}
 end
 
 #---Show methods-----------------------------------------------------------------------------------#
