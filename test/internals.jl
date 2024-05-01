@@ -24,20 +24,20 @@ end
 end
 
 @testset "Represented grades" begin
-    @test nonzero_grades(KVector{2,APS}) === 2:2
-    @test nonzero_grades(zero(KVector{2,APS})) === 2:2
-    @test nonzero_grades(CliffordNumber{APS}) === 0:3
-    @test nonzero_grades(zero(CliffordNumber{APS})) === 0:3
-    @test RepresentedGrades(KVector{2,APS})[0:3] == [false, false, true, false]
-    @test RepresentedGrades(CliffordNumber{APS})[0:3] == trues(4)
+    @test nonzero_grades(KVector{2,VGA(3)}) === 2:2
+    @test nonzero_grades(zero(KVector{2,VGA(3)})) === 2:2
+    @test nonzero_grades(CliffordNumber{VGA(3)}) === 0:3
+    @test nonzero_grades(zero(CliffordNumber{VGA(3)})) === 0:3
+    @test RepresentedGrades(KVector{2,VGA(3)})[0:3] == [false, false, true, false]
+    @test RepresentedGrades(CliffordNumber{VGA(3)})[0:3] == trues(4)
 end
 
 @testset "Printing/display" begin
     import CliffordNumbers.short_typename
-    @test short_typename(zero(CliffordNumber{APS,Float64,8})) === CliffordNumber{APS,Float64}
-    @test short_typename(zero(CliffordNumber{APS,Float64})) === CliffordNumber{APS,Float64}
-    @test short_typename(zero(EvenCliffordNumber{APS,Int,4})) === EvenCliffordNumber{APS,Int}
-    @test short_typename(zero(OddCliffordNumber{APS,Int})) === OddCliffordNumber{APS,Int}
-    @test short_typename(zero(KVector{1,APS,Bool,3})) === KVector{1,APS,Bool}
-    @test short_typename(zero(KVector{2,APS,Bool})) === KVector{2,APS,Bool}
+    @test short_typename(zero(CliffordNumber{VGA(3),Float64,8})) === CliffordNumber{VGA(3),Float64}
+    @test short_typename(zero(CliffordNumber{VGA(3),Float64})) === CliffordNumber{VGA(3),Float64}
+    @test short_typename(zero(EvenCliffordNumber{VGA(3),Int,4})) === EvenCliffordNumber{VGA(3),Int}
+    @test short_typename(zero(OddCliffordNumber{VGA(3),Int})) === OddCliffordNumber{VGA(3),Int}
+    @test short_typename(zero(KVector{1,VGA(3),Bool,3})) === KVector{1,VGA(3),Bool}
+    @test short_typename(zero(KVector{2,VGA(3),Bool})) === KVector{2,VGA(3),Bool}
 end
