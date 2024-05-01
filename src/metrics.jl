@@ -285,13 +285,13 @@ spacetime, with the East Coast convention having positive squares for spatial 1-
 Coast convention having negative squares for spatial 1-blades.
 """
 struct LGA{C} <: AbstractSignature
-    dimension::UInt
+    dimensions::UInt
 end
 
 const LGAEast = LGA{false}
 const LGAWest = LGA{true}
 
-dimension(s::LGA) = signed(s.dimension + 1)
+dimension(s::LGA) = signed(s.dimensions + 1)
 is_degenerate(::LGA) = false
 is_positive_definite(::LGA) = false
 
