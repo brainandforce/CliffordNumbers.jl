@@ -320,10 +320,10 @@ const STA = STAWest
     Exterior <: Metrics.AbstractSignature
 
 Represents a signature corresponding to an exterior algebra. In an exterior algebra, all 1-blades
-square to 0.
+square to 0, and the geometric product is equivalent ot the wedge product.
 
 Unlike `VGA`, `PGA`, `CGA`, and `LGA`, the first index is not assumed when constructing this object,
-and can be manually specified.
+and can be manually specified. If it is not specified, it defaults to 1.
 """
 struct Exterior
     dimensions::UInt
