@@ -36,6 +36,15 @@ QuadraticForm(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
 QuadraticForm(::AbstractCliffordNumber{Q}) where Q = Q
 
 """
+    signature(T::Type{<:AbstractCliffordNumber{Q}}) = Q
+    signature(x::AbstractCliffordNumber{Q}) = Q
+
+Returns the metric signature object associated with an `AbstractCliffordNumber` `x` or its type `T`.
+"""
+signature(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
+signature(::AbstractCliffordNumber{Q}) where Q = Q
+
+"""
     numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) = T
     numeric_type(T::Type{<:Union{Real,Complex}}) = T
     numeric_type(x) = numeric_type(typeof(x))
