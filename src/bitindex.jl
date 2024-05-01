@@ -83,9 +83,19 @@ function _bitindex(Q::Type{<:QuadraticForm}, t::NTuple)
     return BitIndex{Q}(i)
 end
 
+function _bitindex(S::Metrics.AbstractSignature, t::NTuple)
+    @assert all(in(eachindex(S)), t) "Some of the indices are not valid for the given signature."
+    (t, parity) = _sort_with_parity(t)
+    i = signmask(UInt, parity)
+    for x in t
+        i = xor(i, 2^(x-1))
+    end
+    return BitIndex{S}(i)
+end
+
 """
     BitIndex(::Type{Q}, i::Integer...)
-    BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
+    BitIndex(x, i::Integer...) = BitIndex(signature(x), i...)
 
 Constructs a `BitIndex{Q}` from a list of integers that represent the basis 1-vectors of the space.
 `Q` can be determined from the `QuadraticForm` associated with `x`, whether it be a type or object.
@@ -95,7 +105,8 @@ basis bivectors are {e₁e₂, e₁e₃, e₂e₃}. The sign of the `BitIndex{Q}
 the basis vector permutation is odd.
 """
 BitIndex(::Type{Q}, i::Integer...) where Q = _bitindex(Q, promote(i...))
-BitIndex(x, i::Integer...) = BitIndex(QuadraticForm(x), i...)
+BitIndex(S::Metrics.AbstractSignature, i::Integer...) = _bitindex(S, promote(i...))
+BitIndex(x, i::Integer...) = BitIndex(signature(x), i...)
 
 #---Show method------------------------------------------------------------------------------------#
 
