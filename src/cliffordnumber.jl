@@ -60,7 +60,7 @@ one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 
-function similar_type(::Type{<:CliffordNumber}, T::Type{<:BaseNumber}, Q::Type{<:QuadraticForm})
+function similar_type(::Type{<:CliffordNumber}, ::Type{T}, ::Val{Q}) where {Q,T<:BaseNumber}
     return CliffordNumber{Q,T,blade_count(Q)}
 end
 

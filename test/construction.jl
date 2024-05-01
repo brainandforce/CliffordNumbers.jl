@@ -74,7 +74,7 @@ end
 
 @testset "Similar types" begin
     import CliffordNumbers.similar_type
-    @test similar(CliffordNumber{APS}, Int, VGA(2)) isa CliffordNumber{VGA(2),Int}
+    @test similar(CliffordNumber{APS}, Int, Val(VGA(2))) isa CliffordNumber{VGA(2),Int}
     @test similar(EvenCliffordNumber{APS}, Int) isa EvenCliffordNumber{APS,Int}
 end
 
