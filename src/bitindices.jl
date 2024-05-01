@@ -56,7 +56,9 @@ BitIndices{Q}(x::AbstractCliffordNumber) where Q = BitIndices{Q,typeof(x)}()
 # Ensure that the second type parameter is a concrete type
 # It doesn't actually need to be, but doing this should simplify things
 BitIndices{Q}(C::Type{<:AbstractCliffordNumber}) where Q = BitIndices{Q}(zero(C))
-BitIndices(x) = BitIndices{QuadraticForm(x)}(x)
+
+BitIndices(::Type{C}) where C<:AbstractCliffordNumber = BitIndices{signature(C),C}()
+BitIndices(x::AbstractCliffordNumber) = BitIndices(typeof(x))
 
 # TODO: more efficient defintion of equality
 
