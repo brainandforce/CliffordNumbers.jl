@@ -86,3 +86,10 @@ end
     @test numeric_type(CliffordNumber{APS,Float64,8}) === Float64
     @test numeric_type(zero(OddCliffordNumber{APS,Int})) === Int
 end
+
+@testset "Metric signatures" begin
+    @test signature(CliffordNumber{QuadraticForm{3,2,1}}) === QuadraticForm{3,2,1}
+    @test signature(zero(CliffordNumber{QuadraticForm{3,2,1}})) === QuadraticForm{3,2,1}
+    @test signature(typeof(zero(CliffordNumber{QuadraticForm{3,2,1}}))) === QuadraticForm{3,2,1}
+    @test signature(CliffordNumber{Metrics.VGA(3),Float32}) === Metrics.VGA(3)
+end
