@@ -73,7 +73,7 @@ one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(KVector{0,Q})
 pseudoscalar(::Type{Q}) where Q = KVector{dimension(Q),Q}(true)
 
 function pseudoscalar(C::Type{<:AbstractCliffordNumber{Q}}) where Q
-    return KVector{dimension(Q),Q}(numeric_type(C)(true))
+    return KVector{dimension(Q),Q}(scalar_type(C)(true))
 end
 
 #---Similar types----------------------------------------------------------------------------------#

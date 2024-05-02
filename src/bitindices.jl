@@ -147,12 +147,12 @@ Clifford number of type `C`, or a similar type from `CliffordNumbers.similar_typ
 end
 
 @inline function getindex(x::AbstractCliffordNumber{Q}, B::BitIndices{Q,C}) where {Q,C}
-    T = similar_type(C, numeric_type(x))
+    T = similar_type(C, scalar_type(x))
     return T(getindex_as_tuple(x, B))
 end
 
 function getindex(x::AbstractCliffordNumber{Q}, B::AbstractBitIndices{Q,C}) where {Q,C}
-    T = similar_type(C, numeric_type(x))
+    T = similar_type(C, scalar_type(x))
     return T(x[Tuple(B)])
 end
 
@@ -166,6 +166,6 @@ function (C::Type{<:AbstractCliffordNumber{Q1}})(x::AbstractCliffordNumber{Q2}) 
 end
 
 function (C::Type{<:AbstractCliffordNumber})(x::AbstractCliffordNumber)
-    T = similar_type(C, numeric_type(x), Val(signature(x)))
+    T = similar_type(C, scalar_type(x), Val(signature(x)))
     return T(getindex_as_tuple(x, BitIndices(T)))
 end

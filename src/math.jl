@@ -52,7 +52,7 @@ function isapprox(
     x::AbstractCliffordNumber,
     y::AbstractCliffordNumber;
     atol::Real = 0,
-    rtol::Real = Base.rtoldefault(numeric_type(x), numeric_type(y), atol),
+    rtol::Real = Base.rtoldefault(scalar_type(x), scalar_type(y), atol),
     nans::Bool = false,
     norm = abs
 )
@@ -206,12 +206,12 @@ end
     #= Turns out map() is better!
     return ntuple(Val{L}()) do i
         a = @inbounds BitIndices(C)[i]
-        convert(numeric_type(C), muladd(is_same_blade(a,b), x, data[i]))
+        convert(scalar_type(C), muladd(is_same_blade(a,b), x, data[i]))
     end
     =#
     return map(BitIndices(C)) do a
         i = to_index(C, a)
-        convert(numeric_type(C), muladd(is_same_blade(a,b), x, (@inbounds data[i])))
+        convert(scalar_type(C), muladd(is_same_blade(a,b), x, (@inbounds data[i])))
     end
 end
 
@@ -232,7 +232,7 @@ Calculate the coefficient indexed by `i` from Clifford numbers `x` and `y`. The 
     i::BitIndex{Q},
     f = Returns(true)
 ) where Q
-    result = zero(promote_type(numeric_type(x), numeric_type(y)))
+    result = zero(promote_type(scalar_type(x), scalar_type(y)))
     for j in BitIndices(x)
         (a, b) = (j, i*j)
         condition = nondegenerate_mult(a,b) * f(a,b)::Bool
@@ -335,7 +335,7 @@ end
 Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
 """
 function abs2(x::AbstractCliffordNumber)
-    result = zero(numeric_type(x))
+    result = zero(scalar_type(x))
     for i in eachindex(Tuple(x))
         result += Tuple(x)[i] * Tuple(x)[i]
     end
@@ -602,7 +602,7 @@ Returns the type expected when exponentiating a Clifford number. This is an `Eve
 the nonzero grades of the input are even, a `CliffordNumber` otherwise.
 """
 @generated function exponential_type(::Type{C}) where {Q,C<:AbstractCliffordNumber{Q}}
-    T = typeof(exp(zero(numeric_type(C))))
+    T = typeof(exp(zero(scalar_type(C))))
     if all(iseven, nonzero_grades(C))
         return :(EvenCliffordNumber{Q,$T,div(blade_count(Q), 2)})
     else
@@ -644,7 +644,7 @@ bottleneck.
         ex = quote
             $ex
             # Use fast multiplication kernel directly
-            y_scaled = y * convert(numeric_type($T), 1 // $n)
+            y_scaled = y * convert(scalar_type($T), 1 // $n)
             term = mul(term, y_scaled)
             # Add the term from this loop to the final result
             result = result + term

@@ -41,9 +41,9 @@ signature(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
 signature(::AbstractCliffordNumber{Q}) where Q = Q
 
 """
-    numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) = T
-    numeric_type(T::Type{<:Union{Real,Complex}}) = T
-    numeric_type(x) = numeric_type(typeof(x))
+    scalar_type(::Type{<:AbstractCliffordNumber{Q,T}}) = T
+    scalar_type(T::Type{<:Union{Real,Complex}}) = T
+    scalar_type(x) = scalar_type(typeof(x))
 
 Returns the numeric type associated with an `AbstractCliffordNumber` instance. For subtypes of
 `Real` and `Complex`, or their instances, this simply returns the input type or instance type.
@@ -57,10 +57,10 @@ normal multiplication, as is the case with complex numbers.
 
 For subtypes `T` of `Number`, `eltype(T) === T`, and this is true for `AbstractCliffordNumber`.
 """
-numeric_type(::Type) = BaseNumber
-numeric_type(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
-numeric_type(T::Type{<:BaseNumber}) = T
-numeric_type(x) = numeric_type(typeof(x))
+scalar_type(::Type) = BaseNumber
+scalar_type(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = T
+scalar_type(T::Type{<:BaseNumber}) = T
+scalar_type(x) = scalar_type(typeof(x))
 
 #---Get underlying tuple---------------------------------------------------------------------------#
 
@@ -76,11 +76,11 @@ zero_tuple(::Type{T}, ::Val{L}) where {T,L} = ntuple(Returns(zero(T)), Val(L))
 
 """
     CliffordNumbers.zero_tuple(::Type{C<:AbstractCliffordNumber})
-        -> NTuple{length(C),numeric_type(C)}
+        -> NTuple{length(C),scalar_type(C)}
 
 Generates a `Tuple` that can be used to construct `zero(C)`.
 """
-zero_tuple(::Type{C}) where C<:AbstractCliffordNumber = zero_tuple(numeric_type(C), Val(length(C)))
+zero_tuple(::Type{C}) where C<:AbstractCliffordNumber = zero_tuple(scalar_type(C), Val(length(C)))
 
 zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(zero_tuple(C))
 zero(C::Type{<:AbstractCliffordNumber}) = C(zero_tuple(Bool, Val(length(C))))
@@ -95,7 +95,7 @@ oneunit(::Union{T,Type{T}}) where T<:AbstractCliffordNumber = convert(T, one(T))
 """
     CliffordNumbers.similar_type(
         C::Type{<:AbstractCliffordNumber},
-        [N::Type{<:BaseNumber} = numeric_type(C)],
+        [N::Type{<:BaseNumber} = scalar_type(C)],
         [Q::Val = Val(signature(C))]
     ) -> Type{<:AbstractCliffordNumber{Q,N}}
 
@@ -110,7 +110,7 @@ function similar_type(x::AbstractCliffordNumber, T::Type{<:BaseNumber}, Q::Val)
 end
 
 similar_type(x, T::Type{<:BaseNumber}) = similar_type(x, T, Val(signature(x)))
-similar_type(x, Q::Val) = similar_type(x, numeric_type(x), Q)
+similar_type(x, Q::Val) = similar_type(x, scalar_type(x), Q)
 
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
@@ -126,7 +126,7 @@ Note that this does not return the scalar (grade 0) coefficient of `x`. Use `rea
 obtain this result.
 """
 function Base.real(x::AbstractCliffordNumber)
-    T = similar_type(x, real(numeric_type(x)))
+    T = similar_type(x, real(scalar_type(x)))
     return T(real.(Tuple(x)))
 end
 
@@ -144,14 +144,14 @@ Note that this operation does not isolate a scalar (grade 0) coefficient of `x` 
 `complex(scalar(x), [scalar(y)])` to obtain this result.
 """
 function Base.complex(x::AbstractCliffordNumber)
-    C = similar_type(x, complex(numeric_type(x)))
+    C = similar_type(x, complex(scalar_type(x)))
     return C(complex.(Tuple(x)))
 end
 
 Base.complex(x::AbstractCliffordNumber{<:Any,<:Complex}) = x
 
 function Base.complex(x::T, y::T) where T<:AbstractCliffordNumber{<:Any,<:Real}
-    C = similar_type(x, complex(numeric_type(x)))
+    C = similar_type(x, complex(scalar_type(x)))
     return C(complex.(Tuple(x), Tuple(y)))
 end
 

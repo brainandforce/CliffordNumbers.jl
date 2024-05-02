@@ -4,7 +4,7 @@
 
 ```@docs
 CliffordNumbers.AbstractCliffordNumber
-CliffordNumbers.numeric_type
+CliffordNumbers.scalar_type
 CliffordNumbers.similar_type
 ```
 

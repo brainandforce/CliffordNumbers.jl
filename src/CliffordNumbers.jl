@@ -32,7 +32,7 @@ export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, ST
 # Abstract supertype for all Clifford numbers
 include("abstract.jl")
 export AbstractCliffordNumber
-export signature, numeric_type
+export signature, scalar_type
 # Working with the grades represented by an AbstractCliffordNumber subtype
 include("grades.jl")
 export RepresentedGrades

@@ -79,12 +79,12 @@ end
 end
 
 @testset "Scalar types" begin
-    @test numeric_type(Int) === Int
-    @test numeric_type(ComplexF16) === ComplexF16
-    @test numeric_type(Int(420)) === Int
-    @test numeric_type(ComplexF16(69)) === ComplexF16
-    @test numeric_type(CliffordNumber{VGA(3),Float64,8}) === Float64
-    @test numeric_type(zero(OddCliffordNumber{VGA(3),Int})) === Int
+    @test scalar_type(Int) === Int
+    @test scalar_type(ComplexF16) === ComplexF16
+    @test scalar_type(Int(420)) === Int
+    @test scalar_type(ComplexF16(69)) === ComplexF16
+    @test scalar_type(CliffordNumber{VGA(3),Float64,8}) === Float64
+    @test scalar_type(zero(OddCliffordNumber{VGA(3),Int})) === Int
 end
 
 @testset "Metric signatures" begin

@@ -2,14 +2,14 @@
 """
     promote_numeric_type(x, y)
 
-Calls `promote_type()` for the result of `numeric_type()` called on all arguments. For incompletely
-specified types, the result of `numeric_type()` is replaced with `Bool`, which always promotes to
+Calls `promote_type()` for the result of `scalar_type()` called on all arguments. For incompletely
+specified types, the result of `scalar_type()` is replaced with `Bool`, which always promotes to
 any larger numeric type.
 """
 promote_numeric_type() = Union{}
 
 function promote_numeric_type(x, y...)
-    T = numeric_type(x)
+    T = scalar_type(x)
     return promote_type(ifelse(T >: BaseNumber, Bool, T), promote_numeric_type(y...))
 end
 
@@ -31,7 +31,7 @@ end
 # Note that complex numbers aren't automatically treated as pseudoscalars
 # (this only works in some dimensions...)
 function promote_rule(C::Type{<:AbstractCliffordNumber{Q}}, ::Type{N}) where {Q,N<:BaseNumber}
-    T = numeric_type(C)
+    T = scalar_type(C)
     return ifelse(T >: BaseNumber, C, similar_type(C, promote_type(T,N)))
 end
 
