@@ -20,6 +20,7 @@ const BaseNumber = Union{Real,Complex}
 
 # Contains tools for working with Hamming weights of integers
 include("hamming.jl")
+using .Hamming
 # New module for metric signatures
 include("metrics.jl")
 using .Metrics

@@ -3,13 +3,14 @@
 ## Hamming weights and related operations
 
 ```@docs
-CliffordNumbers.isevil
-CliffordNumbers.isodious
-CliffordNumbers.number_of_parity
-CliffordNumbers.evil_number
-CliffordNumbers.odious_number
-CliffordNumbers.next_of_hamming_weight
-CliffordNumbers.hamming_number
+CliffordNumbers.Hamming
+CliffordNumbers.Hamming.isevil
+CliffordNumbers.Hamming.isodious
+CliffordNumbers.Hamming.number_of_parity
+CliffordNumbers.Hamming.evil_number
+CliffordNumbers.Hamming.odious_number
+CliffordNumbers.Hamming.next_of_hamming_weight
+CliffordNumbers.Hamming.hamming_number
 ```
 
 ## Indexing
