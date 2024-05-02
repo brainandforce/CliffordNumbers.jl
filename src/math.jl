@@ -140,8 +140,8 @@ end
     muladd(x::Union{Real,Complex}, y::AbstractCliffordNumber{Q}, z::AbstractCliffordNumber{Q})
     muladd(x::AbstractCliffordNumber{Q}, y::Union{Real,Complex}, z::AbstractCliffordNumber{Q})
 
-Multiplies a scalar with a Clifford number and adds another Clifford number using a more efficient
-operation than a juxtaposed multiply and add, if possible.
+Multiplies a scalar with a Clifford number and adds another Clifford number, utilizing optimizations
+made available with scalar `muladd`, such as `fma` if hardware support is available.
 """
 function muladd(x::BaseNumber, y::T, z::T) where T<:AbstractCliffordNumber
     return T(map((_y, _z) -> muladd(x, _y, _z), Tuple(y), Tuple(z)))
