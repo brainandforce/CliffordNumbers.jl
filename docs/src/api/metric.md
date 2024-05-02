@@ -37,4 +37,6 @@ CliffordNumbers.Metrics.STAP
 CliffordNumbers.dimension
 CliffordNumbers.basis_blades
 CliffordNumbers.grades
+CliffordNumbers.is_degenerate
+CliffordNumbers.is_positive_definite
 ```
