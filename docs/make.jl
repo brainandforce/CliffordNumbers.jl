@@ -25,8 +25,8 @@ makedocs(;
         "API" => Any[
             "CliffordNumbers" => "api/clifford.md",
             "Indexing" => "api/indexing.md",
-            "Math" => "api/indexing.md",
-            "Quadratic forms" => "api/quadratic.md",
+            "Math" => "api/math.md",
+            "Metric signatures" => "api/metric.md",
             "Internals" => "api/internal.md",
         ]
     ],
