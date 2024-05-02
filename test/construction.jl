@@ -88,8 +88,13 @@ end
 end
 
 @testset "Metric signatures" begin
-    @test signature(CliffordNumber{QuadraticForm{3,2,1}}) === QuadraticForm{3,2,1}
-    @test signature(zero(CliffordNumber{QuadraticForm{3,2,1}})) === QuadraticForm{3,2,1}
-    @test signature(typeof(zero(CliffordNumber{QuadraticForm{3,2,1}}))) === QuadraticForm{3,2,1}
-    @test signature(CliffordNumber{Metrics.VGA(3),Float32}) === Metrics.VGA(3)
+    @test signature(CliffordNumber{STAP}) === STAP
+    @test signature(CliffordNumber{STAP,Float32}) === STAP
+    @test signature(CliffordNumber{STAP,Float32,16}) === STAP
+    @test signature(EvenCliffordNumber{STAP,Float32,8}) === STAP
+    @test signature(OddCliffordNumber{STAP,Float32,8}) === STAP
+    @test signature(KVector{2,STAP,Float32,6}) === STAP
+    @test signature(zero(CliffordNumber{STAP})) === STAP
+    @test signature(zero(EvenCliffordNumber{STAP})) === STAP
+    @test signature(typeof(zero(CliffordNumber{STAP}))) === STAP
 end

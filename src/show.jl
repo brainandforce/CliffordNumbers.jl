@@ -34,13 +34,7 @@ function to_basis_str(b::BitIndex{Q}; label = nothing, pseudoscalar = nothing) w
         return string(pseudoscalar)
     end
     if isnothing(label) || isempty(label)
-        if Q === QuadraticForm{3,0,0}
-            label = "σ"
-        elseif Q === QuadraticForm{3,1,0} || Q === QuadraticForm{1,3,0}
-            label = "γ"
-        else
-            label = "e"
-        end
+        label = Metrics.blade_symbol(Q)
     end
     return join(
         (label * subscript_string(n+1))^!iszero(2^n & UInt(b)) for n in 0:(dimension(Q) - 1)

@@ -66,8 +66,9 @@ end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
 
-one(C::Type{Q}) where Q = KVector{0,Q}(numeric_type(C)(true))
-one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(Q)
+one(::Type{<:KVector{<:Any,Q}}) where Q = KVector{0,Q}(true)
+one(::Type{<:KVector{<:Any,Q,T}}) where {Q,T} = KVector{0,Q,T}(true)
+one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(KVector{0,Q})
 
 pseudoscalar(::Type{Q}) where Q = KVector{dimension(Q),Q}(true)
 

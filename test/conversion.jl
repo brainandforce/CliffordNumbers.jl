@@ -1,5 +1,4 @@
 @testset "Conversion" begin
-    import CliffordNumbers: QFComplex
     k1 = KVector{1,VGA(3)}(1, 2, 3)
     k2 = KVector{2,VGA(3)}(1, 2, 3)
     # Conversion of scalar CliffordNumbers to Real subtypes
@@ -7,11 +6,14 @@
     @test_throws InexactError convert(Int, CliffordNumber{VGA(3)}(1.5))
     # K-vectors of grade zero are scalars
     @test convert(Float64, KVector{0,VGA(3)}(3)) === Float64(3)
+    #=
     @test convert(Complex{Float64}, CliffordNumber{QFComplex}(1, 2)) === 1.0 + 2.0im
     @test convert(CliffordNumber{QFComplex,Float64}, 1+2im) === CliffordNumber{QFComplex}(1.0, 2.0)
+    =#
     @test convert(OddCliffordNumber, k1) === OddCliffordNumber{VGA(3)}(1, 2, 3, 0)
     @test convert(OddCliffordNumber{VGA(3)}, k1) === OddCliffordNumber{VGA(3)}(1, 2, 3, 0)
-    @test convert(OddCliffordNumber{VGA(3),Float64}, k1) === OddCliffordNumber{VGA(3),Float64}(1, 2, 3, 0)
+    @test convert(OddCliffordNumber{VGA(3),Float64}, k1) === 
+        OddCliffordNumber{VGA(3),Float64}(1, 2, 3, 0)
     @test convert(EvenCliffordNumber, k2) === EvenCliffordNumber{VGA(3)}(0, 1, 2, 3)
     @test_throws InexactError convert(EvenCliffordNumber, k1)
     @test_throws InexactError convert(OddCliffordNumber, k2)

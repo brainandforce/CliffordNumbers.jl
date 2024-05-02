@@ -14,7 +14,6 @@ isscalar(x::Union{CliffordNumber,EvenCliffordNumber}) = all(iszero, Tuple(x)[2:e
 isscalar(x::OddCliffordNumber) = iszero(x)
 isscalar(x::KVector) = iszero(x)
 isscalar(::KVector{0}) = true
-isscalar(::AbstractCliffordNumber{QuadraticForm{0,0,0}}) = true
 isscalar(::BaseNumber) = true
 
 """
