@@ -27,8 +27,6 @@ end
     @test nonzero_grades(zero(KVector{2,VGA(3)})) === 2:2
     @test nonzero_grades(CliffordNumber{VGA(3)}) === 0:3
     @test nonzero_grades(zero(CliffordNumber{VGA(3)})) === 0:3
-    @test RepresentedGrades(KVector{2,VGA(3)})[0:3] == [false, false, true, false]
-    @test RepresentedGrades(CliffordNumber{VGA(3)})[0:3] == trues(4)
 end
 
 @testset "Printing/display" begin

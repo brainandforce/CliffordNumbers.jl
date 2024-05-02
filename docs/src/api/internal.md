@@ -49,9 +49,3 @@ CliffordNumbers.exp_taylor
 CliffordNumbers.product_return_type
 CliffordNumbers.exponential_type
 ```
-
-## Unused features
-
-```@docs
-CliffordNumbers.RepresentedGrades
-```
