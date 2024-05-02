@@ -1,5 +1,9 @@
 # Metric signatures
 
+```@docs
+CliffordNumbers.Metrics
+```
+
 ## Signature types
 
 ```@docs

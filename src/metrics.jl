@@ -1,3 +1,9 @@
+"""
+    CliffordNumbers.Metrics
+
+Contains tools for working with metric signatures associated with `AbstractCliffordNumber` subtypes
+and instances. This includes the [`Metrics.AbstractSignature`](@ref) type and its subtypes.
+"""
 module Metrics
 
 """
@@ -9,6 +15,10 @@ type as well as other specialized types.
 Metric signatures can be interpreted as the signs of the diagonal elements of the metric tensor. All
 elements are either -1, 0, or 1. All nondegenerate Clifford algebras admit an orthonormal basis 
 corresponding to the metric.
+
+Aside from the generic [`Metrics.Signature`](@ref) subtype, types for commonly used algebras are 
+available, including [`Metrics.VGA`](@ref), [`Metrics.PGA`](@ref), and [`Metrics.CGA`](@ref). Custom
+signatures with firmer bounds on their behavior can be implemented by subtyping this type.
 """
 abstract type AbstractSignature <: AbstractVector{Int8}
 end
