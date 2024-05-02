@@ -1,16 +1,16 @@
 # Inspired by Base.promote_eltype in Julia Base
 """
-    promote_numeric_type(x, y)
+    promote_scalar_type(x, y)
 
 Calls `promote_type()` for the result of `scalar_type()` called on all arguments. For incompletely
 specified types, the result of `scalar_type()` is replaced with `Bool`, which always promotes to
 any larger numeric type.
 """
-promote_numeric_type() = Union{}
+promote_scalar_type() = Union{}
 
-function promote_numeric_type(x, y...)
+function promote_scalar_type(x, y...)
     T = scalar_type(x)
-    return promote_type(ifelse(T >: BaseNumber, Bool, T), promote_numeric_type(y...))
+    return promote_type(ifelse(T >: BaseNumber, Bool, T), promote_scalar_type(y...))
 end
 
 # Generic promote rule for Clifford numbers with different element types
@@ -105,7 +105,7 @@ scalar_promote(x::Number) = tuple(x)
 
 function scalar_promote(x::Number, y::Number)
     @inline
-    T = promote_numeric_type(x, y)
+    T = promote_scalar_type(x, y)
     return (scalar_convert(T, x), scalar_convert(T, y))
 end
 
@@ -122,7 +122,7 @@ end
 
 function scalar_promote(x::Number, y::Number, zs::Number...)
     @inline
-    T = promote_numeric_type(x, y, zs...)
+    T = promote_scalar_type(x, y, zs...)
     return scalar_convert.(T, (x, y, zs...))
 end
 

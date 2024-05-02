@@ -320,7 +320,7 @@ Calculates the scalar product of two Clifford numbers with quadratic form `Q`. T
 """
 function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     # Only iterate through a minimal set of indices, known to be nonzero
-    T = promote_numeric_type(x, y)
+    T = promote_scalar_type(x, y)
     result = zero(T)
     inds = eachindex(promote_type(typeof(x), typeof(y)))
     for i in inds
@@ -365,7 +365,7 @@ Returns the type of the contraction when performed on the input types. It only d
 """
 function contraction_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     K = abs(K1 - K2) # this works in all cases, if K2 > K1 then the values are just zero
-    return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
+    return KVector{K,Q,promote_scalar_type(C1, C2),binomial(dimension(Q), K)}
 end
 
 function contraction_type(
@@ -463,7 +463,7 @@ Returns the type of the result of the wedge product of the input types. It only 
 """
 function wedge_product_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
     K = min(K1+K2, dimension(Q))
-    return KVector{K,Q,promote_numeric_type(C1, C2),binomial(dimension(Q), K)}
+    return KVector{K,Q,promote_scalar_type(C1, C2),binomial(dimension(Q), K)}
 end
 
 function wedge_product_type(
