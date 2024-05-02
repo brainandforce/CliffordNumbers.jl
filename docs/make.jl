@@ -21,12 +21,13 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Clifford number types" => "numeric.md",
+        "Metric signatures" => "metrics.md",
         "Operations" => "operations.md",
         "API" => Any[
             "CliffordNumbers" => "api/clifford.md",
             "Indexing" => "api/indexing.md",
             "Math" => "api/math.md",
-            "Metric signatures" => "api/metric.md",
+            "Metric signatures" => "api/metrics.md",
             "Internals" => "api/internal.md",
         ]
     ],

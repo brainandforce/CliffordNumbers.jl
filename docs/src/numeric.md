@@ -24,7 +24,9 @@ ones described below.
 
 ### `EvenCliffordNumber{Q,T,L}` and `OddCliffordNumber{Q,T,L}`: even and odd graded elements
 
-These types represent Clifford numbers of exclusively even or odd grade, respectively.
+These types represent Clifford numbers of exclusively even or odd grade, respectively. These are the
+workhorses of geometric algebra, as they are produced through products of even or odd numbers of
+1-blades. In the majority of cases, you can rely entirely on these types.
 
 Internally, these are the same type: they alias `CliffordNumbers.Z2CliffordNumber{P,Q,T,L}`, where
 `P` is a Boolean parameter which is `false` for `EvenCliffordNumber` and `true` for
@@ -40,7 +42,9 @@ It should be noted that in general, this type is not as efficient as `EvenCliffo
 future). Use this type if your primary operations are addition, or if you need compact storage.
 
 However, there is one exception to this: `KVector{0}`, which represents a scalar. This type has been
-optimized so that operations with it are simply converted to scalar operations.
+optimized so that operations with it are simply converted to scalar operations. Many operations on
+Clifford numbers that return scalars will return a `KVector{0}` to preserve the metric signature and
+other semantics associated with `AbstractCliffordNumber`.
 
 !!! warning
     It is important to note that k-vectors are not *k-blades* (the wedge product of k 1-vectors) or
@@ -85,7 +89,7 @@ the input are lost. By contrast, conversion will throw an `InexactError` if the 
 contain all of the basis blades of the result.
 
 ```
-julia> test = CliffordNumber{APS}(1, 2, 3, 4, 5, 6, 7, 8)
+julia> test = CliffordNumber{VGA(3)}(1, 2, 3, 4, 5, 6, 7, 8)
 8-element CliffordNumber{VGA(3), Int64}:
 1 + 2σ₁ + 3σ₂ + 5σ₃ + 4σ₁σ₂ + 6σ₁σ₃ + 7σ₂σ₃ + 8σ₁σ₂σ₃
 
@@ -112,6 +116,7 @@ quadratic form type parameter can be omitted.
 
 ### Scalar conversion
 
-It may be desirable to convert the scalar type of an argument. The function `scalar_convert(T, x)`
-takes a type `T<:Union{Real,Complex}` and any Clifford number `x` and converts its scalar type to
+It may be desirable to convert the scalar type of a Clifford number without having to specify the
+full typename of the desired output type. The function `scalar_convert(T, x)` takes a type 
+`T<:Union{Real,Complex}` and any Clifford number `x` and converts its scalar type to
 `T`. If `x` is a `Real` or `Complex`, it just converts `x` to an instance of `T`.
