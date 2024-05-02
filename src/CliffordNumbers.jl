@@ -22,12 +22,12 @@ const BaseNumber = Union{Real,Complex}
 include("hamming.jl")
 # New module for metric signatures
 include("metrics.jl")
-export Metrics
+using .Metrics
 import .Metrics: dimension, blade_count, grades, is_degenerate, is_positive_definite
-# Tools for defining quadratic forms/metric signatures (convention may not be great)
-include("quadratic.jl")
-export QuadraticForm, APS, STA, VGA, PGA, CGA
-export dimension, blade_count, grades
+export Metrics
+export Signature, VGA, PGA, CGA, LGA, LGAEast, LGAWest, Exterior
+export dimension, blade_count, grades, is_degenerate, is_positive_definite
+export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, STAPEast, STAPWest
 # Abstract supertype for all Clifford numbers
 include("abstract.jl")
 export AbstractCliffordNumber

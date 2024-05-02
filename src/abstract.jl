@@ -31,10 +31,6 @@ end
 (::Type{T})(x::Vararg{BaseNumber}) where {Q,T<:AbstractCliffordNumber{Q}} = T(x)
 
 #---Get type parameters----------------------------------------------------------------------------#
-
-QuadraticForm(::Type{<:AbstractCliffordNumber{Q}}) where Q = Q
-QuadraticForm(::AbstractCliffordNumber{Q}) where Q = Q
-
 """
     signature(T::Type{<:AbstractCliffordNumber{Q}}) = Q
     signature(x::AbstractCliffordNumber{Q}) = Q

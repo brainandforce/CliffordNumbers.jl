@@ -39,7 +39,7 @@ nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
 #---Default BitIndices construction should include all possible BitIndex objects-------------------#
 
 BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
-BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
+BitIndices(Q::Metrics.AbstractSignature) = BitIndices{Q}()
 
 #---Clifford number indexing-----------------------------------------------------------------------#
 
@@ -48,10 +48,6 @@ BitIndices(Q::Type{<:QuadraticForm}) = BitIndices{Q}()
 
 @inline function getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
     return sign(b) * (@inbounds x.data[to_index(x, b)])
-end
-
-@inline function getindex(x::CliffordNumber{Q}, b::GenericBitIndex) where Q
-    return sign(b) * x.data[to_index(x, b)]
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#

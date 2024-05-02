@@ -3,7 +3,6 @@ using Test
 
 @testset "CliffordNumbers.jl" begin
     include("internals.jl")
-    include("quadratic.jl")
     include("metrics.jl")
     include("construction.jl")
     include("indexing.jl")
