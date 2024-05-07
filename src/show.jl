@@ -37,7 +37,8 @@ function to_basis_str(b::BitIndex{Q}; label = nothing, pseudoscalar = nothing) w
         label = Metrics.blade_symbol(Q)
     end
     return join(
-        (label * subscript_string(n+1))^!iszero(2^n & UInt(b)) for n in 0:(dimension(Q) - 1)
+        (label * subscript_string(eachindex(Q)[n+1]))^!iszero(2^n & UInt(b))
+        for n in 0:(dimension(Q) - 1)
     )
 end
 
