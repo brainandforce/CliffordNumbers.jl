@@ -13,13 +13,17 @@ end
 
 @testset "Units" begin
     # one
-    @test one(KVector{0,VGA(3)}) == KVector{0,VGA(3),Bool}(1)
+    @test one(KVector{0,VGA(3)}) === KVector{0,VGA(3),Bool}(1)
+    @test one(KVector{0,VGA(3),Float32}) === KVector{0,VGA(3),Float32}(1)
     @test one(KVector{0,VGA(3)}) == 1
     @test one(KVector{1,VGA(3)}) == KVector{0,VGA(3),Bool}(1)
+    @test one(KVector{1,VGA(3),Float32}) === KVector{0,VGA(3),Float32}(1)
     @test one(KVector{1,VGA(3)}) == 1
     @test one(KVector{2,VGA(3)}) == KVector{0,VGA(3),Bool}(1)
+    @test one(KVector{2,VGA(3),Float32}) === KVector{0,VGA(3),Float32}(1)
     @test one(KVector{2,VGA(3)}) == 1
     @test one(KVector{3,VGA(3)}) == KVector{0,VGA(3),Bool}(1)
+    @test one(KVector{3,VGA(3),Float32}) === KVector{0,VGA(3),Float32}(1)
     @test one(KVector{3,VGA(3)}) == 1
     @test one(EvenCliffordNumber{VGA(3)}) == EvenCliffordNumber{VGA(3),Bool}(1, 0, 0, 0)
     @test one(EvenCliffordNumber{VGA(3)}) == 1
@@ -76,6 +80,7 @@ end
     import CliffordNumbers.similar_type
     @test similar(CliffordNumber{VGA(3)}, Int, Val(VGA(2))) isa CliffordNumber{VGA(2),Int}
     @test similar(EvenCliffordNumber{VGA(3)}, Int) isa EvenCliffordNumber{VGA(3),Int}
+    @test similar(KVector, Int, Val(STA), Val(2)) isa KVector{2,STA,Int}
 end
 
 @testset "Scalar types" begin

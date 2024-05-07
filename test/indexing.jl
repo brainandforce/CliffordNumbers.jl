@@ -115,3 +115,12 @@ end
     @test x[BitIndices(k)] === k
     @test x[BitIndices(KVector{2,VGA(3)})] === k
 end
+
+@testset "Type lengths" begin
+    @test length(KVector{2,STA}) === length(KVector{2,STA,Int,6})
+    @test length(zero(KVector{2,STA})) === length(KVector{2,STA,Int,6})
+    @test length(CliffordNumber{STA}) === length(CliffordNumber{STA,Int,16})
+    @test length(zero(CliffordNumber{STA})) === length(CliffordNumber{STA,Int,16})
+    @test length(EvenCliffordNumber{STA}) === length(EvenCliffordNumber{STA,Int,8})
+    @test length(zero(EvenCliffordNumber{STA})) === length(EvenCliffordNumber{STA,Int,8})
+end

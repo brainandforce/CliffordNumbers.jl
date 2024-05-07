@@ -27,6 +27,7 @@ end
     @test nonzero_grades(zero(KVector{2,VGA(3)})) === 2:2
     @test nonzero_grades(CliffordNumber{VGA(3)}) === 0:3
     @test nonzero_grades(zero(CliffordNumber{VGA(3)})) === 0:3
+    @test nonzero_grades(1) === 0:0
 end
 
 @testset "Printing/display" begin
