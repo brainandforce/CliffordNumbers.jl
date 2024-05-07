@@ -82,8 +82,7 @@ Generates a `Tuple` that can be used to construct `zero(C)`.
 """
 zero_tuple(::Type{C}) where C<:AbstractCliffordNumber = zero_tuple(scalar_type(C), Val(length(C)))
 
-zero(C::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T} = C(zero_tuple(C))
-zero(C::Type{<:AbstractCliffordNumber}) = C(zero_tuple(Bool, Val(length(C))))
+zero(::Type{C}) where C<:AbstractCliffordNumber = C(zero_tuple(Bool, Val(length(C))))
 zero(x::AbstractCliffordNumber) = zero(typeof(x))
 
 # The default defintion assumes oneunit(T) = T(one(x))
