@@ -56,6 +56,10 @@
     @test nondegenerate_square(BitIndex(Val{QF}(), 1, 3)) === true
     @test nondegenerate_square(BitIndex(Val{QF}(), 1, 5)) === false
     @test nondegenerate_square(BitIndex(Val{QF}(), 5, 6)) === false
+    @test Base.Broadcast.broadcastable(BitIndex(Val(VGA(3)))) === tuple(BitIndex(Val(VGA(3))))
+    @test eval(Meta.parse(repr(BitIndex(Val{VGA(3)}())))) === BitIndex(Val(VGA(3)))
+    @test eval(Meta.parse(repr(BitIndex(Val{VGA(3)}(), 1, 2)))) === BitIndex(Val(VGA(3)), 1, 2)
+    @test eval(Meta.parse(repr(BitIndex(Val{VGA(3)}(), 2, 1)))) === BitIndex(Val(VGA(3)), 2, 1)
 end
 
 @testset "BitIndices" begin
@@ -71,6 +75,7 @@ end
     @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(Val{VGA(3)}())
     @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(Val{VGA(3)}(), 1, 2, 3)
     @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
+    @test Base.Broadcast.broadcastable(BitIndices(VGA(3))) isa NTuple{8, BitIndex{VGA(3)}}
 end
 
 @testset "Transformed BitIndices" begin
