@@ -78,9 +78,15 @@ end
 
 @testset "Similar types" begin
     import CliffordNumbers.similar_type
+    @test similar_type(EvenCliffordNumber{VGA(3),Int}, Val(STA)) === EvenCliffordNumber{STA,Int,8}
+    @test similar_type(EvenCliffordNumber{VGA(3),Int}, Bool) === EvenCliffordNumber{VGA(3),Bool,4}
     @test similar(CliffordNumber{VGA(3)}, Int, Val(VGA(2))) isa CliffordNumber{VGA(2),Int}
     @test similar(EvenCliffordNumber{VGA(3)}, Int) isa EvenCliffordNumber{VGA(3),Int}
     @test similar(KVector, Int, Val(STA), Val(2)) isa KVector{2,STA,Int}
+    z = zero(EvenCliffordNumber{VGA(3),Int})
+    @test similar(z, Float32) isa EvenCliffordNumber{VGA(3),Float32,4}
+    @test similar(z, Val(STA)) isa EvenCliffordNumber{STA,Int,8}
+    @test similar(z, Float32, Val(STA)) isa EvenCliffordNumber{STA,Float32,8}
 end
 
 @testset "Scalar types" begin
