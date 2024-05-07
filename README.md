@@ -44,7 +44,9 @@ vector of `BitIndex{Q}` objects.
 
 Mathematical operations are defined generically by working with the `BitIndex{Q}` objects associated
 with an `AbstractCliffordNumber{Q,T}`. Elementwise operations on each element of a `BitIndices`
-instance returns a `TransformedBitIndices`, a wrapper which lazily associates a function 
+instance returns a `TransformedBitIndices`, a wrapper which lazily associates a function with a
+`BitIndices` object, and this can be used to implement grade dependent operations, such as
+(anti)automorphisms.
 
 ## Operations
 
@@ -52,7 +54,7 @@ The following mathematical operations are supported by this package:
   * Addition (`+`), subtraction and negation (`-`)
   * The geometric product (`*`)
   * Scalar left (`/`) and right (`\`) division, including rational division (`//`)
-  * The reverse (`~`), grade involution, and Clifford conjugation
+  * The reverse (`'`), grade involution, and Clifford conjugation
   * The modulus and absolute value (with `abs2` and `abs`)
   * The wedge product (`∧`)
   * The left (`⨼`) and right (`⨽`) contractions
@@ -78,15 +80,8 @@ operations on collections of Clifford numbers.
   * Determining the even subalgebra associated with some Clifford algebra.
   * Converting even multivectors of an algebra to multivectors in the even subalgebra.
 
-## Metric signatures
-  * A better API for metric signatures. The `QuadraticForm{P,Q,R}` type is limited in that the
-positive-squaring, negative-squaring, and zero-squaring basis blades are listed in that specific
-order.
-
 ## Mathematical operations
 
-  * The implementation of the reverse operation: should we overload `Base.reverse`, `Base.conj`, 
-or do something else? What about other grade automorphisms?
   * Better numerical accuracy and stability for some operations. In particular, properly leveraging
 `sinpi`, `cospi`, `hypot`, and other methods with better numerical accuracy and stability 
 internally.
