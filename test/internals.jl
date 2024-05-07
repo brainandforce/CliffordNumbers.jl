@@ -28,6 +28,10 @@ end
     @test nonzero_grades(CliffordNumber{VGA(3)}) === 0:3
     @test nonzero_grades(zero(CliffordNumber{VGA(3)})) === 0:3
     @test nonzero_grades(1) === 0:0
+    @test has_grades_of(KVector{2,VGA(3)}, EvenCliffordNumber{VGA(3)})
+    @test !has_grades_of(zero(KVector{2,VGA(3)}), OddCliffordNumber{VGA(3)})
+    @test !has_grades_of(KVector{1,VGA(3)}, zero(EvenCliffordNumber{VGA(3)}))
+    @test has_grades_of(zero(KVector{1,VGA(3)}), zero(OddCliffordNumber{VGA(3)}))
 end
 
 @testset "Printing/display" begin
