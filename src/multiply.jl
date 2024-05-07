@@ -199,44 +199,33 @@ kernel just returns the geometric product.
     ex = :($(zero_tuple(C)))
     for a in BitIndices(x)
         inds = bitindex_shuffle(a, BitIndices(C))
-        mask = mul_mask(F(), a, inds)
+        # Filter out multiplications which necessarily go to zero
+        x_mask = mul_mask(F(), a, inds)
+        # Filter out indexing operations that automatically go to zero
+        # This must be done manually since we want to work directly with tuples
+        y_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(y)), Val(length(C))))
         # Don't append operations that won't actually do anything
-        if any(mask)
-            ex = :(map(muladd, x[$a] .* $mask, y[$inds], $ex))
+        if any(x_mask) && any(y_mask)
+            # Resolve BitIndex to an integer here to avoid having to call Base.to_index at runtime
+            # This function cannot be inlined or unrolled for KVector arguments
+            # But all values are known at compile time, so interpolate them into expressions
+            ia = to_index(x, a)
+            tuple_inds = to_index.(y, inds)
+            # Construct the tuples that contribute to the product
+            x_tuple_ex = :(Tuple(x)[$ia] .* $x_mask)
+            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds) .* $(sign.(inds)) .* $y_mask)
+            # Combine the tuples using muladd operations
+            ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
         end
     end
     return :($C($ex))
 end
 
-#=
-    TODO: possibly more specialized kernels for KVector types.
+#= Update (2024-05-07)
+    The performance bottlenecks for KVector arguments have been (mostly) resolved.
+    This was done by resolving all BitIndex objects to tuple indices at compile time, avoiding
+    all calls to Base.to_index(::KVector, ::Int) at runtime (since this function cannot be unrolled
+    or inlined at compile time).
 
-    If we use the kernel above with the first argument being a KVector and the second being a
-    CliffordNumber or Z2CliffordNumber, it's a bit slower, but not horribly so. But in the opposite
-    case, it's *very* slow! It's also slow if both arguments are KVectors.
-
-    This is likely because of the compiler being unable to unroll and inline hamming_number(), as
-    the number of loops depends on the input. To solve this, we just have to avoid indexing the
-    KVector.
-
-    However, in the APS case, it seems like the kernel below is still significantly slower than just
-    converting the arguments to Z2CliffordNumber and proceeding.
+    There might be some lingering performance issues, but most of them should be resolved.
 =#
-
-@generated function mul(
-    x::AbstractCliffordNumber{Q,T},
-    y::KVector{K,Q,T},
-    F::GradeFilter = GradeFilter{:*}()
-) where {K,Q,T}
-    C = product_return_type(x, y, F())
-    ex = :($(zero_tuple(C)))
-    for b in BitIndices(y)
-        inds = bitindex_shuffle(BitIndices(C), b)
-        mask = mul_mask(F(), inds, b)
-        # Don't append operations that won't actually do anything
-        if any(mask)
-            ex = :(map(muladd, x[$inds], y[$b] .* $mask, $ex))
-        end
-    end
-    return :($C($ex))
-end
