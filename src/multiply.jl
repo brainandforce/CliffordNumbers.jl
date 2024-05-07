@@ -11,11 +11,11 @@ the below ordering, generating a reordered `NTuple` of `BitIndex{Q}` objects sui
 implementing a geometric product.
 """
 @inline function bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
-    return map(b -> reverse(a) * b, B)
+    return map(b -> a' * b, B)
 end
 
 @inline function bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q}
-    return map(b -> b * reverse(a), B)
+    return map(b -> b * a', B)
 end
 
 bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))

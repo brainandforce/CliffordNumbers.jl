@@ -3,7 +3,7 @@ module CliffordNumbers
 import Base: length, size, axes, getindex, to_index
 import Base: zero, one, oneunit
 import Base: signbit, sign
-import Base: reverse, conj, ~
+import Base: reverse, adjoint, conj, ~
 import Base: ==, isapprox, +, -, *, /, //, muladd, abs, abs2, exp, ^
 import Base: promote_rule, convert, similar
 import Base: summary, show

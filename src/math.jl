@@ -72,16 +72,16 @@ end
 
 #---Sign changing operations-----------------------------------------------------------------------#
 
-for f in (:reverse, :grade_involution, :conj)
+for f in (:adjoint, :grade_involution, :conj)
     @eval $f(x::T) where T<:AbstractCliffordNumber = x[$f.(BitIndices(T))]
 end
 
+reverse(x::AbstractCliffordNumber) = adjoint(x)
+
 # Faster implementations for KVector that don't require indexing
-reverse(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero(grade(x) & 2))
+adjoint(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero(grade(x) & 2))
 grade_involution(x::T) where T<:KVector = T(x.data .* Int8(-1)^isodd(grade(x)))
 conj(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero((grade(x) + 1) & 2))
-
-~(x::AbstractCliffordNumber) = reverse(x)
 
 #---Addition, negation, and subtraction------------------------------------------------------------#
 
@@ -202,7 +202,7 @@ end
 """
     abs2(x::AbstractCliffordNumber{Q,T}) -> T
 
-Calculates the squared norm of `x`, equal to `scalar_product(x, ~x)`.
+Calculates the squared norm of `x`, equal to `scalar_product(x, x')`.
 """
 function abs2(x::AbstractCliffordNumber)
     result = zero(scalar_type(x))
@@ -215,7 +215,7 @@ end
 """
     abs2(x::CliffordNumber{Q,T}) -> Union{Real,Complex}
 
-Calculates the norm of `x`, equal to `sqrt(scalar_product(x, ~x))`.
+Calculates the norm of `x`, equal to `sqrt(scalar_product(x, x'))`.
 """
 abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
 
@@ -375,26 +375,26 @@ end
 """
     versor_inverse(x::CliffordNumber)
 
-Calculates the versor inverse of `x`, equal to `x / scalar_product(x, ~x)`, so that
+Calculates the versor inverse of `x`, equal to `x / scalar_product(x, x')`, so that
 `x * inv(x) == inv(x) * x == 1`.
 
 The versor inverse is only guaranteed to be an inverse for blades and versors. Not all Clifford
 numbers have a well-defined inverse, since Clifford numbers have zero divisors (for instance, in the
 algebra of physical space, 1 + e₁ has a zero divisor).
 """
-versor_inverse(x::CliffordNumber) = ~x / abs2(x)
+versor_inverse(x::CliffordNumber) = x' / abs2(x)
 
 #---Sandwich product-------------------------------------------------------------------------------#
 """
     sandwich(x::CliffordNumber{Q}, y::CliffordNumber{Q})
 
-Calculates the sandwich product of `x` with `y`: `~y * x * y`, but with corrections for numerical
+Calculates the sandwich product of `x` with `y`: `y' * x * y`, but with corrections for numerical
 stability. 
 """
 function sandwich(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
     meat = normalize(x)
     bread = normalize(y)
-    return abs(x) * ~bread * meat * bread
+    return abs(x) * bread' * meat * bread
 end
 
 sandwich(x::BaseNumber, ::CliffordNumber) = x
