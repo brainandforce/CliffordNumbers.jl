@@ -6,7 +6,6 @@ to false, this returns zero (or whatever value is represented by all bits being 
 """
 signmask(T::Type{<:Integer}, signbit::Bool = true) = bitreverse(T(signbit))
 signmask(x::Integer, signbit::Bool = true) = bitreverse(typeof(x)(signbit))
-signmask(signbit::Bool = true) = signmask(UInt, signbit)
 
 """
     BitIndex{Q}
@@ -139,7 +138,6 @@ is_same_blade(a::BitIndex, b::BitIndex) = false
 
 Constructs the `BitIndex` used to obtain the scalar (grade zero) portion of `x`.
 """
-scalar_index(::Type{Q}) where Q = BitIndex{Q}(false, UInt(0))
 scalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}(false, UInt(0))
 scalar_index(x::AbstractCliffordNumber) = scalar_index(typeof(x))
 
@@ -148,7 +146,6 @@ scalar_index(x::AbstractCliffordNumber) = scalar_index(typeof(x))
 
 Constructs the `BitIndex` used to obtain the pseudoscalar (highest grade) portion of `x`.
 """
-pseudoscalar_index(::Type{Q}) where Q = BitIndex{Q}(false, typemax(UInt))
 pseudoscalar_index(::Type{<:AbstractCliffordNumber{Q}}) where Q = BitIndex{Q}(false, typemax(UInt))
 pseudoscalar_index(x::AbstractCliffordNumber) = pseudoscalar_index(typeof(x))
 
@@ -254,8 +251,6 @@ function signbit_of_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     return xor(base_signbit, isodious(UInt(a) & UInt(b) & negative_square_bits(Q)))
 end
 
-signbit_of_mult(i) = signbit_of_mult(i,i)
-
 """
     CliffordNumbers.nondegenerate_mult(a::T, b::T) where T<:BitIndex -> Bool
 
@@ -275,8 +270,6 @@ Clifford/geometric algebras of the same quadratic form.
 function sign_of_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     return Int8(-1)^signbit_of_mult(a,b) * !nondegenerate_mult(a,b)
 end
-
-sign_of_mult(i) = sign_of_mult(i,i)
 
 #---Multiplication and duals-----------------------------------------------------------------------#
 """
