@@ -358,47 +358,6 @@ normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Contractions-----------------------------------------------------------------------------------#
 """
-    CliffordNumbers.contraction_type(::Type, ::Type)
-
-Returns the type of the contraction when performed on the input types. It only differs from
-`CliffordNumbers.geometric_product_type` when both inputs are `KVector`.
-"""
-function contraction_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
-    K = abs(K1 - K2) # this works in all cases, if K2 > K1 then the values are just zero
-    return KVector{K,Q,promote_scalar_type(C1, C2),binomial(dimension(Q), K)}
-end
-
-function contraction_type(
-    ::Type{C1},
-    ::Type{C2}
-) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
-    return geometric_product_type(C1, C2)
-end
-
-"""
-    CliffordNumbers.contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}, ::Val)
-
-Generic implementation of left and right contractions as well as dot products. The left contraction
-is calculated if the final argument is `Val(true)`; the right contraction is calcluated if the final
-argument is `Val(false)`, and the dot product is calculated for any other `Val`.
-
-In general, code should never refer to this method directly; use `left_contraction`,
-`right_contraction`, or `dot` if needed.
-"""
-@inline function contraction(
-    x::AbstractCliffordNumber{Q},
-    y::AbstractCliffordNumber{Q},
-    ::Val{B}
-) where {Q,B}
-    @assert B isa Bool string(
-        "Final argument must be Val(true) for left contraction or Val(false) for right contraction."
-    )
-    T = contraction_type(typeof(x), typeof(y))
-    f = (a,b) -> (grade(a) - grade(b)) * Int8(-1)^B == grade(a*b)
-    return product_kernel(T, x, y, f)
-end
-
-"""
     left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     ⨼(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
@@ -407,8 +366,8 @@ Calculates the left contraction of `x` and `y`.
 For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
 otherwise it is `KVector{n-m,Q}(A*B)`.
 """
-function left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return contraction(x, y, Val(true))
+function ⨼(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return mul(scalar_promote(x, y)..., GradeFilter{:⨼}())
 end
 
 """
@@ -420,8 +379,8 @@ Calculates the right contraction of `x` and `y`.
 For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
 otherwise it is `KVector{m-n,Q}(A*B)`.
 """
-function right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return contraction(x, y, Val(false))
+function ⨽(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return mul(scalar_promote(x, y)..., GradeFilter{:⨽}())
 end
 
 """
@@ -433,13 +392,11 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal
 contraction when `m >= n` and is equal to the right contraction when `n >= m`.
 """
 function dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q 
-    T = contraction_type(typeof(x), typeof(y))
-    f = (a,b) -> abs(grade(a) - grade(b)) == grade(a*b)
-    return product_kernel(T, x, y, f)
+    return mul(scalar_promote(x, y)..., GradeFilter{:dot}())
 end
 
-const ⨼ = left_contraction
-const ⨽ = right_contraction
+const left_contraction = ⨼
+const right_contraction = ⨽
 
 """
     hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
@@ -451,28 +408,10 @@ This product is generally understood to lack utility; left and right contraction
 this product in almost every case. It is implemented for the sake of completeness.
 """
 function hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return ifelse(isscalar(x) || isscalar(y), zero(promote_type(typeof(x), typeof(y))), dot(x,y))
+    return dot(x, y) * !(isscalar(x) || isscalar(y))
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
-"""
-    CliffordNumbers.wedge_product_type(::Type, ::Type)
-
-Returns the type of the result of the wedge product of the input types. It only differs from
-`CliffordNumbers.geometric_product_type` when both inputs are `KVector`.
-"""
-function wedge_product_type(C1::Type{<:KVector{K1,Q}}, C2::Type{<:KVector{K2,Q}}) where {K1,K2,Q}
-    K = min(K1+K2, dimension(Q))
-    return KVector{K,Q,promote_scalar_type(C1, C2),binomial(dimension(Q), K)}
-end
-
-function wedge_product_type(
-    ::Type{C1},
-    ::Type{C2}
-) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
-    return geometric_product_type(C1, C2)
-end
-
 """
     ∧(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
