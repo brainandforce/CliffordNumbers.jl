@@ -66,9 +66,9 @@ end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
 
-one(::Type{<:KVector{<:Any,Q}}) where Q = KVector{0,Q}(true)
-one(::Type{<:KVector{<:Any,Q,T}}) where {Q,T} = KVector{0,Q,T}(true)
-one(::Type{<:AbstractCliffordNumber{Q}}) where Q = one(KVector{0,Q})
+one(K::Type{<:KVector{<:Any,Q}}) where Q = KVector{0,Q}(scalar_type(K)(true))
+# Default implementation for AbstractCliffordNumber subtypes if not explicitly given
+one(C::Type{<:AbstractCliffordNumber{Q}}) where Q = one(KVector{0,Q,scalar_type(C)})
 
 pseudoscalar(::Type{Q}) where Q = KVector{dimension(Q),Q}(true)
 
