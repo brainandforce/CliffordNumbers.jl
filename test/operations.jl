@@ -37,8 +37,9 @@ end
     @test -x === CliffordNumber{VGA(3)}(-1, -2, -3, -4, -5, -6, -7, -8)
     @test x - y === CliffordNumber{VGA(3)}(-8.0, 12.0, -8.0, 16.0, -8.0, -8.0, 22.0, -8.0)
     @test 1 + KVector{0,VGA(3)}(1) === KVector{0,VGA(3)}(2)
-    @test 1 + KVector{1,VGA(3)}(0, 0, 0) === CliffordNumber{VGA(3)}(1)
-    @test 1 + OddCliffordNumber{VGA(3)}(0, 0, 0, 0) === CliffordNumber{VGA(3)}(1)
+    @test 1 - KVector{1,VGA(3)}(0, 0, 0) === CliffordNumber{VGA(3)}(1)
+    @test OddCliffordNumber{VGA(3)}(0, 0, 0, 0) - 1 === CliffordNumber{VGA(3)}(-1)
+    @test OddCliffordNumber{VGA(3)}(0, 0, 0, 0) - 1 === -CliffordNumber{VGA(3)}(1)
 end
 
 @testset "muladd" begin
@@ -69,6 +70,8 @@ end
     @test x * y == CliffordNumber{VGA(3)}(6, 0, 0, 8, 0, 0, 0, 0)
     # When multiplying vectors, the reverse should have a negative bivector
     @test y * x == CliffordNumber{VGA(3)}(6, 0, 0, -8, 0, 0, 0, 0)
+    @test x(y) === x * y
+    @test (y)(x) === y * x
 end
 
 @testset "Scalars" begin
@@ -76,6 +79,10 @@ end
     @test abs2(k) === 25
     @test abs(k) == 5
     @test normalize(k) == k / 5
+    # Testing with KVector{0}
+    @test KVector{0,VGA(3)}(2) * k === 2 * k
+    @test k * KVector{0,VGA(3)}(2) === k * 2
+    @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
 end
 
 @testset "Contractions" begin
