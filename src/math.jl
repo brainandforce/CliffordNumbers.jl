@@ -170,7 +170,7 @@ Calculates the geometric product of `x` and `y`, returning the smallest type whi
 represent all nonzero basis blades of the result.
 """
 @inline function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return mul(scalar_promote(widen_grade_for_mul(x), widen_grade_for_mul(y))...)
+    return mul(scalar_promote(x, y)...)
 end
 
 # KVector{0,Q} is just a scalar compatible with an AbstractCliffordNumber{Q}

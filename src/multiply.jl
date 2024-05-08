@@ -31,8 +31,9 @@ function nondegenerate_mask(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q
     return map(b -> nondegenerate_mult(a, b), B)
 end
 
+#=
 """
-    CliffordNumbers.widen_for_mul(x::AbstractCliffordNumber)
+    CliffordNumbers.widen_grade_for_mul(x::AbstractCliffordNumber)
 
 Widens `x` to an `EvenCliffordNumber`, `OddCliffordNumber`, or `CliffordNumber` as appropriate
 for the fast multiplication kernel.
@@ -46,6 +47,7 @@ function widen_grade_for_mul(x::AbstractCliffordNumber)
     all(iodd, nonzero_grades(x)) && return OddCliffordNumber(x)
     return CliffordNumber(x)
 end
+=#
 
 #---Grade filters----------------------------------------------------------------------------------#
 """
