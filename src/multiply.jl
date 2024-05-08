@@ -159,18 +159,6 @@ end
 
 #---Geometric product------------------------------------------------------------------------------#
 """
-    CliffordNumbers.geometric_product_type(::Type{S}, ::Type{T})
-
-Returns the type of the result of the geometric product of the input types.
-"""
-function geometric_product_type(
-    ::Type{C1},
-    ::Type{C2}
-) where {Q,C1<:AbstractCliffordNumber{Q},C2<:AbstractCliffordNumber{Q}}
-    return product_return_type(C1, C2, GradeFilter{:*}())
-end
-
-"""
     CliffordNumbers.mul(
         x::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
         y::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
