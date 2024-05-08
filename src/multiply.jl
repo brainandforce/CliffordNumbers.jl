@@ -148,7 +148,7 @@ function product_return_type(
     ::ContractionGradeFilters
 ) where {Q,K1,K2}
     K = abs(K1 - K2)
-    return KVector{K, Q, promote_scalar_type(X, Y), binomial(dimension(Q), k)}
+    return KVector{K, Q, promote_scalar_type(X, Y), binomial(dimension(Q), K)}
 end
 
 function product_return_type(
