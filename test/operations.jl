@@ -78,6 +78,15 @@ end
     @test normalize(k) == k / 5
 end
 
+@testset "Contractions" begin
+    k = KVector{1,VGA(3)}(1, 2, 3)
+    l = KVector{2,VGA(3)}(4, 5, 6)
+    @test k ⨼ k === k ⨽ k
+    @test l ⨼ l === l ⨽ l
+    @test iszero(l ⨼ k)
+    @test iszero(k ⨽ l)
+end
+
 @testset "Wedge product" begin
     x = KVector{1,VGA(3)}(1, 0, 0)
     y = KVector{1,VGA(3)}(0, 1, 0)
