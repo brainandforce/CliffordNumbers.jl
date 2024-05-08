@@ -92,6 +92,9 @@ end
     @test l ⨼ l === l ⨽ l
     @test iszero(l ⨼ k)
     @test iszero(k ⨽ l)
+    @test dot(k, l) === dot(l, k)
+    @test dot(k, l) === k ⨼ l
+    @test dot(l, k) === (k ⨼ l) * 1^(grade(l) * (grade(k) - grade(l)))
 end
 
 @testset "Wedge product" begin

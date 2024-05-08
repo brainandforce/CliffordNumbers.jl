@@ -92,6 +92,9 @@ const ContractionGradeFilters = Union{GradeFilter{:⨼},GradeFilter{:⨽},GradeF
 Generates a `NTuple{L,Bool}` which is `true` whenever the multiplication of the blade indexed by `a`
 and blades indexed by `B` is nonzero. `false` is returned if the grades multiply to zero due to the
 squaring of a degenerate component, or if they are filtered by `F`.
+
+In the special case of dot products (`F = CliffordNumbers.GradeFilter{:dot}()`), the return type is
+not an` NTuple{L,Bool}`, but `NTuple{L,Int8}`, as some multiplications must flip sign
 """
 function mul_mask(F::GradeFilter, a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
     return map(b -> F(a,b) & nondegenerate_mult(a,b), B)
@@ -201,9 +204,14 @@ kernel just returns the geometric product.
             # But all values are known at compile time, so interpolate them into expressions
             ia = to_index(x, a)
             tuple_inds = to_index.(y, inds)
+            # Special case for dot products
+            signs = sign.(inds)
+            if F <: GradeFilter{:dot}
+                signs = signs .* Int8(-1).^(grade.(inds) .* (grade(a) .- grade.(inds)))
+            end
             # Construct the tuples that contribute to the product
             x_tuple_ex = :(Tuple(x)[$ia] .* $x_mask)
-            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds) .* $(sign.(inds)) .* $y_mask)
+            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds) .* $signs .* $y_mask)
             # Combine the tuples using muladd operations
             ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
         end
