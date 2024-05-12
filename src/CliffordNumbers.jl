@@ -52,6 +52,7 @@ export EvenCliffordNumber, OddCliffordNumber
 # Compact representation of k-vectors
 include("kvector.jl")
 export KVector
+export pseudoscalar
 # Conversion and promotion tools
 include("convert.jl")
 export scalar_convert

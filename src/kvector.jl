@@ -70,9 +70,19 @@ one(K::Type{<:KVector{<:Any,Q}}) where Q = KVector{0,Q}(scalar_type(K)(true))
 # Default implementation for AbstractCliffordNumber subtypes if not explicitly given
 one(C::Type{<:AbstractCliffordNumber{Q}}) where Q = one(KVector{0,Q,scalar_type(C)})
 
+"""
+    pseudoscalar(C::Type{<:AbstractCliffordNumber{Q,T}}) -> KVector{dimension{Q},Q,T}
+    pseudoscalar(x::AbstractCliffordNumber{Q})
+
+Returns the pseudoscalar associated with the signature `Q` of the argument. The result will have the
+same scalar type as the input if such information is given; otherwise it will use `Bool` as the
+scalar type so as to promote to any other numeric type.
+"""
 function pseudoscalar(C::Type{<:AbstractCliffordNumber{Q}}) where Q
     return KVector{dimension(Q),Q}(scalar_type(C)(true))
 end
+
+pseudoscalar(x::AbstractCliffordNumber) = pseudoscalar(typeof(x))
 
 #---Similar types----------------------------------------------------------------------------------#
 
