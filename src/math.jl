@@ -119,16 +119,27 @@ end
 
 # TODO: is it more efficient to define some more specific methods for some types?
 
-#---Scalar multiplication--------------------------------------------------------------------------#
+#---Scalar multiplication and division-------------------------------------------------------------#
 
-for op in (:*, :/, ://)
+@inline function *(x::AbstractCliffordNumber, y::Number)
+    data = map(_x -> (_x * y), Tuple(x))
+    return similar_type(typeof(x), eltype(data))(data)
+end
+
+# Don't assume commutative multiplication, just to be safe
+@inline function *(x::Number, y::AbstractCliffordNumber)
+    data = map(_y -> (x * _y), Tuple(y))
+    return similar_type(typeof(y), eltype(data))(data)
+end
+
+for op in (:/, ://)
     @eval begin
         @inline function $op(x::AbstractCliffordNumber, y::BaseNumber)
             data = map(_x -> $op(_x, y), Tuple(x))
             return similar_type(typeof(x), eltype(data))(data)
         end
         @inline function $op(x::BaseNumber, y::AbstractCliffordNumber)
-            data = map(_y -> $op(x, _y), Tuple(y))
+            data = Tuple(y') .* $op(x, sum(Tuple(y) .* Tuple(y')))
             return similar_type(typeof(y), eltype(data))(data)
         end
     end

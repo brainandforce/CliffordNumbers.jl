@@ -85,6 +85,20 @@ end
     @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
 end
 
+@testset "Inverses" begin
+    k = KVector{1,VGA(3)}(1, 2, 3)
+    l = KVector{2,VGA(3)}(4, 5, 6)
+    # TODO: fix approximate equality methods to consolidate these tests
+    @test isscalar(k * (1 / k))
+    @test scalar(k * (1 / k)) ≈ 1
+    @test isscalar((1 / k) * k)
+    @test scalar((1 / k) * k) ≈ 1
+    @test isscalar(k * (1 / k))
+    @test scalar(k * (1 / k)) ≈ 1
+    @test isscalar((1 / k) * k)
+    @test scalar((1 / k) * k) ≈ 1
+end
+
 @testset "Contractions" begin
     k = KVector{1,VGA(3)}(1, 2, 3)
     l = KVector{2,VGA(3)}(4, 5, 6)
