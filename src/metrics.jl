@@ -392,7 +392,7 @@ const STAP = STAPWest
 @doc (@doc STAPWest) STAP
 
 export dimension, blade_count, grades, is_degenerate, is_positive_definite
-export Signature, VGA, PGA, CGA, LGA, LGAEast, LGAWest
+export Signature, VGA, PGA, CGA, LGA, LGAEast, LGAWest, Exterior
 export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, STAPEast, STAPWest
 
 end

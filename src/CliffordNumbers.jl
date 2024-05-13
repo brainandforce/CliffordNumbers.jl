@@ -62,7 +62,7 @@ export widen_grade, scalar_promote
 include("multiply.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
-export isscalar, ispseudoscalar, scalar, select_grade, scalar_product, normalize, left_contraction, 
+export isscalar, ispseudoscalar, scalar,  scalar_product, normalize, left_contraction, 
     right_contraction, dot, hestenes_product, wedge, commutator, anticommutator, versor_inverse, 
     sandwich, exppi, exptau
 export ⨼, ⨽, ∧, ×, ⨰
