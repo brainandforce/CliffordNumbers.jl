@@ -73,9 +73,6 @@ end
     return :($data)
 end
 
-#---Broadcast and map for abstract types as well as this one---------------------------------------#
-
-Broadcast.broadcastable(b::AbstractBitIndices) = Tuple(b)
 Base.map(f, b::AbstractBitIndices) = map(f, Tuple(b))
 
 #---Range of valid indices for CliffordNumber------------------------------------------------------#
@@ -108,9 +105,16 @@ Base.Tuple(b::TransformedBitIndices{Q,C}) where {Q,C} = map(b.f, BitIndices{Q,C}
 
 #---Broadcasting implementation--------------------------------------------------------------------#
 
-Broadcast.broadcasted(f, b::BitIndices) = TransformedBitIndices(f, b)
+# AbstractBitIndices types behave like Tuples when broadcast
+Broadcast.BroadcastStyle(::Type{<:AbstractBitIndices}) = Broadcast.Style{Tuple}()
 
-function Broadcast.broadcasted(f, b::TransformedBitIndices{Q,C}) where {Q,C}
+Broadcast.broadcasted(::Broadcast.BroadcastStyle, f, b::BitIndices) = TransformedBitIndices(f, b)
+
+function Broadcast.broadcasted(
+    ::Broadcast.BroadcastStyle,
+    f,
+    b::TransformedBitIndices{Q,C}
+) where {Q,C}
     return TransformedBitIndices{Q,C}(x -> f(b.f(x)))
 end
 

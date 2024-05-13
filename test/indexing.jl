@@ -75,7 +75,8 @@ end
     @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(Val{VGA(3)}())
     @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(Val{VGA(3)}(), 1, 2, 3)
     @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
-    @test Base.Broadcast.broadcastable(BitIndices(VGA(3))) isa NTuple{8, BitIndex{VGA(3)}}
+    @test Broadcast.BroadcastStyle(BitIndices) === Broadcast.Style{Tuple}()
+    @test Broadcast.BroadcastStyle(TransformedBitIndices) === Broadcast.Style{Tuple}()
 end
 
 @testset "Transformed BitIndices" begin
