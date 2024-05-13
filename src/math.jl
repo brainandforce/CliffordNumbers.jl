@@ -151,6 +151,12 @@ for op in (:/, ://)
     end
 end
 
+# Needed for ambiguity resolution with //(x::Number, y::Complex)
+function //(x::AbstractCliffordNumber, y::Complex)
+    data = map(_x -> //(_x, y), tuple(x))
+    return similar_type(typeof(x), eltype(data))(data)
+end
+
 (x::AbstractCliffordNumber)(y::BaseNumber) = x * y
 
 """
