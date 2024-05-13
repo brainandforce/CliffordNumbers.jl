@@ -1,5 +1,7 @@
 using CliffordNumbers
-using Test
+using Aqua, Test
+
+Aqua.test_all(CliffordNumbers; unbound_args = false)
 
 @testset "CliffordNumbers.jl" begin
     include("internals.jl")
