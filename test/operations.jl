@@ -1,4 +1,4 @@
-@testset "Equality" begin
+@testset "(Approximate) equality" begin
     x = CliffordNumber{VGA(3),Float64}(1, 2, 3, 4, 5, 6, 7, 8)
     @test convert(CliffordNumber{VGA(3),Int}, x) isa CliffordNumber{VGA(3),Int}
     @test x == convert(CliffordNumber{VGA(3),Int}, x)
@@ -6,6 +6,9 @@
     # Equality between disparate types
     @test KVector{2,VGA(3)}(4, 2, 0) == CliffordNumber{VGA(3),Int}(0, 0, 0, 4, 0, 2, 0, 0)
     @test KVector{2,VGA(3)}(4, 2, 0) == CliffordNumber{VGA(3),Float64}(0, 0, 0, 4, 0, 2, 0, 0)
+    @test one(EvenCliffordNumber{VGA(3)}) == 1
+    @test one(EvenCliffordNumber{VGA(3)}) ≈ 1
+    @test 1 ≈ one(EvenCliffordNumber{VGA(3)})
 end
 
 @testset "Grade automorphisms" begin

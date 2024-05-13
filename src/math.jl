@@ -58,9 +58,12 @@ function isapprox(
 )
     # This mirrors the implementation for `AbstractArray`
     d = abs(x - y)
+    # TODO: do we need to account for the sizes of the inputs?
     if isfinite(d)
+        # The norm of the difference should not exceed the tolerance
         return d <= max(atol, rtol*max(norm(x), norm(y)))
     else
+        # Compare each element of each Clifford number
         (tx, ty) = Tuple.(promote(x, y))
         return all(isapprox.(tx, ty; atol, rtol, nans, norm))
     end
@@ -69,6 +72,9 @@ function isapprox(
     This is probably due to the closure bug, but why does the if block avoid the problem?
     =#
 end
+
+isapprox(x::AbstractCliffordNumber, y::Number; kwargs...) = isapprox(promote(x, y)...; kwargs...)
+isapprox(x::Number, y::AbstractCliffordNumber; kwargs...) = isapprox(promote(y, x)...; kwargs...)
 
 #---Sign changing operations-----------------------------------------------------------------------#
 
