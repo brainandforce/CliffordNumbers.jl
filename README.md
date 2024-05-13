@@ -7,7 +7,8 @@
 
 A simple, fully static multivector implementation for Julia. While not the most space efficient, it
 allows for fast prototyping and implementation of geometric algebras and multivectors of arbitrary
-dimension or metric signature.
+dimension or metric signature. This also allows multivectors to be stored inline in arrays, which
+should improve performance 
 
 # Clifford numbers
 
@@ -15,7 +16,12 @@ dimension or metric signature.
 
 This package exports `AbstractCliffordNumber{Q,T}` and its subtypes, which describe the behavior of
 multivectors with quadratic form `Q` and scalar type `T<:Union{Real,Complex}`. This is a subtype of 
-`Number`, and therefore acts as a scalar.
+`Number`, and therefore acts as a scalar for the purpose of broadcasting.
+
+To index an `AbstractCliffordNumber`, we provide the `BitIndex{Q}` type, which allows for arbitrary
+components to be indexed, and the `BitIndices{Q,C<:AbstractCliffordNumber{Q}}` type, which provides
+all valid indices of instances of `C` that are not constrained to be zero. Indexing with ordinary
+integers is disallowed, but `Tuple(::AbstractCliffordNumber)` obtains the backing `Tuple`.
 
 `AbstractCliffordNumber{Q,T}` includes the following concrete subtypes:
   * `CliffordNumber{Q,T,L}`, which represents the coefficients associated with all basis blades.
@@ -23,17 +29,20 @@ multivectors with quadratic form `Q` and scalar type `T<:Union{Real,Complex}`. T
 only basis blades of even or odd grade being nonzero. These are especially important when dealing
 with physically realizable Euclidean transformations (rotations and translations).
   * `KVector{K,Q,T,L}`, which represents multivectors with only basis blades of grade `K` being
-zero. This is especially useful for representing common vectors and bivectors.
+zero. This is especially useful for representing common vectors, bivectors, pseudovectors, etc.
 
-## Promotion
+## Promotion and conversion
 
 The type promotion system is heavily leveraged to minimize the memory footprint needed to represent
 the results of various operations. Promotion can convert the numeric types associated with two 
 `AbstractCliffordNumber{Q}` instances (for instance, the sum of `KVector{1,APS,Int}` and
 `KVector{1,APS,Float64}` is `KVector{1,APS,Float64}`), but it can also leverage grade information to
 promote to smaller types: the sum of `KVector{1,APS,Int}` and `KVector{3,APS,Int}` is an
-`OddCliffordNumber{APS,Int}`, but the sum of `KVector{1,APS,Int}` and `KVector{2,APS,Int}` are
+`OddCliffordNumber{APS,Int}`, but the sum of `KVector{1,APS,Int}` and `KVector{2,APS,Int}` is a
 `CliffordNumber{APS,Int}`.
+
+We provide the `scalar_promote` and `scalar_convert` functions to allow for promotion of the scalar
+types backing an `AbstractCliffordNumber` without needlessly expanding the represented grades.
 
 ## Indexing
 
@@ -53,13 +62,14 @@ instance returns a `TransformedBitIndices`, a wrapper which lazily associates a 
 The following mathematical operations are supported by this package:
   * Addition (`+`), subtraction and negation (`-`)
   * The geometric product (`*`)
+  * Efficient `muladd` operations involving scalars and multivectors
   * Scalar left (`/`) and right (`\`) division, including rational division (`//`)
   * The reverse (`'`), grade involution, and Clifford conjugation
   * The modulus and absolute value (with `abs2` and `abs`)
   * The wedge product (`∧`)
   * The left (`⨼`) and right (`⨽`) contractions
   * The dot product and the Hestenes dot product
-  * The commutator product (`×`)
+  * The commutator product (`×`) and anticommutator product (`⨰`)
   * Exponentiation
 
 Some of the names or implementations of various operations may change in the near future.
@@ -72,8 +82,7 @@ operations on collections of Clifford numbers.
 
 ## Type system
 
-  * A `StaticMultivector{Q,T,L}` type, allowing for non-static implementations.
-  * `numeric_type` will likely be renamed to `scalartype`.
+  * A `StaticMultivector{[G],Q,T,L}` type, allowing for non-static implementations.
 
 ## Relationships between Clifford algebras
 
@@ -90,7 +99,7 @@ internally.
 
   * How do we handle the dot product of this package and the dot product of the `LinearAlgebra`
 standard library? This package has no dependencies, but the semantics should be compatible as much
-as possible.
+as possible without requiring a `LinearAlgebra` dependency.
   * Secondarily, `StaticArrays.similar_type` and `CliffordNumbers.similar_type` have essentially
 identical behavior.
 
