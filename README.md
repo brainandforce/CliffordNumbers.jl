@@ -8,7 +8,7 @@
 A simple, fully static multivector implementation for Julia. While not the most space efficient, it
 allows for fast prototyping and implementation of geometric algebras and multivectors of arbitrary
 dimension or metric signature. This also allows multivectors to be stored inline in arrays, which
-should improve performance 
+should improve performance.
 
 # Clifford numbers
 
@@ -29,7 +29,7 @@ integers is disallowed, but `Tuple(::AbstractCliffordNumber)` obtains the backin
 only basis blades of even or odd grade being nonzero. These are especially important when dealing
 with physically realizable Euclidean transformations (rotations and translations).
   * `KVector{K,Q,T,L}`, which represents multivectors with only basis blades of grade `K` being
-zero. This is especially useful for representing common vectors, bivectors, pseudovectors, etc.
+nonzero. This is especially useful for representing common vectors, bivectors, pseudovectors, etc.
 
 ## Promotion and conversion
 
