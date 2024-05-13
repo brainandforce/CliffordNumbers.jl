@@ -127,13 +127,13 @@ end
 
 #---Scalar multiplication and division-------------------------------------------------------------#
 
-@inline function *(x::AbstractCliffordNumber, y::Number)
+@inline function *(x::AbstractCliffordNumber, y::BaseNumber)
     data = map(_x -> (_x * y), Tuple(x))
     return similar_type(typeof(x), eltype(data))(data)
 end
 
 # Don't assume commutative multiplication, just to be safe
-@inline function *(x::Number, y::AbstractCliffordNumber)
+@inline function *(x::BaseNumber, y::AbstractCliffordNumber)
     data = map(_y -> (x * _y), Tuple(y))
     return similar_type(typeof(y), eltype(data))(data)
 end
