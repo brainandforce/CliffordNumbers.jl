@@ -50,7 +50,8 @@ other semantics associated with `AbstractCliffordNumber`.
     It is important to note that k-vectors are not *k-blades* (the wedge product of k 1-vectors) or
     *k-versors* (the geometric product of k 1-vectors). In dimensions up to 3, all k-vectors are
     also k-blades, but this is not generally true: as a counterexample, $e_1 e_2 + e_3 e_4$ is not
-    representable as a k-blade. However, all k-blades are k-vectors.
+    representable as a k-blade. However, all k-blades are k-vectors. k-versors usually consist of
+    more than one grade.
 
 !!! note
     In the future, we may consider adding a `DualKVector` or `PseudoKVector` type to more easily
@@ -76,10 +77,60 @@ grades.
 
 The `widen_grade` function performs an equivalent operation with the grades of a Clifford number,
 converting `KVector` to `EvenCliffordNumber` or `OddCliffordNumber` depending on the grade, and
-converting those to `CliffordNumber`. New `AbstractCliffordNumber` subtypes should define this if
-they intend to promote to types other than `CliffordNumber`.
+converting those to `CliffordNumber`. New `AbstractCliffordNumber` subtypes will widen directly to
+`CliffordNumber` by default, and this should be overridden for new types so that it widens to the
+smallest wider type.
 
 ## Construction and conversion
+
+### From the constructors
+
+The constructors of all `AbstractCliffordNumber` subtypes accept `Tuple` or `Vararg` arguments. In
+interactive use, you will probably use the latter. When defining a new type, you only need to define
+the `(::Type{T})(::Tuple)` constructors, as the `Vararg` constructors are automatically provided.
+
+Some type parameters may be omitted in constructors, and the differences in behavior between these
+constructors is given below, using `CliffordNumber` as an example:
+- `CliffordNumber{Q,T}(x...)` converts all arguments `x` to type `T`.
+- `CliffordNumber{Q}(x...)` promotes all arguments `x` to a common type `T`, so it is equivalent to `CliffordNumber{Q,promote_type(typeof.(x)...)}(x)`.
+- `CliffordNumber(x...)` is *not* a valid constructor, as an algebra must be specified.
+
+For types that include grade information, such as `KVector`, this information must be included to
+produce a valid constructor.
+
+#### Indices
+
+In most literature, the components of multivectors are listed in grade order. However, this ordering
+is not used here: instead, the natural binary ordering of blades is used.For a computer, each basis
+blade of an ``n``-dimensional algebra can be represented with an ``n``-bit integer: each of its
+binary digits correspond to the presence or absence of a vector composing the blade.
+
+For a concrete example, the coefficients of a `CliffordNumber{VGA(3)}` are ordered like so:
+```math
+\left(1, e_1, e_2, e_1 e_2, e_3, e_1 e_3, e_2 e_3, e_1 e_2 e_3\right)
+```
+Note how ``e_1 e_2`` precedes ``e_3`` here, but also note how the first four elements and the second
+four elements only differ by the presence of an `e_3` factor.
+
+`CliffordNumber` and its backing `Tuple` can be indexed  straightforwardly with this relationship.
+The basis blade order of all `AbstractCliffordNumber` instances are identical, with smaller types
+like `KVector{2,VGA(3)}` skipping over all basis blades not of grade 2 in the list above.
+
+!!! warning
+    Many resources do not use a lexicographic order for the bivectors of the algebra of physical
+    space or the spacetime algebra, opting for cyclic permutations so that ``e_3 e_1`` is preferred
+    over ``e_1 e_3``. It's a good idea to check the convention before construction so you can
+    include any necessary negative signs.
+
+As a workaround for the possibly unintuitive ordering of coefficients, you can also use sums of
+`KVector` instances: the sum will automatically promote to `EvenCliffordNumber`,
+`OddCliffordNumber`, or `CliffordNumber` as needed to represent all grades.
+
+#### Scalars
+
+`CliffordNumber{Q}` and `EvenCliffordNumber{Q}` also accept a single scalar argument, and this
+constructs an object with all non-scalar blade coefficients being zero. By definition, `KVector{0}`
+does the same, and is the most efficient representation of a scalar associated with an algebra.
 
 ### From other Clifford numbers
 
@@ -111,8 +162,13 @@ ERROR: InexactError: ...
     operations are generally defined to be identical to the constructor, and always throw the same
     error for a given pair of type and value.
 
+    If converting an `AbstractCliffordNumber` to any other numeric type, construction and conversion
+    behave identically, as expected.
+
 Construction and conversion of Clifford numbers from other Clifford numbers the only time that the
-quadratic form type parameter can be omitted.
+quadratic form type parameter can be omitted, as it can be inferred directly from the input. In the
+case of `CliffordNumbers.Z2CliffordNumber`, the parity type parameter can also be inferred from a
+`KVector` input.
 
 ### Scalar conversion
 
