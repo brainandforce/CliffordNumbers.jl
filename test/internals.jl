@@ -42,4 +42,5 @@ end
     @test short_typename(zero(OddCliffordNumber{VGA(3),Int})) === OddCliffordNumber{VGA(3),Int}
     @test short_typename(zero(KVector{1,VGA(3),Bool,3})) === KVector{1,VGA(3),Bool}
     @test short_typename(zero(KVector{2,VGA(3),Bool})) === KVector{2,VGA(3),Bool}
+    @test short_typename(AbstractCliffordNumber{STA,Bool}) === AbstractCliffordNumber{STA,Bool}
 end

@@ -186,9 +186,10 @@ end
     CliffordNumbers.short_typename(T::Type{<:AbstractCliffordNumber})
     CliffordNumbers.short_typename(x::AbstractCliffordNumber})
     
-Returns a type with a shorter name than `T`, but still constructs `T`. This is achieved by removing
-dependent type parameters; often this includes the length parameter.
+Returns a type with a shorter name than `T`, but still constructs an instance of `T`. This is
+achieved by removing dependent type parameters; often this includes the length parameter.
 """
+short_typename(::Type{C}) where C<:AbstractCliffordNumber = C
 short_typename(x::AbstractCliffordNumber) = short_typename(typeof(x))
 
 function show(io::IO, x::AbstractCliffordNumber)
