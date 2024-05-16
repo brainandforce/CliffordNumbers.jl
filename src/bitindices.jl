@@ -89,10 +89,13 @@ function getindex(b::BitIndices{Q}, i::Integer) where Q
 end
 
 # Very efficient tuple generation
-@generated function Base.Tuple(::B) where B<:BitIndices
+@generated function _Tuple(::B) where B<:BitIndices
     data = ntuple(i -> B()[i], Val(length(B)))
     return :($data)
 end
+
+# Avoid generating more methods if C contains extraneous parameters
+Base.Tuple(::BitIndices{Q,C}) where {Q,C} = _Tuple(BitIndices{Q,bitindices_type(C)}())
 
 Base.map(f, b::AbstractBitIndices) = map(f, Tuple(b))
 
