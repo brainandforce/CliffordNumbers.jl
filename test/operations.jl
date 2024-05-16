@@ -88,21 +88,21 @@ end
     @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
 end
 
-@testset "Inverses" begin
+@testset "Inverses and division" begin
     k = KVector{1,VGA(3)}(1, 2, 3)
     l = KVector{2,VGA(3)}(4, 5, 6)
-    # TODO: fix approximate equality methods to consolidate these tests
-    @test isscalar(k * (1 / k))
-    @test scalar(k * (1 / k)) ≈ 1
-    @test isscalar((1 / k) * k)
-    @test scalar((1 / k) * k) ≈ 1
-    @test isscalar(k * (1 / k))
-    @test scalar(k * (1 / k)) ≈ 1
-    @test isscalar((1 / k) * k)
-    @test scalar((1 / k) * k) ≈ 1
+    @test k * (1 / k) ≈ 1
+    @test (1 / k) * k ≈ 1
+    @test inv(k) ≈ 1 / k
+    @test l * (1 / l) ≈ -1
+    @test (1 / l) * l ≈ -1
+    @test inv(l) ≈ -1 / l   # This one fails for exact equality, but I don't know why
+    @test inv(KVector{0,VGA(2)}(2)) == KVector{0,VGA(2)}(1//2)
+    @test inv(KVector{0,VGA(2)}(2)) === KVector{0,VGA(2)}(inv(2))
+    @test_throws CliffordNumbers.InverseException inv(1 + KVector{1,VGA(2)}(1, 0))
 end
 
-@testset "Contractions" begin
+@testset "Contractions and dot products" begin
     k = KVector{1,VGA(3)}(1, 2, 3)
     l = KVector{2,VGA(3)}(4, 5, 6)
     @test k ⨼ k === k ⨽ k
