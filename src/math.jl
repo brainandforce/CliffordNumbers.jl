@@ -100,7 +100,7 @@ function +(x::AbstractCliffordNumber, y::BaseNumber)
     return T(data)
 end
 
-+(x::BaseNumber, y::CliffordNumber) = y + x
++(x::BaseNumber, y::AbstractCliffordNumber) = y + x
 
 function -(x::AbstractCliffordNumber)
     data = (-).(Tuple(x))
@@ -236,7 +236,7 @@ function abs2(x::AbstractCliffordNumber)
 end
 
 """
-    abs2(x::CliffordNumber{Q,T}) -> Union{Real,Complex}
+    abs2(x::AbstractCliffordNumber{Q,T}) -> Union{Real,Complex}
 
 Calculates the norm of `x`, equal to `sqrt(scalar_product(x, x'))`.
 """
