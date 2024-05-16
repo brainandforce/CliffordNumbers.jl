@@ -188,8 +188,8 @@ end
 #---Geometric product------------------------------------------------------------------------------#
 """
     CliffordNumbers.mul(
-        x::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
-        y::Union{CliffordNumber{Q,T},Z2CliffordNumber{<:Any,Q,T}},
+        x::AbstractCliffordNumber{Q,T},
+        y::AbstractCliffordNumber{Q,T},
         [F::GradeFilter = GradeFilter{:*}()]
     )
 
@@ -244,5 +244,5 @@ end
     all calls to Base.to_index(::KVector, ::Int) at runtime (since this function cannot be unrolled
     or inlined at compile time).
 
-    There might be some lingering performance issues, but most of them should be resolved.
+    There might be some lingering performance issues with the order of differently sized arguments.
 =#
