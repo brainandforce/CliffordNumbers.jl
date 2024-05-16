@@ -39,7 +39,7 @@ Base.:*(::AbstractCliffordNumber{Q}, ::AbstractCliffordNumber{Q}) where Q
 CliffordNumbers.left_contraction
 CliffordNumbers.right_contraction
 CliffordNumbers.dot
-CliffordNumbers.hestenes_product
+CliffordNumbers.hestenes_dot
 CliffordNumbers.wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
 CliffordNumbers.commutator
 CliffordNumbers.anticommutator

@@ -301,7 +301,7 @@ const left_contraction = ⨼
 const right_contraction = ⨽
 
 """
-    CliffordNumbers.hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    CliffordNumbers.hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Returns the Hestenes product: this is equal to the dot product given by `dot(x, y)` but is equal to
 to zero when either `x` or `y` is a scalar.
@@ -312,7 +312,7 @@ In almost every case, left and right contractions are preferable - the dot produ
 product are less regular in algebraic sense. It is provided for the sake of exact reproducibility of
 results which use it.
 """
-function hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+function hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return dot(x, y) * !(isscalar(x) || isscalar(y))
 end
 

@@ -103,7 +103,7 @@ end
 end
 
 @testset "Contractions and dot products" begin
-    import CliffordNumbers: dot, hestenes_product
+    import CliffordNumbers: dot, hestenes_dot
     k = KVector{1,VGA(3)}(1, 2, 3)
     l = KVector{2,VGA(3)}(4, 5, 6)
     @test k ⨼ k === k ⨽ k

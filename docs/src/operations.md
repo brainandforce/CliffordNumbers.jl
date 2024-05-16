@@ -117,7 +117,7 @@ is zero if either `x` or `y` is a scalar.
 Contractions are generally favored over the dot products due to their nicer implementations and
 properties, which have fewer exceptions. It is generally recommended that the Hestenes dot product 
 be avoided, though it is included in this library for the sake of completeness as
-`CliffordNumber.hestenes_product`, which is also not exported.
+`CliffordNumber.hestenes_dot`, which is also not exported.
 
 #### Commutator and anticommutator products
 
