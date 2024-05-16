@@ -199,3 +199,23 @@ end
 function summary(io::IO, x::AbstractCliffordNumber)
     println(io, length(x), "-element ", short_typename(x), ":")
 end
+
+#---Algebra mismatch errors------------------------------------------------------------------------#
+"""
+    CliffordNumbers.AlgebraMismatch(f, args::Tuple)
+
+The arguments to function `f` expected all of it arguments `args` to be part of the same algebra.
+"""
+struct AlgebraMismatch <: Exception
+    f::Any
+    args::Tuple{Vararg{Any}}
+end
+
+function Base.showerror(io::IO, ex::AlgebraMismatch)
+    print(io, "Arguments to ", ex.f, " were not Clifford numbers of the same algebra.")
+    for (n,x) in enumerate(ex.args)
+        if x isa AbstractCliffordNumber
+            print(io, "\n  Argument ", n, " has signature parameter ", signature(x))
+        end
+    end
+end

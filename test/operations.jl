@@ -75,6 +75,7 @@ end
     @test y * x == CliffordNumber{VGA(3)}(6, 0, 0, -8, 0, 0, 0, 0)
     @test x(y) === x * y
     @test (y)(x) === y * x
+    @test_throws CliffordNumbers.AlgebraMismatch x * one(CliffordNumber{STA})
 end
 
 @testset "Scalars" begin
