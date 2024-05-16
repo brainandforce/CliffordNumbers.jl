@@ -105,18 +105,19 @@ The analogous right contraction is only nonzero if `grade(x) ≥ grade(y)`, and 
 with `⨽`.
 
 The *dot product* is a symmetric variation of the left and right contractions, and provides a looser
-constraint on the basis blades: `grade(dot(x,y))` must equal `abs(grade(x) - grade(y))`. The 
-*Hestenes dot product* is equivalent to the dot product above, but is zero if either `x` or `y`
-is a scalar.
+constraint on the basis blades: `grade(CliffordNumbers.dot(x,y))` must equal
+`abs(grade(x) - grade(y))`. The  *Hestenes dot product* is equivalent to the dot product above, but
+is zero if either `x` or `y` is a scalar.
 
-!!! warn
-    Currently, the dot product is implemented with the exported function `CliffordNumbers.dot`.
-    However, this package does not depend on LinearAlgebra, so there will be a name conflict
-    between the methods defined by this package and those defined by LinearAlgebra.
+!!! note
+    Currently, the dot product is implemented with the unexported function `CliffordNumbers.dot`.
+    This package does not depend on LinearAlgebra, so there would be a name conflict if this method
+    were exported and both this package and LinearAlgebra were loaded.
 
-Contractions are generally favored over the dot products due to their nicer properties. It is
-generally recommended that the Hestenes dot product be avoided, though it is included in this
-library for the sake of completeness.
+Contractions are generally favored over the dot products due to their nicer implementations and
+properties, which have fewer exceptions. It is generally recommended that the Hestenes dot product 
+be avoided, though it is included in this library for the sake of completeness as
+`CliffordNumber.hestenes_product`, which is also not exported.
 
 #### Commutator and anticommutator products
 

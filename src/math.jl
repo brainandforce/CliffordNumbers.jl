@@ -277,12 +277,21 @@ function ⨽(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
 end
 
 """
-    dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    CliffordNumbers.dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the dot product of `x` and `y`.
 
 For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal to the left
-contraction when `m >= n` and is equal to the right contraction when `n >= m`.
+contraction when `m >= n` and is equal to the right contraction (up to sign) when `n >= m`.
+
+# Why is this function not exported?
+
+The LinearAlgebra package also defines a `dot` function, and if both packages are used together,
+this will cause a name conflict if `CliffordNumbers.dot` is exported. In the future, we will try to
+resolve this without requiring a LinearAlgebra dependency.
+
+Additionally, there is reason to prefer the use of the left and right contractions over the dot
+product because the contractions require fewer exceptions in their definitions and properties.
 """
 function dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q 
     return mul(scalar_promote(x, y)..., GradeFilter{:dot}())
@@ -292,13 +301,16 @@ const left_contraction = ⨼
 const right_contraction = ⨽
 
 """
-    hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    CliffordNumbers.hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Returns the Hestenes product: this is equal to the dot product given by `dot(x, y)` but is equal to
 to zero when either `x` or `y` is a scalar.
 
-This product is generally understood to lack utility; left and right contractions are preferred over
-this product in almost every case. It is implemented for the sake of completeness.
+# Why is this function not exported?
+
+In almost every case, left and right contractions are preferable - the dot product and the Hestenes
+product are less regular in algebraic sense. It is provided for the sake of exact reproducibility of
+results which use it.
 """
 function hestenes_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return dot(x, y) * !(isscalar(x) || isscalar(y))
