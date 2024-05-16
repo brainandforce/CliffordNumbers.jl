@@ -340,8 +340,8 @@ const wedge = ∧
 
 #---Commutator and anticommutator products---------------------------------------------------------#
 """
-    commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the commutator (or antisymmetric) product, equal to `1//2 * (x*y - y*x)`.
 
@@ -353,13 +353,14 @@ invoked with the `wedge` function or the `∧` operator.
 Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
 will be promoted to `Rational` subtypes.
 """
-function commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+function ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return 1//2 * (x*y - y*x)
 end
 
-const × = commutator
+const commutator = ×
 
 """
+    ⨰(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
 Calculates the anticommutator (or symmetric) product, equal to `1//2 * (x*y + y*x)`.
@@ -373,11 +374,11 @@ which use infix operators `⨼` and `⨽` respectively.
 Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
 will be promoted to `Rational` subtypes.
 """
-function anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+function ⨰(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     return 1//2 * (x*y + y*x)
 end
 
-const ⨰ = anticommutator
+const anticommutator = ⨰
 
 #---Inverses and division--------------------------------------------------------------------------#
 """
