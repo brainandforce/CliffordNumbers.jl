@@ -22,7 +22,7 @@ makedocs(;
         "Home" => "home.md",
         "Clifford number types" => "numeric.md",
         "Metric signatures" => "metrics.md",
-        "Indexing" => "indexing.md"
+        "Indexing" => "indexing.md",
         "Operations" => "operations.md",
         "API" => Any[
             "CliffordNumbers" => "api/clifford.md",
