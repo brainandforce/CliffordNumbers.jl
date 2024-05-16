@@ -46,20 +46,21 @@ bitindices_type(x::AbstractCliffordNumber) = bitindices_type(typeof(x))
 """
     BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
 
-Represents a range of valid `BitIndex` objects for the nonzero components of a given multivector 
-with quadratic form `Q`.
+Represents a range of valid `BitIndex` objects for the nonzero components of a given multivector of
+algebra `Q`.
 
-For a generic `AbstractCliffordNumber{Q}`, this returns `BitIndices{CliffordNumber{Q}}`, which
-contains all possible indices for a multivector associated with the quadratic form `Q`. This may 
-also be constructed with `BitIndices(Q)`.
-
-For sparse representations, such as `KVector{K,Q}`, the object only contains the indices of the
+For a generic `AbstractCliffordNumber{Q}`, this returns `BitIndices{Q,CliffordNumber{Q}}`, which
+contains all possible indices for a multivector associated with the algebra parameter `Q`. For
+sparser representations, such as `KVector{K,Q}`, the object only contains the indices of the
 nonzero elements of the multivector.
 
 # Construction
 
-`BitIndices` can be constructed by calling the type constructor with either the multivector or its
-type.
+`BitIndices` can be constructed by calling the type constructor with the Clifford number or its
+type. This will automatically strip some type parameters so that identical `BitIndices` objects are
+constructed regardless of the scalar type.
+
+For this reason, you should not use `BitIndices{Q,C}()`; instead use `BitIndices(C)`.
 
 # Indexing
 
@@ -68,11 +69,20 @@ the dense case to use zero-based indexing, as the basis blades are naturally enc
 for the dense representation of `CliffordNumber`, one-based indexing is used by the tuples which
 contain the data associated with this package's implementations of Clifford numbers.
 
+# Broadcasting
+
+Because `BitIndices(x)` only lazily references the indices of `x`, we define a new type,
+[`TransformedBitIndices`](@ref), which allows for a function `f` to be lazily associated with the
+`BitIndices` object, and this type is constructed when a `f.(BitIndices(x))` is called.
+
 # Interfaces for new subtypes of `AbstractCliffordNumber`
 
 When defining the behavior of `BitIndices` for new subtypes `T` of `AbstractCliffordNumber`, 
 `Base.getindex(::BitIndices{Q,T}, i::Integer)` should be defined so that all indices of T that are
 not constrained to be zero are returned.
+
+You should also define `CliffordNumbers.bitindices_type(::Type{T})` so that type parameters that do
+not affect the construction of the `BitIndices` object are stripped.
 """
 struct BitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractBitIndices{Q,C}
 end
