@@ -12,6 +12,7 @@ Base.conj(::BitIndex)
 
 ```@docs
 CliffordNumbers.versor_inverse
+Base.inv(::AbstractCliffordNumber)
 ```
 
 ## Addition and subtraction
