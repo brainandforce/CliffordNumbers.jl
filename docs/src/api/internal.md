@@ -35,6 +35,7 @@ CliffordNumbers.mul
 CliffordNumbers.GradeFilter
 CliffordNumbers.nondegenerate_mask
 CliffordNumbers.mul_mask
+CliffordNumbers.mul_signs
 CliffordNumbers.bitindex_shuffle
 CliffordNumbers.widen_grade_for_mul
 ```
