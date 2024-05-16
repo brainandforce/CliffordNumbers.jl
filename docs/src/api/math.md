@@ -11,8 +11,6 @@ Base.conj(::BitIndex)
 ## Duals and inverses
 
 ```@docs
-CliffordNumbers.dual
-CliffordNumbers.undual
 CliffordNumbers.versor_inverse
 ```
 
@@ -44,7 +42,6 @@ CliffordNumbers.hestenes_product
 CliffordNumbers.wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
 CliffordNumbers.commutator
 CliffordNumbers.anticommutator
-CliffordNumbers.sandwich
 ```
 
 ### Scalar products and normalization

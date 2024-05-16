@@ -365,35 +365,6 @@ end
 
 const ⨰ = anticommutator
 
-#---Duals------------------------------------------------------------------------------------------#
-# TODO: make this work for things that aren't CliffordNumber
-"""
-    dual(x::CliffordNumber) -> CliffordNumber
-
-Calculates the dual of `x`, which is equal to the left contraction of `x` with the inverse of the
-pseudoscalar.
-
-Note that the dual has some properties that depend on the dimension and quadratic form:
-  * The inverse of the unit pseudoscalar is equal to its reverse, meaning that the sign may be
-positive or negative depending on the total number of dimensions in the space.
-  * If the metric is degenerate, the dual is not unique.
-"""
-function dual(x::CliffordNumber{Q}) where Q
-    is_degenerate(Q) && error("Cannot calculate the dual in a degenerate metric.")
-    return CliffordNumber{Q}(ntuple(i -> x[dual(BitIndices(Q)[i])], Val(length(x))))
-end
-
-"""
-    undual(x::CliffordNumber) -> CliffordNumber
-
-Calculates the undual of `x`, which is equal to the left contraction of `x` with the pseudoscalar.
-This function can be used to reverse the behavior of `dual()`.
-"""
-function undual(x::CliffordNumber{Q}) where Q
-    is_degenerate(Q) && error("Cannot calculate the ;undual in a degenerate metric.")
-    return CliffordNumber{Q}(ntuple(i -> x[undual(BitIndices(Q)[i])], Val(length(x))))
-end
-
 #---Division---------------------------------------------------------------------------------------#
 """
     versor_inverse(x::CliffordNumber)
@@ -406,21 +377,6 @@ numbers have a well-defined inverse, since Clifford numbers have zero divisors (
 algebra of physical space, 1 + e₁ has a zero divisor).
 """
 versor_inverse(x::CliffordNumber) = x' / abs2(x)
-
-#---Sandwich product-------------------------------------------------------------------------------#
-"""
-    sandwich(x::CliffordNumber{Q}, y::CliffordNumber{Q})
-
-Calculates the sandwich product of `x` with `y`: `y' * x * y`, but with corrections for numerical
-stability. 
-"""
-function sandwich(x::CliffordNumber{Q}, y::CliffordNumber{Q}) where Q
-    meat = normalize(x)
-    bread = normalize(y)
-    return abs(x) * bread' * meat * bread
-end
-
-sandwich(x::BaseNumber, ::CliffordNumber) = x
 
 #---Exponentials-----------------------------------------------------------------------------------#
 """

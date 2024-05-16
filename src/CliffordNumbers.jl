@@ -64,7 +64,7 @@ include("multiply.jl")
 include("math.jl")
 export isscalar, ispseudoscalar, scalar,  scalar_product, normalize, left_contraction, 
     right_contraction, dot, hestenes_product, wedge, commutator, anticommutator, versor_inverse, 
-    sandwich, exppi, exptau
+    exppi, exptau
 export ⨼, ⨽, ∧, ×, ⨰
 # Pretty printing
 include("show.jl")
