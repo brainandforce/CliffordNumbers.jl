@@ -192,8 +192,8 @@ end
 Calculates the geometric product of `x` and `y`, returning the smallest type which is able to
 represent all nonzero basis blades of the result.
 """
-@inline function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return mul(scalar_promote(x, y)...)
+function *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return @inline mul(scalar_promote(x, y)..., GradeFilter{:*}())
 end
 
 *(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = throw(AlgebraMismatch(*, (x, y)))
@@ -204,7 +204,7 @@ end
 *(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * only(Tuple(k))
 *(k::KVector{0,Q}, l::KVector{0,Q}) where Q = KVector{0,Q}(only(Tuple(k)) * only(Tuple(l)))
 
-@inline (x::AbstractCliffordNumber)(y::AbstractCliffordNumber) = x * y
+(x::AbstractCliffordNumber)(y::AbstractCliffordNumber) = @inline x * y
 
 #---Scalar products--------------------------------------------------------------------------------#
 """
@@ -262,7 +262,7 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is 
 otherwise it is `KVector{n-m,Q}(A*B)`.
 """
 function ⨼(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return mul(scalar_promote(x, y)..., GradeFilter{:⨼}())
+    return @inline mul(scalar_promote(x, y)..., GradeFilter{:⨼}())
 end
 
 """
@@ -275,7 +275,7 @@ For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is
 otherwise it is `KVector{m-n,Q}(A*B)`.
 """
 function ⨽(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return mul(scalar_promote(x, y)..., GradeFilter{:⨽}())
+    return @inline mul(scalar_promote(x, y)..., GradeFilter{:⨽}())
 end
 
 """
@@ -296,7 +296,7 @@ Additionally, there is reason to prefer the use of the left and right contractio
 product because the contractions require fewer exceptions in their definitions and properties.
 """
 function dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q 
-    return mul(scalar_promote(x, y)..., GradeFilter{:dot}())
+    return @inline mul(scalar_promote(x, y)..., GradeFilter{:dot}())
 end
 
 const left_contraction = ⨼
@@ -311,11 +311,12 @@ to zero when either `x` or `y` is a scalar.
 # Why is this function not exported?
 
 In almost every case, left and right contractions are preferable - the dot product and the Hestenes
-product are less regular in algebraic sense. It is provided for the sake of exact reproducibility of
+product are less regular in algebraic sense, and the conditionals present in its implementation 
+slow it down relative to contractions. It is provided for the sake of exact reproducibility of
 results which use it.
 """
 function hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return dot(x, y) * !(isscalar(x) || isscalar(y))
+    return !(isscalar(x) || isscalar(y)) * dot(x, y)
 end
 
 #---Wedge (outer) product--------------------------------------------------------------------------#
@@ -329,7 +330,7 @@ Note that the wedge product, in general, is *not* equal to the commutator produc
 product), which may be invoked with the `commutator` function or the `×` operator.
 """
 function ∧(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return mul(scalar_promote(x, y)..., GradeFilter{:∧}())
+    return @inline mul(scalar_promote(x, y)..., GradeFilter{:∧}())
 end
 
 ∧(x::BaseNumber, y::BaseNumber) = x * y
