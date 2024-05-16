@@ -5,17 +5,18 @@
 [![Build Status][ci-status-img]][ci-status-url]
 [![Coverage][codecov-img]][codecov-url]
 
-A simple, fully static multivector implementation for Julia. While not the most space efficient, it
-allows for fast prototyping and implementation of geometric algebras and multivectors of arbitrary
-dimension or metric signature. This also allows multivectors to be stored inline in arrays, which
-should improve performance.
+A simple, statically sized multivector (Clifford number) implementation for Julia using graded
+representations. This allows for common multivector operations, particularly the various products
+of geometric algebra, to be easily implemented with extremely high performance (faster than matrix
+multiplications of matrix representations) without depending on any linear algebra library.
+Additionally, the multivectors provided by this package can be stored inline in arrays.
 
 # Clifford numbers
 
 ## Types
 
 This package exports `AbstractCliffordNumber{Q,T}` and its subtypes, which describe the behavior of
-multivectors with quadratic form `Q` and scalar type `T<:Union{Real,Complex}`. This is a subtype of 
+multivectors with algebra `Q` and scalar type `T<:Union{Real,Complex}`. This is a subtype of
 `Number`, and therefore acts as a scalar for the purpose of broadcasting.
 
 To index an `AbstractCliffordNumber`, we provide the `BitIndex{Q}` type, which allows for arbitrary
