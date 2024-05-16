@@ -188,8 +188,8 @@ end
 #---Geometric product------------------------------------------------------------------------------#
 """
     CliffordNumbers.mul(
-        x::AbstractCliffordNumber{Q,T},
-        y::AbstractCliffordNumber{Q,T},
+        x::AbstractCliffordNumber{Q},
+        y::AbstractCliffordNumber{Q},
         [F::GradeFilter = GradeFilter{:*}()]
     )
 
@@ -210,7 +210,7 @@ kernel just returns the geometric product.
     x::AbstractCliffordNumber{Q,T},
     y::AbstractCliffordNumber{Q,T},
     F::GradeFilter = GradeFilter{:*}()
-) where {Q,T}
+) where {Q,T<:BaseNumber}
     C = product_return_type(x, y, F())
     ex = :($(zero_tuple(C)))
     for a in BitIndices(x)
@@ -246,3 +246,19 @@ end
 
     There might be some lingering performance issues with the order of differently sized arguments.
 =#
+
+function mul(
+    x::AbstractCliffordNumber{Q},
+    y::AbstractCliffordNumber{Q},
+    F::GradeFilter = GradeFilter{:*}()
+) where Q
+    return @inline mul(scalar_promote(x, y)..., F)
+end
+
+function mul(
+    x::AbstractCliffordNumber,
+    y::AbstractCliffordNumber,
+    ::GradeFilter{S} = GradeFilter{:mul}()
+) where S
+    throw(AlgebraMismatch(S, (x, y)))
+end
