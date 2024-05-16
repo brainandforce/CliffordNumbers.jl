@@ -38,6 +38,8 @@ nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
 
 #---Default BitIndices construction should include all possible BitIndex objects-------------------#
 
+bitindices_type(::Type{<:CliffordNumber{Q}}) where Q = CliffordNumber{Q}
+
 BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
 BitIndices(Q::Metrics.AbstractSignature) = BitIndices{Q}()
 

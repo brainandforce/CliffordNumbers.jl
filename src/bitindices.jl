@@ -17,6 +17,31 @@ length(::T) where T<:AbstractBitIndices = length(T)
 # Conversion to tuple
 # Base.Tuple(b::T) where T<:AbstractBitIndices = ntuple(i -> b[i], Val(length(T)))
 
+"""
+    CliffordNumbers.bitindices_type(C::Type{<:AbstractCliffordNumber{Q,T}})
+
+Removes extraneous type parameters from `C`, converting it to the least parameterized type that
+can be used to parameterize an `AbstractBitIndices{Q,C}` object. This is to avoid issues with the
+proliferation of type parameters that would construct identical `BitIndices` objects otherwise:
+for instance, `BitIndices{VGA(3),EvenCliffordNumber{VGA(3),Float32,4}}()` and
+`BitIndices{VGA(3),EvenCliffordNumber{VGA(3),Int}}()` have identical elements, and are equal when
+compared with `==`, but are not the same object.
+
+For types defined in this package, this strips the scalar type parameter `T` and any length
+parameters present.
+
+# Examples
+```julia-repl
+julia> CliffordNumbers.bitindices_type(CliffordNumber{VGA(3),Float32,8})
+CliffordNumber{VGA(3)}
+
+julia> CliffordNumbers.bitindices_type(KVector{2,STA,Bool})
+KVector{2,STA}
+```
+"""
+bitindices_type(::Type{AbstractCliffordNumber{Q,<:Any}}) where Q = AbstractCliffordNumber{Q}
+bitindices_type(x::AbstractCliffordNumber) = bitindices_type(typeof(x))
+
 #---Clifford number iteration----------------------------------------------------------------------#
 """
     BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
@@ -52,13 +77,9 @@ not constrained to be zero are returned.
 struct BitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractBitIndices{Q,C}
 end
 
-BitIndices{Q}(x::AbstractCliffordNumber) where Q = BitIndices{Q,typeof(x)}()
-# Ensure that the second type parameter is a concrete type
-# It doesn't actually need to be, but doing this should simplify things
-BitIndices{Q}(C::Type{<:AbstractCliffordNumber}) where Q = BitIndices{Q}(zero(C))
-
-BitIndices(::Type{C}) where C<:AbstractCliffordNumber = BitIndices{signature(C),C}()
-BitIndices(x::AbstractCliffordNumber) = BitIndices(typeof(x))
+BitIndices{Q}(::Type{C}) where {Q,C<:AbstractCliffordNumber} = BitIndices{Q,bitindices_type(C)}()
+BitIndices(::Type{C}) where C<:AbstractCliffordNumber = BitIndices{signature(C)}(C)
+(::Type{B})(x::AbstractCliffordNumber) where B<:BitIndices = B(typeof(x))
 
 # TODO: more efficient defintion of equality
 
@@ -93,7 +114,11 @@ struct TransformedBitIndices{Q,C<:AbstractCliffordNumber{Q},F} <: AbstractBitInd
 end
 
 TransformedBitIndices{Q,C}(f) where {Q,C} = TransformedBitIndices{Q,C,typeof(f)}(f)
-TransformedBitIndices(f, ::BitIndices{Q,C}) where {Q,C} = TransformedBitIndices{Q,C}(f)
+
+function TransformedBitIndices(f, ::BitIndices{Q,C}) where {Q,C}
+    return TransformedBitIndices{Q,bitindices_type(C)}(f)
+end
+
 TransformedBitIndices(f, x) = TransformedBitIndices(f, BitIndices(x))
 
 function getindex(b::TransformedBitIndices{Q,C}, i::Integer) where {Q,C}

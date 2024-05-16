@@ -63,6 +63,11 @@
 end
 
 @testset "BitIndices" begin
+    # Tests to check that types don't proliferate like crazy
+    @test BitIndices(CliffordNumber{VGA(3)}) === BitIndices{VGA(3),CliffordNumber{VGA(3)}}()
+    @test BitIndices(CliffordNumber{VGA(3),Float32}) === BitIndices(CliffordNumber{VGA(3)})
+    @test BitIndices(CliffordNumber{VGA(3),Complex{Int}}) === BitIndices(CliffordNumber{VGA(3)})
+    @test BitIndices(CliffordNumber{VGA(3),Bool,8}) === BitIndices(CliffordNumber{VGA(3)})
     APS_bivector_indices = [
         BitIndex(Val{VGA(3)}(), 1, 2),
         BitIndex(Val{VGA(3)}(), 1, 3),

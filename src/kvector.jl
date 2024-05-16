@@ -31,7 +31,7 @@ length(x::KVector) = length(typeof(x))
 
 #---Indexing---------------------------------------------------------------------------------------#
 
-size(::BitIndices{Q,<:KVector{K}}) where {Q,K} = tuple(length(KVector{K,Q}))
+bitindices_type(::Type{<:KVector{K,Q}}) where {K,Q} = KVector{K,Q}
 
 """
     grade(::Type{<:KVector{K}}) = K

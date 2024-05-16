@@ -18,6 +18,7 @@ CliffordNumbers.Hamming.hamming_number
 ```@docs
 CliffordNumbers.signmask
 CliffordNumbers._sort_with_parity!
+CliffordNumbers.bitindices_type
 ```
 
 ## Construction
