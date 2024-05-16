@@ -86,7 +86,7 @@ The wedge product is the defining product of the exterior algebra. This is avail
 `wedge()` function, or with the `∧` infix operator.
 
 !!! tip
-    You can define elements of exterior algebras directly by using `QuadraticForm{0,0,R}`, whose
+    You can define elements of exterior algebras directly by using `Metrics.Exterior(D)`, whose
     geometric product is equivalent to the wedge product.
 
 #### Contractions and dot products
