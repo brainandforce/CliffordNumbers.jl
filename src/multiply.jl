@@ -151,30 +151,30 @@ Without specialization on `S`, a type suitable for the geometric product is retu
     P = (c1_odd && c2_even) || (c1_even && c2_odd)
     T = promote_scalar_type(C1,C2)
     if (!c1_odd && !c1_even) || (!c2_odd && !c2_even)
-        return :(CliffordNumber{Q,$T,blade_count(Q)})
+        return :(CliffordNumber{Q})
     else
-        return :(Z2CliffordNumber{$P,Q,$T,div(blade_count(Q), 2)})
+        return :(Z2CliffordNumber{$P,Q})
     end
 end
 
 function product_return_type(
-    X::Type{<:KVector{K1,Q}},
-    Y::Type{<:KVector{K2,Q}},
+    ::Type{<:KVector{K1,Q}},
+    ::Type{<:KVector{K2,Q}},
     ::GradeFilter{:∧}
 ) where {Q,K1,K2}
     # TODO: do we need this minimizing behavior?
     # Maybe we can let K exceed the expected value and return a zero-element multivector.
     K = min(K1 + K2, dimension(Q))
-    return KVector{K, Q, promote_scalar_type(X, Y), binomial(dimension(Q), K)}
+    return KVector{K,Q}
 end
 
 function product_return_type(
-    X::Type{<:KVector{K1,Q}},
-    Y::Type{<:KVector{K2,Q}},
+    ::Type{<:KVector{K1,Q}},
+    ::Type{<:KVector{K2,Q}},
     ::ContractionGradeFilters
 ) where {Q,K1,K2}
     K = abs(K1 - K2)
-    return KVector{K, Q, promote_scalar_type(X, Y), binomial(dimension(Q), K)}
+    return KVector{K,Q}
 end
 
 function product_return_type(
@@ -235,7 +235,7 @@ kernel just returns the geometric product.
             ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
         end
     end
-    return :($C($ex))
+    return :(($C)($ex))
 end
 
 #= Update (2024-05-07)
