@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - main
+      - release
+    paths-ignore:
+      - CITATION.cff
+      - CONTRIBUTING.md
+      - LICENSE
+      - README.md
     tags: ['*']
   pull_request:
 concurrency:
