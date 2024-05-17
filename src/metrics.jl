@@ -38,11 +38,12 @@ is equal to `2^dimension(s)`.
 dimension(s::AbstractSignature) = signed(s.dimensions)
 
 """
-    blade_count(s::AbstractSignature) -> Int64
+    blade_count(s) -> Int
 
-Returns the total number of blades associated with `s`, which is equal to `2^dimension(s)`.
+Returns the total number of blades associated with metric signature `s`, which is equal to
+`2^dimension(s)`.
 """
-blade_count(s::AbstractSignature) = 2^dimension(s)
+blade_count(s) = 2^dimension(s)
 
 """
     grades(s::AbstractSignature) -> UnitRange{Int8}
