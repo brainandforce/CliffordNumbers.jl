@@ -3,22 +3,21 @@
     AbstractCliffordNumber{Q,T} <: Number
 
 An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q` and
-element type `T`.
+element type `T`. These are statically size and therefore should be able to be stored inline in
+arrays or other data structures,
 
 # Interface
 
 ## Required implementation
 
 All subtypes `C` of `AbstractCliffordNumber{Q}` must implement the following functions:
-  * `Base.length(x::C)` should return the number of nonzero basis elements represented by `x`.
   * `CliffordNumbers.similar_type(::Type{C}, ::Type{T}, ::Type{Q}) where {C,T,Q}` should construct a
 new type similar to `C` which subtypes `AbstractCliffordNumber{Q,T}` that may serve as a
 constructor.
   * `Base.getindex(x::C, b::BitIndex{Q})` should allow one to recover the coefficients associated
 with each basis blade represented by `C`.
-
-## Required implementation for static types
-  * `Base.length(::Type{C})` should be defined, with `Base.length(x::C) = length(typeof(x))`.
+  * `nblades(::Type{C})` should be defined to return the number of basis blades represented by the
+type. By default, `nblades(x::AbstractCliffordNumber) = nblades(typeof(x))`.
   * `Base.Tuple(x::C)` should return the tuple used to construct `x`. The fallback is
 `getfield(x, :data)::Tuple`, so any type declared with a `NTuple` field named `data` should have
 this defined automatically.
@@ -29,6 +28,21 @@ end
 #---Default varargs constructors for types---------------------------------------------------------#
 
 (::Type{T})(x::Vararg{BaseNumber}) where {Q,T<:AbstractCliffordNumber{Q}} = T(x)
+
+#---Number of blades-------------------------------------------------------------------------------#
+"""
+    nblades(::Type{<:Number}) -> Int
+    nblades(x::Number)
+
+Returns the number of blades represented by a `Number` subtype or instance. For subtypes of `Number`
+that are not `AbstractCliffordNumber`, this is always 1.
+
+This function is separate from `Base.length` since `AbstractCliffordNumber` is a scalar type for
+which `collect()` returns a zero-dimensional array. For consistency, `length(x)` should always equal
+`length(collect(x))`.
+"""
+nblades(::Type{<:Number}) = 1
+nblades(x::Number) = nblades(typeof(x))
 
 #---Get type parameters----------------------------------------------------------------------------#
 """
@@ -76,13 +90,13 @@ zero_tuple(::Type{T}, ::Val{L}) where {T,L} = ntuple(Returns(zero(T)), Val(L))
 
 """
     CliffordNumbers.zero_tuple(::Type{C<:AbstractCliffordNumber})
-        -> NTuple{length(C),scalar_type(C)}
+        -> NTuple{nblades(C),scalar_type(C)}
 
 Generates a `Tuple` that can be used to construct `zero(C)`.
 """
-zero_tuple(::Type{C}) where C<:AbstractCliffordNumber = zero_tuple(scalar_type(C), Val(length(C)))
+zero_tuple(::Type{C}) where C<:AbstractCliffordNumber = zero_tuple(scalar_type(C), Val(nblades(C)))
 
-zero(::Type{C}) where C<:AbstractCliffordNumber = C(zero_tuple(Bool, Val(length(C))))
+zero(::Type{C}) where C<:AbstractCliffordNumber = C(zero_tuple(Bool, Val(nblades(C))))
 zero(x::AbstractCliffordNumber) = zero(typeof(x))
 
 # The default defintion assumes oneunit(T) = T(one(x))
@@ -193,11 +207,11 @@ short_typename(::Type{C}) where C<:AbstractCliffordNumber = C
 short_typename(x::AbstractCliffordNumber) = short_typename(typeof(x))
 
 function show(io::IO, x::AbstractCliffordNumber)
-    print(io, short_typename(x), (isone(length(x)) ? string('(', only(Tuple(x)), ')') : Tuple(x)))
+    print(io, short_typename(x), (isone(nblades(x)) ? string('(', only(Tuple(x)), ')') : Tuple(x)))
 end
 
 function summary(io::IO, x::AbstractCliffordNumber)
-    println(io, length(x), "-element ", short_typename(x), ":")
+    println(io, nblades(x), "-element ", short_typename(x), ":")
 end
 
 #---Algebra mismatch errors------------------------------------------------------------------------#

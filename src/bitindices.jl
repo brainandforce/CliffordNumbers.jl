@@ -8,10 +8,10 @@ by `C`.
 abstract type AbstractBitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractVector{BitIndex{Q}}
 end
 
-size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(length(C))
+size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(nblades(C))
 size(b::AbstractBitIndices) = size(typeof(b))
 
-length(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = length(C)
+length(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = nblades(C)
 length(::T) where T<:AbstractBitIndices = length(T)
 
 # Conversion to tuple

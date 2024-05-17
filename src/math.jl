@@ -96,7 +96,7 @@ conj(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero((grade(x) + 1) & 2))
 function +(x::AbstractCliffordNumber, y::BaseNumber)
     T = promote_type(typeof(x), typeof(y))
     b = BitIndices(T)
-    data = ntuple(i -> x[b[i]] + (iszero(grade(b[i])) * y), Val(length(T)))
+    data = ntuple(i -> x[b[i]] + (iszero(grade(b[i])) * y), Val(nblades(T)))
     return T(data)
 end
 
@@ -112,14 +112,14 @@ end
 function -(x::AbstractCliffordNumber, y::BaseNumber)
     T = promote_type(typeof(x), typeof(y))
     b = BitIndices(T)
-    data = ntuple(i -> x[b[i]] - (iszero(grade(b[i])) * y), Val(length(T)))
+    data = ntuple(i -> x[b[i]] - (iszero(grade(b[i])) * y), Val(nblades(T)))
     return T(data)
 end
 
 function -(x::BaseNumber, y::AbstractCliffordNumber)
     T = promote_type(typeof(x), typeof(y))
     b = BitIndices(T)
-    data = ntuple(i -> (iszero(grade(b[i])) * x) - y[b[i]], Val(length(T)))
+    data = ntuple(i -> (iszero(grade(b[i])) * x) - y[b[i]], Val(nblades(T)))
     return T(data)
 end
 

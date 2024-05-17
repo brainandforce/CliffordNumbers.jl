@@ -219,7 +219,7 @@ kernel just returns the geometric product.
         x_mask = mul_mask(F(), a, inds)
         # Filter out indexing operations that automatically go to zero
         # This must be done manually since we want to work directly with tuples
-        y_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(y)), Val(length(C))))
+        y_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(y)), Val(nblades(C))))
         # Don't append operations that won't actually do anything
         if any(x_mask) && any(y_mask)
             # Resolve BitIndex to an integer here to avoid having to call Base.to_index at runtime

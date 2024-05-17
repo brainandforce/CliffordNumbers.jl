@@ -55,13 +55,11 @@ function Z2CliffordNumber{P,Q}(x::Tuple{Vararg{BaseNumber}}) where {P,Q}
 end
 
 # Convert real/complex numbers to CliffordNumber
-(::Type{T})(x::BaseNumber) where {T<:Z2CliffordNumber} = T(ntuple(i -> x*isone(i), Val(length(T))))
+(::Type{T})(x::BaseNumber) where {T<:Z2CliffordNumber} = T(ntuple(i -> x*isone(i), Val(nblades(T))))
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-length(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(blade_count(Q), 2)
-length(x::Z2CliffordNumber) = length(typeof(x))
-
+nblades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(blade_count(Q), 2)
 nonzero_grades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = P:2:dimension(Q)
 
 #---Indexing---------------------------------------------------------------------------------------#
@@ -83,7 +81,7 @@ end
 
 #---Multiplicative identity------------------------------------------------------------------------#
 
-one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
+one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(nblades(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 

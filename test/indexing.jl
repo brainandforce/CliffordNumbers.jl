@@ -123,10 +123,10 @@ end
 end
 
 @testset "Type lengths" begin
-    @test length(KVector{2,STA}) === length(KVector{2,STA,Int,6})
-    @test length(zero(KVector{2,STA})) === length(KVector{2,STA,Int,6})
-    @test length(CliffordNumber{STA}) === length(CliffordNumber{STA,Int,16})
-    @test length(zero(CliffordNumber{STA})) === length(CliffordNumber{STA,Int,16})
-    @test length(EvenCliffordNumber{STA}) === length(EvenCliffordNumber{STA,Int,8})
-    @test length(zero(EvenCliffordNumber{STA})) === length(EvenCliffordNumber{STA,Int,8})
+    @test nblades(KVector{2,STA}) === nblades(KVector{2,STA,Int,6})
+    @test nblades(zero(KVector{2,STA})) === nblades(KVector{2,STA,Int,6})
+    @test nblades(CliffordNumber{STA}) === nblades(CliffordNumber{STA,Int,16})
+    @test nblades(zero(CliffordNumber{STA})) === nblades(CliffordNumber{STA,Int,16})
+    @test nblades(EvenCliffordNumber{STA}) === nblades(EvenCliffordNumber{STA,Int,8})
+    @test nblades(zero(EvenCliffordNumber{STA})) === nblades(EvenCliffordNumber{STA,Int,8})
 end

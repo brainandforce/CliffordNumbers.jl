@@ -25,9 +25,7 @@ KVector{K,Q}(x::Tuple{Vararg{BaseNumber}}) where {K,Q} = KVector{K,Q}(promote(x.
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-length(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L} = L
-length(::Type{<:KVector{K,Q}}) where {K,Q} = binomial(dimension(Q), K)
-length(x::KVector) = length(typeof(x))
+nblades(::Type{<:KVector{K,Q}}) where {K,Q} = binomial(dimension(Q), K)
 
 #---Indexing---------------------------------------------------------------------------------------#
 
@@ -52,7 +50,7 @@ end
 @inline function to_index(C::Type{<:KVector{K,Q}}, b::BitIndex{Q}) where {K,Q}
     # Default to 1 as a valid index for any KVector instance
     i = 1
-    for n in 1:length(C)
+    for n in 1:nblades(C)
         is_same_blade(b, (@inbounds BitIndices(C)[n])) && (i = n)
     end
     return i

@@ -27,13 +27,11 @@ CliffordNumber{Q}(x::Tuple{Vararg{T}}) where {Q,T<:BaseNumber} = CliffordNumber{
 CliffordNumber{Q}(x::Tuple{Vararg{BaseNumber}}) where Q = CliffordNumber{Q}(promote(x...))
 
 # Convert real/complex numbers to CliffordNumber
-(::Type{T})(x::BaseNumber) where T<:CliffordNumber = T(ntuple(i -> x*isone(i), Val(length(T))))
+(::Type{T})(x::BaseNumber) where T<:CliffordNumber = T(ntuple(i -> x*isone(i), Val(nblades(T))))
 
 #---Number of elements-----------------------------------------------------------------------------#
 
-length(::Type{<:CliffordNumber{Q}}) where Q = blade_count(Q)
-length(m::CliffordNumber) = length(typeof(m))
-
+nblades(::Type{<:CliffordNumber{Q}}) where Q = blade_count(Q)
 nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
 
 #---Default BitIndices construction should include all possible BitIndex objects-------------------#
@@ -54,7 +52,7 @@ end
 
 #---Multiplicative identity------------------------------------------------------------------------#
 
-one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(length(C))))
+one(C::Type{<:CliffordNumber{Q}}) where Q = C(ntuple(isone, Val(nblades(C))))
 
 #---Similar types----------------------------------------------------------------------------------#
 
