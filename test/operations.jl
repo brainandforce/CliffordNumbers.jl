@@ -7,6 +7,7 @@
     @test KVector{2,VGA(3)}(4, 2, 0) == CliffordNumber{VGA(3),Int}(0, 0, 0, 4, 0, 2, 0, 0)
     @test KVector{2,VGA(3)}(4, 2, 0) == CliffordNumber{VGA(3),Float64}(0, 0, 0, 4, 0, 2, 0, 0)
     @test one(EvenCliffordNumber{VGA(3)}) == 1
+    @test 1 == one(EvenCliffordNumber{VGA(3)})
     @test one(EvenCliffordNumber{VGA(3)}) ≈ 1
     @test 1 ≈ one(EvenCliffordNumber{VGA(3)})
 end
@@ -87,6 +88,14 @@ end
     @test KVector{0,VGA(3)}(2) * k === 2 * k
     @test k * KVector{0,VGA(3)}(2) === k * 2
     @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
+    @test isscalar(CliffordNumber{VGA(3)}(1))
+    @test isscalar(EvenCliffordNumber{VGA(3)}(1, 0, 0, 0))
+    @test !isscalar(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4))
+    @test !isscalar(OddCliffordNumber{VGA(3)}(1, 2, 3, 4))
+    @test isscalar(OddCliffordNumber{VGA(3)}(0, 0, 0, 0))
+    @test isscalar(KVector{1,STA}(0, 0, 0, 0))
+    @test !isscalar(KVector{3,STA}(1, 3, 3, 7))
+    @test isscalar(complex(420, 69))
 end
 
 @testset "Inverses and division" begin
