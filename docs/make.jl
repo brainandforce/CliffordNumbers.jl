@@ -19,7 +19,7 @@ makedocs(;
         assets = String[],
     ),
     pages=[
-        "Home" => "home.md",
+        "Home" => "index.md",
         "Clifford number types" => "numeric.md",
         "Metric signatures" => "metrics.md",
         "Indexing" => "indexing.md",
