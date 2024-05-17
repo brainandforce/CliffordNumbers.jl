@@ -39,6 +39,7 @@ CliffordNumbers.Metrics.STAP
 
 ```@docs
 CliffordNumbers.dimension
+CliffordNumbers.signature
 CliffordNumbers.blade_count
 CliffordNumbers.grades
 CliffordNumbers.is_degenerate

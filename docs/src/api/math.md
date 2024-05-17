@@ -35,14 +35,14 @@ Base.muladd(x::BaseNumber, y::T, z::T) where T<:AbstractCliffordNumber
 ### Geometric products
 
 ```@docs
-Base.:*(::AbstractCliffordNumber{Q}, ::AbstractCliffordNumber{Q}) where Q
-CliffordNumbers.left_contraction
-CliffordNumbers.right_contraction
+Base.:*(::AbstractCliffordNumber, ::AbstractCliffordNumber)
+CliffordNumbers.:⨼
+CliffordNumbers.:⨽
 CliffordNumbers.dot
 CliffordNumbers.hestenes_dot
-CliffordNumbers.wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-CliffordNumbers.commutator
-CliffordNumbers.anticommutator
+CliffordNumbers.:∧(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+CliffordNumbers.:×
+CliffordNumbers.:⨰
 ```
 
 ### Scalar products and normalization

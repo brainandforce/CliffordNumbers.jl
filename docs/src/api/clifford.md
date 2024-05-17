@@ -42,4 +42,5 @@ Base.complex(::AbstractCliffordNumber)
 CliffordNumbers.isscalar
 CliffordNumbers.ispseudoscalar
 CliffordNumbers.scalar
+CliffordNumbers.pseudoscalar
 ```
