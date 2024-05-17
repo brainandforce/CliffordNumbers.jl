@@ -199,7 +199,7 @@ methods which either convert the arguments or fall back to other methods.
 The arguments to this function should all agree in scalar type `T`. The `*` function, which exposes
 the fast geometric product implementation, promotes the scalar types of the arguments before
 utilizing this kernel. The scalar multiplication operations are implemented using [`muladd`](@ref), 
-allowing for hardware [`fma`](@ref) operations to be used when available.
+allowing for hardware fma operations to be used when available.
 
 The `GradeFilter` `F` allows for some blade multiplications to be excluded if they meet certain
 criteria. This is useful for implementing products besides the geometric product, such as the wedge
