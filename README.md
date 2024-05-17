@@ -9,7 +9,8 @@ A simple, statically sized multivector (Clifford number) implementation for Juli
 representations. This allows for common multivector operations, particularly the various products
 of geometric algebra, to be easily implemented with extremely high performance (faster than matrix
 multiplications of matrix representations) without depending on any linear algebra library.
-Additionally, the multivectors provided by this package can be stored inline in arrays.
+Additionally, the multivectors provided by this package can be stored inline in arrays or other data
+structures.
 
 # Clifford numbers
 
@@ -17,7 +18,9 @@ Additionally, the multivectors provided by this package can be stored inline in 
 
 This package exports `AbstractCliffordNumber{Q,T}` and its subtypes, which describe the behavior of
 multivectors with algebra `Q` and scalar type `T<:Union{Real,Complex}`. This is a subtype of
-`Number`, and therefore acts as a scalar for the purpose of broadcasting.
+`Number`, and therefore acts as a scalar for the purpose of broadcasting. For this reason, we
+provide an `nblades` function separate from `Base.length` to count the number of blades represented
+by a type.
 
 To index an `AbstractCliffordNumber`, we provide the `BitIndex{Q}` type, which allows for arbitrary
 components to be indexed, and the `BitIndices{Q,C<:AbstractCliffordNumber{Q}}` type, which provides
