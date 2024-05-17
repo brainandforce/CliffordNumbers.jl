@@ -35,6 +35,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/brainandforce/CliffordNumbers.jl",
+    repo="github.com/brainandforce/CliffordNumbers.jl.git",
     devbranch="main",
 )
