@@ -69,7 +69,7 @@ one(K::Type{<:KVector{<:Any,Q}}) where Q = KVector{0,Q}(scalar_type(K)(true))
 one(C::Type{<:AbstractCliffordNumber{Q}}) where Q = one(KVector{0,Q,scalar_type(C)})
 
 """
-    pseudoscalar(C::Type{<:AbstractCliffordNumber{Q,T}}) -> KVector{dimension{Q},Q,T}
+    pseudoscalar(C::Type{<:AbstractCliffordNumber{Q,T}}) -> KVector{dimension(Q),Q,T}
     pseudoscalar(x::AbstractCliffordNumber{Q})
 
 Returns the pseudoscalar associated with the signature `Q` of the argument. The result will have the
