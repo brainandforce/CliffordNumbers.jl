@@ -1,7 +1,7 @@
 name = "CliffordNumbers"
 uuid = "3998ac73-6bd4-4031-8035-f167dd3ed523"
 authors = ["Brandon Flores"]
-version = "0.1.0"
+version = "0.1.1-dev"
 
 [compat]
 Aqua = "0.8"
