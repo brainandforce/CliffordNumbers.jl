@@ -295,6 +295,48 @@ const wedge = ∧
 const left_contraction = ⨼
 const right_contraction = ⨽
 
+#---Commutator and anticommutator products---------------------------------------------------------#
+"""
+    ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the commutator (or antisymmetric) product, equal to `1//2 * (x*y - y*x)`.
+
+Note that the commutator product, in general, is *not* equal to the wedge product, which may be
+invoked with the `wedge` function or the `∧` operator.
+
+# Type promotion
+
+Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
+will be promoted to `Rational` subtypes.
+"""
+function ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return 1//2 * (x*y - y*x)
+end
+
+"""
+    ⨰(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the anticommutator (or symmetric) product, equal to `1//2 * (x*y + y*x)`.
+
+Note that the dot product, in general, is *not* equal to the anticommutator product, which may be
+invoked with `dot`. In some cases, the preferred operators might be the left and right contractions,
+which use infix operators `⨼` and `⨽` respectively.
+
+# Type promotion
+
+Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
+will be promoted to `Rational` subtypes.
+"""
+function ⨰(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return 1//2 * (x*y + y*x)
+end
+
+# Long names for operations
+const commutator = ×
+const anticommutator = ⨰
+
 #---Scalar products--------------------------------------------------------------------------------#
 """
     scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
@@ -339,48 +381,6 @@ abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
 Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 """
 normalize(x::AbstractCliffordNumber) = x / abs(x)
-
-#---Commutator and anticommutator products---------------------------------------------------------#
-"""
-    ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-    commutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the commutator (or antisymmetric) product, equal to `1//2 * (x*y - y*x)`.
-
-Note that the commutator product, in general, is *not* equal to the wedge product, which may be
-invoked with the `wedge` function or the `∧` operator.
-
-# Type promotion
-
-Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
-will be promoted to `Rational` subtypes.
-"""
-function ×(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return 1//2 * (x*y - y*x)
-end
-
-const commutator = ×
-
-"""
-    ⨰(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-    anticommutator(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the anticommutator (or symmetric) product, equal to `1//2 * (x*y + y*x)`.
-
-Note that the dot product, in general, is *not* equal to the anticommutator product, which may be
-invoked with `dot`. In some cases, the preferred operators might be the left and right contractions,
-which use infix operators `⨼` and `⨽` respectively.
-
-# Type promotion
-
-Because of the rational `1//2` factor in the product, inputs with scalar types subtyping `Integer`
-will be promoted to `Rational` subtypes.
-"""
-function ⨰(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return 1//2 * (x*y + y*x)
-end
-
-const anticommutator = ⨰
 
 #---Inverses and division--------------------------------------------------------------------------#
 """
