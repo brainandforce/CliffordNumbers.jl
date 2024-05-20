@@ -184,23 +184,116 @@ function muladd(x::AbstractCliffordNumber{Q}, y::BaseNumber, z::AbstractClifford
     return muladd(xx, y, zz)
 end
 
-#---Geometric product-----------------------------------------------------------------------------#
-"""
+#---Geometric product, wedge product, and contractions---------------------------------------------#
+for op in (:*, :∧, :⨼, :⨽, :dot)
+    @eval begin
+        @inline function $op(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+            return @inline mul(x, y, GradeFilter{$(Expr(:quote, op))}())
+        end
+    end
+end
+
+# Parenthetical multiplication
+(x::AbstractCliffordNumber)(y::AbstractCliffordNumber) = @inline x * y
+
+# Scalars in wedge products
+∧(x::BaseNumber, y::BaseNumber) = x * y
+∧(x::BaseNumber, y::AbstractCliffordNumber) = x * y
+∧(x::AbstractCliffordNumber, y::BaseNumber) = y * x
+
+# Optimized versions for k-vector arguments
+for op in (:*, :∧)
+    @eval begin
+        @inline $op(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = only(Tuple(k)) * x
+        @inline $op(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * only(Tuple(k))
+        @inline function $op(k::KVector{0,Q}, l::AbstractCliffordNumber{0,Q}) where Q
+            return KVector{0,Q}((only(Tuple(k)) * only(Tuple(l))))
+        end
+    end
+end
+
+@doc """
     *(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
     (x::AbstractCliffordNumber{Q})(y::AbstractCliffordNumber{Q})
 
 Calculates the geometric product of `x` and `y`, returning the smallest type which is able to
 represent all nonzero basis blades of the result.
 """
-*(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = @inline mul(x, y, GradeFilter{:*}())
+*
 
-# KVector{0,Q} is just a scalar compatible with an AbstractCliffordNumber{Q}
-# TODO: this may be best in an eval block with all other products
-*(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = only(Tuple(k)) * x
-*(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * only(Tuple(k))
-*(k::KVector{0,Q}, l::KVector{0,Q}) where Q = KVector{0,Q}(only(Tuple(k)) * only(Tuple(l)))
+@doc """
+    ∧(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
 
-(x::AbstractCliffordNumber)(y::AbstractCliffordNumber) = @inline x * y
+Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with quadratic form `Q`.
+
+Note that the wedge product, in general, is *not* equal to the commutator product (or antisymmetric
+product), which may be invoked with the `commutator` function or the `×` operator.
+"""
+∧
+
+@doc """
+    left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    ⨼(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the left contraction of `x` and `y`.
+
+For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
+otherwise it is `KVector{n-m,Q}(A*B)`.
+"""
+⨼
+
+@doc """
+    right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+    ⨽(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the right contraction of `x` and `y`.
+
+For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
+otherwise it is `KVector{m-n,Q}(A*B)`.
+"""
+⨽
+
+@doc """
+    CliffordNumbers.dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the dot product of `x` and `y`.
+
+For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal to the left
+contraction when `m >= n` and is equal to the right contraction (up to sign) when `n >= m`.
+
+# Why is this function not exported?
+
+The LinearAlgebra package also defines a `dot` function, and if both packages are used together,
+this will cause a name conflict if `CliffordNumbers.dot` is exported. In the future, we will try to
+resolve this without requiring a LinearAlgebra dependency.
+
+Additionally, there is reason to prefer the use of the left and right contractions over the dot
+product because the contractions require fewer exceptions in their definitions and properties.
+"""
+dot
+
+"""
+    CliffordNumbers.hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Returns the Hestenes product: this is equal to the dot product given by `dot(x, y)` but is equal to
+to zero when either `x` or `y` is a scalar.
+
+# Why is this function not exported?
+
+In almost every case, left and right contractions are preferable - the dot product and the Hestenes
+product are less regular in algebraic sense, and the conditionals present in its implementation 
+slow it down relative to contractions. It is provided for the sake of exact reproducibility of
+results which use it.
+"""
+function hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    return !(isscalar(x) || isscalar(y)) * dot(x, y)
+end
+
+# Long names for operations
+const wedge = ∧
+const left_contraction = ⨼
+const right_contraction = ⨽
 
 #---Scalar products--------------------------------------------------------------------------------#
 """
@@ -246,86 +339,6 @@ abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
 Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 """
 normalize(x::AbstractCliffordNumber) = x / abs(x)
-
-#---Contractions-----------------------------------------------------------------------------------#
-"""
-    left_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-    ⨼(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the left contraction of `x` and `y`.
-
-For basis blades `A` of grade `m` and `B` of grade `n`, the left contraction is zero if `n < m`,
-otherwise it is `KVector{n-m,Q}(A*B)`.
-"""
-⨼(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = @inline mul(x, y, GradeFilter{:⨼}())
-
-"""
-    right_contraction(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-    ⨽(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the right contraction of `x` and `y`.
-
-For basis blades `A` of grade `m` and `B` of grade `n`, the right contraction is zero if `m < n`,
-otherwise it is `KVector{m-n,Q}(A*B)`.
-"""
-⨽(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = @inline mul(x, y, GradeFilter{:⨽}())
-
-"""
-    CliffordNumbers.dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the dot product of `x` and `y`.
-
-For basis blades `A` of grade `m` and `B` of grade `n`, the dot product is equal to the left
-contraction when `m >= n` and is equal to the right contraction (up to sign) when `n >= m`.
-
-# Why is this function not exported?
-
-The LinearAlgebra package also defines a `dot` function, and if both packages are used together,
-this will cause a name conflict if `CliffordNumbers.dot` is exported. In the future, we will try to
-resolve this without requiring a LinearAlgebra dependency.
-
-Additionally, there is reason to prefer the use of the left and right contractions over the dot
-product because the contractions require fewer exceptions in their definitions and properties.
-"""
-dot(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = @inline mul(x, y, GradeFilter{:dot}())
-
-const left_contraction = ⨼
-const right_contraction = ⨽
-
-"""
-    CliffordNumbers.hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Returns the Hestenes product: this is equal to the dot product given by `dot(x, y)` but is equal to
-to zero when either `x` or `y` is a scalar.
-
-# Why is this function not exported?
-
-In almost every case, left and right contractions are preferable - the dot product and the Hestenes
-product are less regular in algebraic sense, and the conditionals present in its implementation 
-slow it down relative to contractions. It is provided for the sake of exact reproducibility of
-results which use it.
-"""
-function hestenes_dot(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return !(isscalar(x) || isscalar(y)) * dot(x, y)
-end
-
-#---Wedge (outer) product--------------------------------------------------------------------------#
-"""
-    ∧(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-    wedge(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the wedge (outer) product of two Clifford numbers `x` and `y` with quadratic form `Q`.
-
-Note that the wedge product, in general, is *not* equal to the commutator product (or antisymmetric
-product), which may be invoked with the `commutator` function or the `×` operator.
-"""
-∧(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = @inline mul(x, y, GradeFilter{:∧}())
-
-∧(x::BaseNumber, y::BaseNumber) = x * y
-∧(x::BaseNumber, y::AbstractCliffordNumber) = x * y
-∧(x::AbstractCliffordNumber, y::BaseNumber) = y * x
-
-const wedge = ∧
 
 #---Commutator and anticommutator products---------------------------------------------------------#
 """
