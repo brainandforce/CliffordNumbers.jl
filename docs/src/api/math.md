@@ -35,12 +35,12 @@ Base.muladd(x::BaseNumber, y::T, z::T) where T<:AbstractCliffordNumber
 ### Geometric products
 
 ```@docs
-Base.:*(::AbstractCliffordNumber, ::AbstractCliffordNumber)
+Base.:*
 CliffordNumbers.:⨼
 CliffordNumbers.:⨽
 CliffordNumbers.dot
 CliffordNumbers.hestenes_dot
-CliffordNumbers.:∧(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+CliffordNumbers.:∧
 CliffordNumbers.:×
 CliffordNumbers.:⨰
 ```
