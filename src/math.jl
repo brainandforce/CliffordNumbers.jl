@@ -206,7 +206,7 @@ for op in (:*, :∧)
     @eval begin
         @inline $op(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = only(Tuple(k)) * x
         @inline $op(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * only(Tuple(k))
-        @inline function $op(k::KVector{0,Q}, l::AbstractCliffordNumber{0,Q}) where Q
+        @inline function $op(k::KVector{0,Q}, l::KVector{0,Q}) where Q
             return KVector{0,Q}((only(Tuple(k)) * only(Tuple(l))))
         end
     end
