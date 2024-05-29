@@ -29,7 +29,7 @@ of both researchers and enthusiasts.
 `CliffordNumbers.jl` provides a high-performance implementation of commonly used operations in
 geometric algebras of up to 6 dimensions without relying on a linear algebra library. In common
 cases, the performance of this library allows for implementations of isometry composition or 
-application with significantly greater speed
+application with significantly greater speed than a matrix-based implementation for those spaces.
 
 # Statement of need
 
@@ -54,8 +54,9 @@ the Clifford algebra $\text{Cl}_{3,0,0}\left(\mathbb{R}\right)$. In computer gra
 which are used to compose and apply rotations, are isomorphic to the *rotors* of APS, or elements
 which represent rotations. Like with quaternions, single-sided multiplications constitute 
 composition of rotations, and double-sided multiplications represent application of the rotation to
-some object of the space, and this is always faster than an equivalent matrix-vector multiplication
-performing the rotation.
+some object of the space. The composition of 3D rotations is much faster when implemented with
+quaternions as compared to matrices, and for this reason, 3D graphics libraries universally use
+them.
 
 # Implementation
 
@@ -65,6 +66,7 @@ the Julia Base `Number` type, and much of the semantics of the concrete subtypes
 `AbstractCliffordNumber{Q,T}` match those of other `Number` subtypes, including `Real`, 
 `Complex{T}`, and the `Quaternion{T}` type provided by `Quaternions.jl`. This design decision was
 made because the complex numbers and quaternions are both isomorphic to real Clifford algebras, and
+the types provided by this library fill in the gaps for Clifford algebras of arbitrary signature.
 
 This library does not depend on a linear algebra package. Unlike many other software implementations
 of geometric algebras, this package does not use matrix representations to calculate the geometric
@@ -76,7 +78,13 @@ implementations that use matrix representations.
 # Indexing
 
 Although `AbstractCliffordNumber{Q,T}` instances behave like scalars, it is often necessary to
-obtain individual components of an instance, either in the implementation of 
+obtain individual components of an instance. To facilitate this, we provide the `BitIndex{Q}` type,
+which allows for the retrieval of the coefficient associated with a blade.
+
+The `BitIndices{Q,C<:AbstractCliffordNumber{Q}}` type represents all of the indices of a type `C`
+or an instance thereof. This allows for iterations over all indices of an `AbstractCliffordNumber`
+at compile time, which is key to the fast implementation of various operations, including the
+various products of geometric algebra.
 
 # Performance
 
@@ -127,15 +135,15 @@ The multiplication of two complex numbers consists of 4 multiplications and 2 ad
 The multiplication of a pair of 2×2 matrices consists of 4 sets of dot products between rows of the
 first matrix and columns of the second. These dot products consist of two complex multiplications
 and a complex addition, so in total there are 8 complex multiplications and 4 complex additions,
-which total 32 real multiplications and 24 real additions.
+which total 32 real multiplications and 24 real additions. The geometric product in the additive
+representation can be implemented with a multiplication table, requiring 64 multiplications and 56
+additions.
 
-The geometric product in the additive representation can be implemented with a multiplication table,
-requiring 56 multiplications and 56 additions.
-
-However, in practice, isometries of the space are represented by $k$-versors, the geometric product
-of $k$ 1-blades. These necessarily only contain elements of either even or odd grades, meaning that
-only half as many coefficients are present. On top of this, the `KVector{K,Q,T,L}` data type can be
-used to represent $k$-blades, and these only have `binomial(dimension(Q), K)` elements
+In practice, isometries of the space are represented by $k$-versors, the geometric product of $k$
+1-blades. These necessarily only contain elements of either even or odd grades, meaning that only 
+half as many coefficients are present. On top of this, the `KVector{K,Q,T,L}` data type can be used
+to represent $k$-blades, and these only have `binomial(dimension(Q), K)` elements. Therefore, the
+speedup can be significantly larger.
 
 # Examples
 
