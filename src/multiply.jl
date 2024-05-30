@@ -157,6 +157,27 @@ Without specialization on `S`, a type suitable for the geometric product is retu
     end
 end
 
+# Extra implementation for k-vectors: special handling scalar and pseudoscalar arguments
+# TODO: can we integrate this into the above function?
+@generated function product_return_type(
+    ::Type{C1},
+    ::Type{C2},
+    ::GradeFilter{<:Any}
+) where {K1,K2,Q,C1<:KVector{K1,Q},C2<:KVector{K2,Q}}
+    D = dimension(Q)
+    # Handle the scalar and pseudoscalar cases
+    if isone(nblades(C1))
+        iszero(K1) && return :(KVector{K2,Q})
+        K1 == D && return :(KVector{$D-K2,Q})
+    elseif isone(nblades(C2))
+        iszero(K2) && return :(KVector{K1,Q})
+        K2 == D && return :(KVector{$D-K1,Q})
+    end
+    # Fall back to a Z2CliffordNumber with the right parity
+    P = isodd(xor(K1, K2))
+    return :(Z2CliffordNumber{$P,Q})
+end
+
 function product_return_type(
     ::Type{<:KVector{K1,Q}},
     ::Type{<:KVector{K2,Q}},

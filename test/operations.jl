@@ -77,6 +77,17 @@ end
     @test x(y) === x * y
     @test (y)(x) === y * x
     @test_throws CliffordNumbers.AlgebraMismatch x * one(CliffordNumber{STA})
+    # Check that scalar/pseudoscalar multiplications promote correctly
+    @test k1 * KVector{0,VGA(3)}(2) === KVector{1,VGA(3)}(8, 4, 0)
+    @test KVector{0,VGA(3)}(2) * k1 === KVector{1,VGA(3)}(8, 4, 0)
+    # Test kernel directly for the scalar case (this is overridden)
+    @test CliffordNumbers.mul(k1, KVector{0,VGA(3)}(2)) === KVector{1,VGA(3)}(8, 4, 0)
+    @test CliffordNumbers.mul(KVector{0,VGA(3)}(2), k1) === KVector{1,VGA(3)}(8, 4, 0)
+    @test k1 * KVector{3,VGA(3)}(2) === KVector{2,VGA(3)}(0, -4,  8)
+    @test KVector{3,VGA(3)}(2) * k1 === KVector{2,VGA(3)}(0, -4,  8)
+    # Test promotions of KVector with Z2CliffordNumber implicitly
+    @test k1 * k2 * l2 isa OddCliffordNumber{VGA(3)}
+    @test k1 * l1 * l2 isa EvenCliffordNumber{VGA(3)}
 end
 
 @testset "Scalars" begin
