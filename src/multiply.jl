@@ -229,8 +229,9 @@ kernel just returns the geometric product.
             tuple_inds = to_index.(y, inds)
             signs = mul_signs(F(), a, inds)
             # Construct the tuples that contribute to the product
-            x_tuple_ex = :(Tuple(x)[$ia] .* $x_mask)
-            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds) .* $signs .* $y_mask)
+            x_tuple_ex = :(Tuple(x)[$ia].value .* $x_mask)
+            y_tuple_raw = :(getfield.(getindex.(tuple(Tuple(y)), $tuple_inds), :value))
+            y_tuple_ex = :($y_tuple_raw .* $signs .* $y_mask)
             # Combine the tuples using muladd operations
             ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
         end

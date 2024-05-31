@@ -7,7 +7,7 @@ a k-vector.
 k-vectors have `binomial(dimension(Q), K)` components.
 """
 struct KVector{K,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
-    data::NTuple{L,T}
+    data::NTuple{L,VecElement{T}}
     function KVector{K,Q,T,L}(x::Tuple) where {K,Q,T,L}
         @assert 0 <= K <= dimension(Q) "K can only range from 0 to $(dimension(Q)) (got $K)."
         check_element_count(binomial(dimension(Q), K), L, x)
@@ -59,7 +59,7 @@ end
 @inline to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
 
 @inline function getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
-    return (@inbounds k.data[to_index(k, b)]) * sign(b) * (grade(b) === K)
+    return (@inbounds (k.data[to_index(k, b)]).value) * sign(b) * (grade(b) === K)
 end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#

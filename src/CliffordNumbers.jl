@@ -8,6 +8,7 @@ import Base: ==, isapprox, +, -, *, /, //, muladd, abs, abs2, exp, ^
 import Base: promote_rule, convert, similar
 import Base: summary, show
 
+import Base.VecElement
 import Base.Broadcast
 
 """

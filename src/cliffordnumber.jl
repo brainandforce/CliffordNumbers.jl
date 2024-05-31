@@ -11,7 +11,7 @@ the order is: 1, e₁, e₂, e₁₂, e₃, e₁₃, e₂₃, e₁₂₃ = i. Th
 optimization when calculating the geometric product.
 """
 struct CliffordNumber{Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
-    data::NTuple{L,T}
+    data::NTuple{L,VecElement{T}}
     function CliffordNumber{Q,T,L}(x::Tuple) where {Q,T,L}
         check_element_count(blade_count(Q), L, x)
         return new{Q,T,L}(x)
@@ -47,7 +47,7 @@ BitIndices(Q::Metrics.AbstractSignature) = BitIndices{Q}()
 @inline to_index(x::CliffordNumber{Q}, i::BitIndex{Q}) where Q = to_index(typeof(x), i)
 
 @inline function getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
-    return sign(b) * (@inbounds x.data[to_index(x, b)])
+    return sign(b) * (@inbounds (x.data[to_index(x, b)]).value)
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#

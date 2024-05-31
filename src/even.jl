@@ -15,7 +15,7 @@ This type is not exported, and usually you will want to refer to the following a
     const OddCliffordNumber{Q,T,L} = Z2CliffordNumber{true,Q,T,L}
 """
 struct Z2CliffordNumber{P,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
-    data::NTuple{L,T}
+    data::NTuple{L,VecElement{T}}
     function Z2CliffordNumber{P,Q,T,L}(x::Tuple) where {P,Q,T,L}
         @assert P isa Bool "The first type parameter must be a Bool (got $P)."
         check_element_count(div(blade_count(Q), 2), L, x)
@@ -76,7 +76,7 @@ end
 @inline to_index(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q} = to_index(typeof(x), b)
 
 @inline function getindex(x::Z2CliffordNumber{P,Q}, b::BitIndex{Q}) where {P,Q}
-    return xor(iseven(grade(b)), P) * sign(b) * (@inbounds x.data[to_index(x, b)])
+    return xor(iseven(grade(b)), P) * sign(b) * (@inbounds (x.data[to_index(x, b)]).value)
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#

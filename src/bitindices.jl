@@ -185,7 +185,8 @@ Clifford number of type `C`, or a similar type from `CliffordNumbers.similar_typ
     # The mask is needed for the KVector case.
     # BitIndex objects that don't map to a tuple index just get to turned to index 1
     mask = in.(BitIndices(C), tuple(BitIndices(x)))
-    return :(map(*, getindex.(tuple(Tuple(x)), $inds), $mask))
+    tup = :(getfield.(getindex.(tuple(Tuple(x)), $inds), :value))
+    return :(map(*, $tup, $mask))
 end
 
 @inline function getindex(x::AbstractCliffordNumber{Q}, B::BitIndices{Q,C}) where {Q,C}
