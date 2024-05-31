@@ -135,8 +135,8 @@ similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
 Gets the real portion of each coefficient of `x`. For `T<:Real` this operation does nothing; for
 `T<:Complex{S}` this an `AbstractCliffordNumber{Q,S}`.
 
-Note that this does not return the scalar (grade 0) coefficient of `x`. Use `real(scalar(x))` to
-obtain this result.
+Note that this does not return the scalar (grade 0) coefficient of `x`. Use `scalar(x)` to obtain
+this result in general, or `real(scalar(x))` if only the real portion is desired.
 """
 function Base.real(x::AbstractCliffordNumber)
     T = similar_type(x, real(scalar_type(x)))
