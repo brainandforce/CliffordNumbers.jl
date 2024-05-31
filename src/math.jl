@@ -458,9 +458,31 @@ end
 
 exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
 
-# Odd grade Clifford numbers promote incorrectly due to broken type inference, see this issue:
-# https://github.com/JuliaLang/julia/issues/53504
-^(k::Union{KVector,OddCliffordNumber}, n::Integer) = convert(exponential_type(k), k)^n
+# If the exponent is a constant, we can leverage that information to promote conservatively
+@inline function Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{n}) where n
+    # Handle negative cases: invert x, flip the sign of n, and retry
+    n < 0 && return Base.literal_pow(^, inv(x), Val(abs(n)))
+    # Handle positive cases: force promotion to even multivectors
+    n > 0 && return (x*x)^(div(n,2)) * Base.literal_pow(^, x, Val(rem(n,2)))
+    return one(x)
+end
+
+# Overload Base.literal_pow for common cases
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{0}) = one(x)
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{1}) = x
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{2}) = x*x
+
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{-1}) = inv(x)
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{-2}) = (i = inv(x); i*i)
+
+# It appears that exponentiation with `Bool` does not get converted to Base.literal_pow
+# But they're defined here anyway
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{false}) = one(x)
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{true}) = x
+
+# Odd grade Clifford numbers promote incorrectly by default, because typeof(one(x)) != typeof(x)
+# See this issue: https://github.com/JuliaLang/julia/issues/53504
+^(x::C, n::Integer) where C<:Union{KVector,OddCliffordNumber} = convert(exponential_type(C), x)^n
 
 """
     CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = Val(16))
