@@ -9,6 +9,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
   - `Base.float` and `Base.big` definitions for `AbstractCliffordNumber` types and instances.
+  - `Base.literal_pow` definitions for `AbstractCliffordNumber` instances raised to constant powers,
+    allowing the powers of `KVector`, `EvenCliffordNumber`, or `OddCliffordNumber` to be inferred
+    as either `EvenCliffordNumber` or `OddCliffordNumber` depending on the exponent.
 
 ### Changed
   - Geometric products involving pseudoscalars (`KVector{K,Q}` where `K === dimension(Q)`) now
