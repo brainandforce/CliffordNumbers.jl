@@ -176,14 +176,19 @@ end
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exppi(1//2 * k)
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exptau(1//4 * k)
     # Integer exponentiation of a multivector
-    k1 = KVector{1,VGA(3)}(4, 2, 0)
-    k2 = KVector{2,VGA(3)}(0, 6, 9)
-    @test k1^2 isa CliffordNumber
-    @test k2^2 isa EvenCliffordNumber
-    @test k1^0 == one(k1)
-    @test k1^1 == k1
-    @test k1^2 == k1 * k1
-    @test k2^0 == one(k2)
-    @test k2^1 == k2
-    @test k2^2 == k2 * k2
+    k = KVector{1,VGA(3)}(4, 2, 0)
+    l = KVector{2,VGA(3)}(0, 6, 9)
+    # Base.literal_pow tests
+    @test k^-2 === inv(k) * inv(k)
+    @test l^-2 === inv(l) * inv(l)
+    @test k^-1 === inv(k)
+    @test l^-1 === inv(l)
+    @test k^0 === one(k)
+    @test l^0 === one(l)
+    @test k^1 === k
+    @test l^1 === l
+    @test k^2 isa EvenCliffordNumber
+    @test l^2 isa EvenCliffordNumber
+    @test k^3 isa OddCliffordNumber
+    @test l^3 isa EvenCliffordNumber
 end
