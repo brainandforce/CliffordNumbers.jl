@@ -5,7 +5,7 @@ import Base: zero, one, oneunit
 import Base: signbit, sign
 import Base: reverse, adjoint, conj, ~
 import Base: ==, isapprox, +, -, *, /, //, muladd, abs, abs2, exp, ^
-import Base: promote_rule, convert, similar
+import Base: promote_rule, convert, similar, float, big
 import Base: summary, show
 
 import Base.Broadcast

@@ -24,6 +24,13 @@ end
 convert(::Type{T}, k::KVector{0}) where T<:BaseNumber = convert(T, only(k.data))
 
 #---Convert only the scalar portion of an AbstractCliffordNumber-----------------------------------#
+
+float(::Type{C}) where C<:AbstractCliffordNumber = similar_type(C, float(scalar_type(C)))
+float(x::AbstractCliffordNumber) = convert(float(typeof(x)), x)
+
+big(::Type{C}) where C<:AbstractCliffordNumber = similar_type(C, big(scalar_type(C)))
+big(x::AbstractCliffordNumber) = convert(big(typeof(x)), x)
+
 """
     scalar_convert(T::Type{<:Union{Real,Complex}}, x::AbstractCliffordNumber) -> T
     scalar_convert(T::Type{<:Union{Real,Complex}}, x::Union{Real,Complex}) -> T

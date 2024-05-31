@@ -93,3 +93,14 @@ end
     @test widen_grade(KVector{2,VGA(3),Int32}(1, 2, 3)) === EvenCliffordNumber{VGA(3),Int32}(0, 1, 2, 3)
     @test widen_grade(KVector{1,VGA(3),Int}(4, 5, 6)) === OddCliffordNumber{VGA(3),Int}(4, 5, 6, 0)
 end
+
+@testset "float() and big()" begin
+    @test float(CliffordNumber{STA,Int}) <: CliffordNumber{STA,Float64}
+    @test float(CliffordNumber{STA,Complex{Bool}}) <: CliffordNumber{STA,ComplexF64}
+    @test big(CliffordNumber{STA,Int}) <: CliffordNumber{STA,BigInt}
+    @test big(CliffordNumber{STA,Float64}) <: CliffordNumber{STA,BigFloat}
+    @test float(KVector{1,VGA(3)}(1, 2, 3)) === KVector{1,VGA(3),Float64}(1, 2, 3)
+    @test float(KVector{1,VGA(3),Complex{Int}}(1, 2, 3)) === KVector{1,VGA(3),ComplexF64}(1, 2, 3)
+    @test big(KVector{1,VGA(3)}(1, 2, 3)) == KVector{1,VGA(3),BigInt}(1, 2, 3)
+    @test big(KVector{1,VGA(3),Float64}(1, 2, 3)) == KVector{1,VGA(3),BigFloat}(1, 2, 3)
+end
