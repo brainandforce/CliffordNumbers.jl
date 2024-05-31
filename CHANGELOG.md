@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - `Base.float` and `Base.big` definitions for `AbstractCliffordNumber` types and instances.
+
 ## [0.1.1] - 2024-05-28
 
 ### Changed
