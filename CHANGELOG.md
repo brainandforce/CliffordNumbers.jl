@@ -10,6 +10,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
   - `Base.float` and `Base.big` definitions for `AbstractCliffordNumber` types and instances.
 
+### Changed
+  - Geometric products involving pseudoscalars (`KVector{K,Q}` where `K === dimension(Q)`) now
+    promote to smaller types if possible.
+
 ## [0.1.1] - 2024-05-28
 
 ### Changed
