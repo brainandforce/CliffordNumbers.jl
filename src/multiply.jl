@@ -234,15 +234,18 @@ kernel just returns the geometric product.
 ) where {Q,T<:BaseNumber}
     C = product_return_type(x, y, F())
     ex = :($(zero_tuple(C)))
+    # TODO: specialize kernel to favor iterating through the indices of the smaller argument
     for a in BitIndices(x)
+        # Permute the indices of y so that the result coefficients are correctly ordered
         inds = bitindex_shuffle(a, BitIndices(C))
         # Filter out multiplications which necessarily go to zero
         x_mask = mul_mask(F(), a, inds)
         # Filter out indexing operations that automatically go to zero
         # This must be done manually since we want to work directly with tuples
         y_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(y)), Val(nblades(C))))
+        mask = x_mask .& y_mask
         # Don't append operations that won't actually do anything
-        if any(x_mask) && any(y_mask)
+        if any(mask)
             # Resolve BitIndex to an integer here to avoid having to call Base.to_index at runtime
             # This function cannot be inlined or unrolled for KVector arguments
             # But all values are known at compile time, so interpolate them into expressions
@@ -250,8 +253,8 @@ kernel just returns the geometric product.
             tuple_inds = to_index.(y, inds)
             signs = mul_signs(F(), a, inds)
             # Construct the tuples that contribute to the product
-            x_tuple_ex = :(Tuple(x)[$ia] .* $x_mask)
-            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds) .* $signs .* $y_mask)
+            x_tuple_ex = :(Tuple(x)[$ia] .* $(signs .* mask))
+            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds))
             # Combine the tuples using muladd operations
             ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
         end
