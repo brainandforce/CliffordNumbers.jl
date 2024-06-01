@@ -360,13 +360,7 @@ end
 
 Calculates the squared norm of `x`, equal to `scalar_product(x, x')`.
 """
-function abs2(x::AbstractCliffordNumber)
-    result = zero(scalar_type(x))
-    for i in eachindex(Tuple(x))
-        result += Tuple(x)[i] * Tuple(x)[i]
-    end
-    return result
-end
+abs2(x::AbstractCliffordNumber) = scalar_product(x, x')
 
 """
     abs2(x::AbstractCliffordNumber{Q,T}) -> Union{Real,Complex}

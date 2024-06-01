@@ -95,6 +95,9 @@ end
     @test abs2(k) === 25
     @test abs(k) == 5
     @test normalize(k) == k / 5
+    # Testing non-positive definite and degenerate metrics
+    @test abs2(KVector{1,STA}(0, 2, 3, 4)) == -29
+    @test abs2(KVector{1,PGA(3)}(1, 0, 0, 0)) == 0
     # Testing with KVector{0}
     @test KVector{0,VGA(3)}(2) * k === 2 * k
     @test k * KVector{0,VGA(3)}(2) === k * 2
