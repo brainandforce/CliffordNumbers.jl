@@ -4,7 +4,7 @@
 
 An element of a Clifford algebra, often referred to as a multivector, with quadratic form `Q` and
 element type `T`. These are statically size and therefore should be able to be stored inline in
-arrays or other data structures,
+arrays or other data structures.
 
 # Interface
 
