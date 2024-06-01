@@ -13,6 +13,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
   - Geometric products involving pseudoscalars (`KVector{K,Q}` where `K === dimension(Q)`) now
     promote to smaller types if possible.
+  - `CliffordNumbers.mul` iterates through the indices of the smaller argument, which drastically
+    reduces the performance discrepancy when the multiplication arguments are reversed if SIMD
+    vectorization is utilized.
 
 ## [0.1.1] - 2024-05-28
 
