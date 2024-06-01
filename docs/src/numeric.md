@@ -110,7 +110,7 @@ For a concrete example, the coefficients of a `CliffordNumber{VGA(3)}` are order
 \left(1, e_1, e_2, e_1 e_2, e_3, e_1 e_3, e_2 e_3, e_1 e_2 e_3\right)
 ```
 Note how ``e_1 e_2`` precedes ``e_3`` here, but also note how the first four elements and the second
-four elements only differ by the presence of an `e_3` factor.
+four elements only differ by the presence of an ``e_3`` factor.
 
 `CliffordNumber` and its backing `Tuple` can be indexed  straightforwardly with this relationship.
 The basis blade order of all `AbstractCliffordNumber` instances are identical, with smaller types
