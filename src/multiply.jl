@@ -234,29 +234,58 @@ kernel just returns the geometric product.
 ) where {Q,T<:BaseNumber}
     C = product_return_type(x, y, F())
     ex = :($(zero_tuple(C)))
-    # TODO: specialize kernel to favor iterating through the indices of the smaller argument
-    for a in BitIndices(x)
-        # Permute the indices of y so that the result coefficients are correctly ordered
-        inds = bitindex_shuffle(a, BitIndices(C))
-        # Filter out multiplications which necessarily go to zero
-        x_mask = mul_mask(F(), a, inds)
-        # Filter out indexing operations that automatically go to zero
-        # This must be done manually since we want to work directly with tuples
-        y_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(y)), Val(nblades(C))))
-        mask = x_mask .& y_mask
-        # Don't append operations that won't actually do anything
-        if any(mask)
-            # Resolve BitIndex to an integer here to avoid having to call Base.to_index at runtime
-            # This function cannot be inlined or unrolled for KVector arguments
-            # But all values are known at compile time, so interpolate them into expressions
-            ia = to_index(x, a)
-            tuple_inds = to_index.(y, inds)
-            signs = mul_signs(F(), a, inds)
-            # Construct the tuples that contribute to the product
-            x_tuple_ex = :(Tuple(x)[$ia] .* $(signs .* mask))
-            y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds))
-            # Combine the tuples using muladd operations
-            ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
+    # Generate the expression differently if the first argument is longer
+    # This helps leverage SIMD and cuts down on the number of loop iterations
+    # However, it seems that a smaller first argument is still *slightly* slower, why?
+    # TODO: can we unify the cases and not have to repeat so much code?
+    if nblades(x) > nblades(y) 
+        for b in BitIndices(y)
+            # Permute the indices of x so that the result coefficients are correctly ordered
+            inds = bitindex_shuffle(BitIndices(C), b)
+            # Filter out indexing operations that automatically go to zero
+            # This must be done manually since we want to work directly with tuples
+            x_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(x)), Val(nblades(C))))
+            # Filter out multiplications which necessarily go to zero
+            y_mask = mul_mask(F(), inds, b)
+            mask = x_mask .& y_mask
+            if any(mask)
+                # Resolve BitIndex to an integer here to avoid calling Base.to_index at runtime
+                # This function cannot be inlined or unrolled for KVector arguments
+                # But all values are known at compile time, so interpolate them into expressions
+                ib = to_index(y, b)
+                tuple_inds = to_index.(x, inds)
+                signs = mul_signs(F(), inds, b)
+                # Construct the tuples that contribute to the product
+                x_tuple_ex = :(getindex.(tuple(Tuple(x)), $tuple_inds))
+                y_tuple_ex = :(Tuple(y)[$ib] .* $(signs .* mask))
+                # Combine the tuples using muladd operations
+                ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
+            end
+        end
+    else
+        for a in BitIndices(x)
+            # Permute the indices of y so that the result coefficients are correctly ordered
+            inds = bitindex_shuffle(a, BitIndices(C))
+            # Filter out multiplications which necessarily go to zero
+            x_mask = mul_mask(F(), a, inds)
+            # Filter out indexing operations that automatically go to zero
+            # This must be done manually since we want to work directly with tuples
+            y_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(y)), Val(nblades(C))))
+            mask = x_mask .& y_mask
+            # Don't append operations that won't actually do anything
+            if any(mask)
+                # Resolve BitIndex to an integer here to avoid calling Base.to_index at runtime
+                # This function cannot be inlined or unrolled for KVector arguments
+                # But all values are known at compile time, so interpolate them into expressions
+                ia = to_index(x, a)
+                tuple_inds = to_index.(y, inds)
+                signs = mul_signs(F(), a, inds)
+                # Construct the tuples that contribute to the product
+                x_tuple_ex = :(Tuple(x)[$ia] .* $(signs .* mask))
+                y_tuple_ex = :(getindex.(tuple(Tuple(y)), $tuple_inds))
+                # Combine the tuples using muladd operations
+                ex = :(map(muladd, $x_tuple_ex, $y_tuple_ex, $ex))
+            end
         end
     end
     return :(($C)($ex))
