@@ -82,31 +82,6 @@ Note that `AbstractCliffordNumber{Q,T}` is a scalar type, so dotted operators do
 operations to each coefficient individually. However, they can be used to perform elementwise
 operations on collections of Clifford numbers.
 
-# Features to be added or improved
-
-## Type system
-
-  * A `StaticMultivector{[G],Q,T,L}` type, allowing for non-static implementations.
-
-## Relationships between Clifford algebras
-
-  * Determining the even subalgebra associated with some Clifford algebra.
-  * Converting even multivectors of an algebra to multivectors in the even subalgebra.
-
-## Mathematical operations
-
-  * Better numerical accuracy and stability for some operations. In particular, properly leveraging
-`sinpi`, `cospi`, `hypot`, and other methods with better numerical accuracy and stability 
-internally.
-
-## Interoperability
-
-  * How do we handle the dot product of this package and the dot product of the `LinearAlgebra`
-standard library? This package has no dependencies, but the semantics should be compatible as much
-as possible without requiring a `LinearAlgebra` dependency.
-  * Secondarily, `StaticArrays.similar_type` and `CliffordNumbers.similar_type` have essentially
-identical behavior.
-
 [docs-stable-img]:  https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]:  https://brainandforce.github.io/CliffordNumbers.jl/stable
 [docs-dev-img]:     https://img.shields.io/badge/docs-dev-blue.svg
