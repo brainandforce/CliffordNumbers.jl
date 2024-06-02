@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - Left complement (`left_complement()`) and right complement (`right_complement()`) of `BitIndex`
+    objects.
+
 ### Fixed
   - Incorrect defintion of `abs2` for non-positive-definite and degenerate metrics.
 
