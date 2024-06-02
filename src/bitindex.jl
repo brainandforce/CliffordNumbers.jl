@@ -297,3 +297,35 @@ end
 
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
+
+"""
+    left_complement(b::BitIndex{Q}) -> BitIndex{Q}
+
+Returns the left complement of `b`, define so that `left_complement(b) * b` generates the
+pseudoscalar index of elements of the algebra `Q`.
+
+When the left complement is applied twice, the original `BitIndex` object is returned up to a change
+of sign, given by `(-1)^(grade(b) * (dimension(Q) - grade(b))). This implies that in algebras of odd 
+dimension, the left complement and [right complement](@ref right_complement) are identical because
+either `grade(b)` or `dimension(Q) - grade(b)` must be even. The complement is independent of the
+signature of `Q`, depending only on the dimension.
+
+Lengyel's convention for the left complement is an underbar.
+"""
+left_complement(b::BitIndex{Q}) where Q = BitIndex{Q}(false, typemax(UInt)) * b'
+
+"""
+    right_complement(b::BitIndex{Q}) -> BitIndex{Q}
+
+Returns the right complement of `b`, define so that `b * right_complement(b)` generates the
+pseudoscalar index of elements of the algebra `Q`.
+
+When the right complement is applied twice, the original `BitIndex` object is returned up to a
+change of sign, given by `(-1)^(grade(b) * (dimension(Q) - grade(b))). This implies that in algebras
+of odd dimension, the [left complement](@ref left_complement) and right complement are identical
+because either `grade(b)` or `dimension(Q) - grade(b)` must be even. The complement is independent
+of the signature of `Q`, depending only on the dimension.
+
+Lengyel's convention for the right complement is an overbar.
+"""
+right_complement(b::BitIndex{Q}) where Q = b' * BitIndex{Q}(false, typemax(UInt))
