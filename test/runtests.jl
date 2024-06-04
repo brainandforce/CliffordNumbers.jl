@@ -1,5 +1,6 @@
 using CliffordNumbers
-using Aqua, Test, Unitful
+using Aqua, Test
+using LinearAlgebra, StaticArrays, Unitful
 
 Aqua.test_all(CliffordNumbers; unbound_args = false)
 
@@ -15,7 +16,7 @@ Aqua.test_all(CliffordNumbers; unbound_args = false)
     include("indexing.jl")
     include("conversion.jl")
     include("operations.jl")
-    if VERSION >= v"1.9.0"
-        include("ext/Unitful.jl")
-    end
+    include("ext/LinearAlgebra.jl")
+    include("ext/StaticArraysCore.jl")
+    include("ext/Unitful.jl")
 end
