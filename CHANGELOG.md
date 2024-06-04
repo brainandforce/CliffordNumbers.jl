@@ -7,9 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Next]
 
+### Added
+  - Package extensions for `LinearAlgebra` and `StaticArraysCore` to add methods to
+    `LinearAlgebra.dot`, `LinearAlgebra.normalize`, `StaticArraysCore.similar_type`.
+
 ### Removed
   - **[BREAKING]** `CliffordNumbers.normalize` is no longer exported to avoid a name conflict with
     `LinearAlgebra.normalize`.
+  - **[BREAKING]** Support for Julia 1.8 due to the use of package extensions.
 
 ## [0.1.10] - 2024-11-06
 
