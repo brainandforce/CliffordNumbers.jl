@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Next]
+
+### Added
+  - Package extensions for `LinearAlgebra` and `StaticArraysCore` to support their `dot` and
+    `similar_type` functions, respectively.
+
+### Removed
+  - **[BREAKING]** Support for Julia 1.8 due to the use of package extensions.
+
 ## [Unreleased]
 
 ### Added
@@ -71,6 +80,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Initial release of CliffordNumbers.jl
 
+[Next]:       https://github.com/brainandforce/CliffordNumbers.jl/tree/next
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
 [0.1.5]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.5
 [0.1.4]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.4
