@@ -63,6 +63,7 @@
 end
 
 @testset "Complements" begin
+    # We don't have support for the wedge product of 
     b = BitIndex(Val(VGA(2)))
     @test left_complement(b) === BitIndex(Val(VGA(2)), 1, 2)
     @test right_complement(b) === BitIndex(Val(VGA(2)), 1, 2)
@@ -98,6 +99,37 @@ end
     @test right_complement(b) === BitIndex(Val(VGA(3)))
     @test left_complement(b) * b === BitIndex(Val(VGA(3)), 1, 2, 3)
     @test b * right_complement(b) === BitIndex(Val(VGA(3)), 1, 2, 3)
+    # Tests for degenerate metrics (PGA)
+    b = BitIndex(Val(PGA(3)), 0)
+    @test left_complement(b) === -BitIndex(Val(PGA(3)), 1, 2, 3)
+    @test right_complement(b) === BitIndex(Val(PGA(3)), 1, 2, 3)
+    @test left_complement(b) * b === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    @test b * right_complement(b) === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    b = BitIndex(Val(PGA(3)), 1)
+    @test left_complement(b) === BitIndex(Val(PGA(3)), 0, 2, 3)
+    @test right_complement(b) === -BitIndex(Val(PGA(3)), 0, 2, 3)
+    @test left_complement(b) * b === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    @test b * right_complement(b) === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    b = BitIndex(Val(PGA(3)), 0, 1)
+    @test left_complement(b) === BitIndex(Val(PGA(3)), 2, 3)
+    @test right_complement(b) === BitIndex(Val(PGA(3)), 2, 3)
+    @test left_complement(b) * b === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    @test b * right_complement(b) === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    b = BitIndex(Val(PGA(3)), 2, 3)
+    @test left_complement(b) === BitIndex(Val(PGA(3)), 0, 1)
+    @test right_complement(b) === BitIndex(Val(PGA(3)), 0, 1)
+    @test left_complement(b) * b === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    @test b * right_complement(b) === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    b = BitIndex(Val(PGA(3)), 0, 1, 2)
+    @test left_complement(b) === -BitIndex(Val(PGA(3)), 3)
+    @test right_complement(b) === BitIndex(Val(PGA(3)), 3)
+    @test left_complement(b) * b === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    @test b * right_complement(b) === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    b = BitIndex(Val(PGA(3)), 1, 2, 3)
+    @test left_complement(b) === BitIndex(Val(PGA(3)), 0)
+    @test right_complement(b) === -BitIndex(Val(PGA(3)), 0)
+    @test left_complement(b) * b === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
+    @test b * right_complement(b) === BitIndex(Val(PGA(3)), 0, 1, 2, 3)
 end
 
 @testset "BitIndices" begin
