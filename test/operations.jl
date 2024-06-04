@@ -88,6 +88,17 @@ end
     # Test promotions of KVector with Z2CliffordNumber implicitly
     @test k1 * k2 * l2 isa OddCliffordNumber{VGA(3)}
     @test k1 * l1 * l2 isa EvenCliffordNumber{VGA(3)}
+    # Test non-positive-definite metrics
+    e0 = KVector{1,PGA(3)}(1, 0, 0, 0)
+    e1 = KVector{1,PGA(3)}(0, 1, 0, 0)
+    γ0 = KVector{1,STA}(1, 0, 0, 0)
+    γ1 = KVector{1,STA}(0, 1, 0, 0)
+    @test e0 * e0 === EvenCliffordNumber{PGA(3)}(0)
+    @test e1 * e1 === EvenCliffordNumber{PGA(3)}(1)
+    @test e0 * e1 === -e1 * e0
+    @test γ0 * γ0 === EvenCliffordNumber{STA}(1)
+    @test γ1 * γ1 === EvenCliffordNumber{STA}(-1)
+    @test γ0 * γ1 === -γ1 * γ0
 end
 
 @testset "Scalars" begin

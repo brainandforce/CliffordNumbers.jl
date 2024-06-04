@@ -1,4 +1,9 @@
 #---Efficient multiplication kernels---------------------------------------------------------------#
+
+# This calculates the "inverse" of i
+# TODO: document this fully
+_inv(i::T) where T<:BitIndex = T(xor(signbit(i), signbit_of_square(i)), UInt(i))
+
 """
     CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
     CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q})
@@ -11,11 +16,11 @@ the below ordering, generating a reordered `NTuple` of `BitIndex{Q}` objects sui
 implementing a geometric product.
 """
 @inline function bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
-    return map(b -> a' * b, B)
+    return map(b -> _inv(a) * b, B)
 end
 
 @inline function bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q}
-    return map(b -> b * a', B)
+    return map(b -> b * _inv(a), B)
 end
 
 bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))

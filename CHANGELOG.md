@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+  - Incorrect products for elements of algebras with negative-squaring elements.
+
 ## [0.1.3] - 2024-06-04
 
 ### Added
