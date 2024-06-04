@@ -199,9 +199,11 @@ end
     CliffordNumbers.signbit_of_square(b::BitIndex) -> Bool
 
 Returns the signbit associated with squaring the basis blade indexed by `b`.
+
+For basis blades squaring to zero, the result is not meaningful.
 """
 function signbit_of_square(b::BitIndex{Q}) where Q
-    return xor(!iszero(grade(b) & 2), isodd(count_ones(UInt(b) & ~positive_square_bits(Q))))
+    return xor(!iszero(grade(b) & 2), isodd(count_ones(UInt(b) & negative_square_bits(Q))))
 end
 
 """
