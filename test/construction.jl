@@ -87,6 +87,22 @@ end
     @test similar(z, Float32) isa EvenCliffordNumber{VGA(3),Float32,4}
     @test similar(z, Val(STA)) isa EvenCliffordNumber{STA,Int,8}
     @test similar(z, Float32, Val(STA)) isa EvenCliffordNumber{STA,Float32,8}
+    # Complement types
+    import CliffordNumbers.complement_type
+    @test complement_type(CliffordNumber) === CliffordNumber
+    @test complement_type(CliffordNumber{VGA(3)}) === CliffordNumber{VGA(3)}
+    @test complement_type(CliffordNumber{VGA(3),Float32}) === CliffordNumber{VGA(3),Float32}
+    @test complement_type(CliffordNumber{VGA(3),Float32,8}) === CliffordNumber{VGA(3),Float32,8}
+    @test complement_type(EvenCliffordNumber{VGA(3)}) === OddCliffordNumber{VGA(3)}
+    @test complement_type(OddCliffordNumber{VGA(3)}) === EvenCliffordNumber{VGA(3)}
+    @test complement_type(EvenCliffordNumber{VGA(2)}) === EvenCliffordNumber{VGA(2)}
+    @test complement_type(OddCliffordNumber{VGA(2)}) === OddCliffordNumber{VGA(2)}
+    @test complement_type(EvenCliffordNumber{VGA(3),Float32}) === OddCliffordNumber{VGA(3),Float32}
+    @test complement_type(OddCliffordNumber{STA,Float32,8}) === OddCliffordNumber{STA,Float32,8}
+    @test complement_type(KVector{1,VGA(2)}) === KVector{1,VGA(2)}
+    @test complement_type(KVector{1,VGA(3)}) === KVector{2,VGA(3)}
+    @test complement_type(KVector{2,STA,Float32}) === KVector{2,STA,Float32}
+    @test complement_type(KVector{3,STA,Float32,4}) === KVector{1,STA,Float32,4}
 end
 
 @testset "Scalar types" begin

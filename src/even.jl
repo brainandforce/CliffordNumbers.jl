@@ -89,6 +89,18 @@ function similar_type(::Type{<:Z2CliffordNumber{P}}, ::Type{T}, ::Val{Q}) where 
     return Z2CliffordNumber{P,Q,T,div(blade_count(Q),2)}
 end
 
+function complement_type(::Type{Z2CliffordNumber{P,Q,T,L}}) where {P,Q,T,L}
+    return Z2CliffordNumber{xor(P,isodd(dimension(Q))),Q,T,L}
+end
+
+function complement_type(::Type{Z2CliffordNumber{P,Q,T}}) where {P,Q,T}
+    return Z2CliffordNumber{xor(P,isodd(dimension(Q))),Q,T}
+end
+
+function complement_type(::Type{Z2CliffordNumber{P,Q}}) where {P,Q}
+    return Z2CliffordNumber{xor(P,isodd(dimension(Q))),Q}
+end
+
 #---Show methods-----------------------------------------------------------------------------------#
 
 short_typename(::Type{<:Z2CliffordNumber{P,Q,T}}) where {P,Q,T} = Z2CliffordNumber{P,Q,T}

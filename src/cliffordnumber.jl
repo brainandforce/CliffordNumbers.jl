@@ -60,6 +60,12 @@ function similar_type(::Type{<:CliffordNumber}, ::Type{T}, ::Val{Q}) where {Q,T<
     return CliffordNumber{Q,T,blade_count(Q)}
 end
 
+complement_type(::Type{<:AbstractCliffordNumber{Q,T}}) where {Q,T<:BaseNumber} = CliffordNumber{Q,T}
+complement_type(::Type{<:AbstractCliffordNumber{Q}}) where Q = CliffordNumber{Q}
+complement_type(::Type{<:AbstractCliffordNumber}) = CliffordNumber
+
+complement_type(::Type{CliffordNumber{Q,T,L}}) where {Q,T,L} = CliffordNumber{Q,T,L}
+
 #---Show methods-----------------------------------------------------------------------------------#
 
 short_typename(::Type{<:CliffordNumber{Q,T}}) where {Q,T} = CliffordNumber{Q,T}

@@ -92,6 +92,10 @@ function similar_type(::Type{<:KVector}, ::Type{T}, ::Val{Q}, ::Val{K}) where {K
     return KVector{K,Q,T,binomial(dimension(Q),K)}
 end
 
+complement_type(::Type{KVector{K,Q,T,L}}) where {K,Q,T,L} = KVector{dimension(Q)-K,Q,T,L}
+complement_type(::Type{KVector{K,Q,T}}) where {K,Q,T} = KVector{dimension(Q)-K,Q,T}
+complement_type(::Type{KVector{K,Q}}) where {K,Q} = KVector{dimension(Q)-K,Q}
+
 #---Show methods-----------------------------------------------------------------------------------#
 
 short_typename(::Type{<:KVector{K,Q,T}}) where {K,Q,T} = KVector{K,Q,T}

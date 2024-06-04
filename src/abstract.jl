@@ -128,6 +128,20 @@ similar_type(x, Q::Val) = similar_type(x, scalar_type(x), Q)
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
 
+"""
+    CliffordNumbers.complement_type(C::Type{<:AbstractCliffordNumber})
+    CliffordNumbers.complement_type(x::AbstractCliffordNumber)
+
+Constructs a type capable of storing the complementary grades of `x`. For the types provided by this
+package:
+  * The complement type of `KVector{K,Q,T}` is `KVector{dimension(Q)-K,Q,T}`.
+  * The complement type of `EvenCliffordNumber{Q,T}` and `OddCliffordNumber{Q,T}` is the same type
+    if `dimension(Q)` is even, or the type of opposite grade parity if `dimension(Q)` is odd.
+  * All other subtypes of `AbstractCliffordNumber{Q,T}`, including `CliffordNumber{Q,T}`, have
+    complement type `CliffordNumber{Q,T}` (unless defined otherwise).
+"""
+complement_type(x::AbstractCliffordNumber) = complement_type(typeof(x))
+
 #---real() and complex()---------------------------------------------------------------------------#
 """
     real(x::AbstractCliffordNumber{Q,T})
