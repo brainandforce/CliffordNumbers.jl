@@ -3,8 +3,15 @@ uuid = "3998ac73-6bd4-4031-8035-f167dd3ed523"
 authors = ["Brandon Flores"]
 version = "0.2.0-dev"
 
+[weakdeps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[extensions]
+LinearAlgebraExt = "LinearAlgebra"
+
 [compat]
 Aqua = "0.8"
+LinearAlgebra = "1"
 Test = "1"
 julia = "1.9"
 
