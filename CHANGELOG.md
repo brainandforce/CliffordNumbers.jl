@@ -17,7 +17,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     objects.
 
 ### Fixed
-  - Incorrect defintion of `abs2` for non-positive-definite and degenerate metrics.
+  - Incorrect definition of `abs2` for non-positive-definite and degenerate metrics.
 
 ## [0.1.2] - 2024-05-31
 
