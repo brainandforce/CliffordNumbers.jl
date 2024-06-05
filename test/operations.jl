@@ -130,6 +130,10 @@ end
     @test inv(l) ≈ -1 / l   # This one fails for exact equality, but I don't know why
     @test inv(KVector{0,VGA(2)}(2)) == KVector{0,VGA(2)}(1//2)
     @test inv(KVector{0,VGA(2)}(2)) === KVector{0,VGA(2)}(inv(2))
+    @test 1 / γ0 == γ0
+    @test 1 / γ1 == -γ1
+    @test inv(γ0) == γ0
+    @test inv(γ1) == -γ1
     @test_throws CliffordNumbers.InverseException inv(1 + KVector{1,VGA(2)}(1, 0))
 end
 
