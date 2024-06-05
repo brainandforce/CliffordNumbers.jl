@@ -151,29 +151,25 @@ end
 end
 
 @testset "Wedge product" begin
-    x = KVector{1,VGA(3)}(1, 0, 0)
-    y = KVector{1,VGA(3)}(0, 1, 0)
-    z = KVector{1,VGA(3)}(0, 0, 1)
-    k1 = KVector{1,VGA(3)}(3, 4, 0)
-    k2 = KVector{2,VGA(3)}(4, 2, 0)
+    k1 = 3*σ1 + 4*σ2
+    k2 = 4*(σ1 ∧ σ2) + 2*(σ1 ∧ σ3)
     five = 5 * one(CliffordNumber{VGA(3)})
     # Self wedges should be zero
-    @test iszero(x ∧ x)
-    @test iszero(y ∧ y)
-    @test iszero(z ∧ z)
+    @test iszero(σ1 ∧ σ1)
+    @test iszero(σ2 ∧ σ2)
+    @test iszero(σ3 ∧ σ3)
     # Reversing the order should flip the sign for vectors
-    @test x ∧ y == -(y ∧ x)
-    @test x ∧ z == -(z ∧ x)
-    @test y ∧ z == -(z ∧ y)
-    @test x ∧ y ∧ z == -(z ∧ y ∧ x)
-    @test iszero(x ∧ y ∧ x)
-    @test iszero(x ∧ y ∧ z ∧ x)
-    @test KVector{1,VGA(3)}(x) ∧ KVector{1,VGA(3)}(y) == -(KVector{1,VGA(3)}(y) ∧ KVector{1,VGA(3)}(x))
+    @test σ1 ∧ σ2 == -(σ2 ∧ σ1)
+    @test σ1 ∧ σ3 == -(σ3 ∧ σ1)
+    @test σ2 ∧ σ3 == -(σ3 ∧ σ2)
+    @test σ1 ∧ σ2 ∧ σ3 == -(σ3 ∧ σ2 ∧ σ1)
+    @test iszero(σ1 ∧ σ2 ∧ σ1)
+    @test iszero(σ1 ∧ σ2 ∧ σ3 ∧ σ1)
     # Ensure the behavior of scalars (both CliffordNumber and normal) are correct
-    @test 5 ∧ x == 5 * x
-    @test five ∧ x == x ∧ five
+    @test 5 ∧ σ1 == 5 * σ1
+    @test five ∧ σ1 == σ1 ∧ five
     @test 5 ∧ 5 == 25
-    # Turns out reversing the order shouldn't change anything
+    # Turns out reversing the order shouldn't change anything for odd k-vector results
     @test k1 ∧ k2 == KVector{3,VGA(3)}(-8)
 end
 
