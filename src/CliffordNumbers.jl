@@ -81,5 +81,8 @@ include("math/exponential.jl")
 export exppi, exptau
 # Pretty printing
 include("show.jl")
+# Generate basis variables with a macro
+include("variables.jl")
+export @basis_vars
 
 end
