@@ -89,10 +89,6 @@ end
     @test k1 * k2 * l2 isa OddCliffordNumber{VGA(3)}
     @test k1 * l1 * l2 isa EvenCliffordNumber{VGA(3)}
     # Test non-positive-definite metrics
-    e0 = KVector{1,PGA(3)}(1, 0, 0, 0)
-    e1 = KVector{1,PGA(3)}(0, 1, 0, 0)
-    γ0 = KVector{1,STA}(1, 0, 0, 0)
-    γ1 = KVector{1,STA}(0, 1, 0, 0)
     @test e0 * e0 === EvenCliffordNumber{PGA(3)}(0)
     @test e1 * e1 === EvenCliffordNumber{PGA(3)}(1)
     @test e0 * e1 === -e1 * e0
