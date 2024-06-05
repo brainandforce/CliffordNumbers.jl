@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+  - `scalar_product`, `abs2`, and `abs` are much faster.
+
 ### Fixed
   - Incorrect products for elements of algebras with negative-squaring elements.
 

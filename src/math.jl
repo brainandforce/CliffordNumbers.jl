@@ -132,15 +132,9 @@ end
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
 """
-function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    # Only iterate through a minimal set of indices, known to be nonzero
-    T = promote_scalar_type(x, y)
-    result = zero(T)
-    inds = eachindex(promote_type(typeof(x), typeof(y)))
-    for i in inds
-        result += T(x[i] * y[i] * sign_of_square(i))
-    end
-    return result
+function scalar_product(x::AbstractCliffordNumber{Q,T}, y::AbstractCliffordNumber{Q,T}) where {Q,T}
+    # This is so much faster than anything else I can come up with
+    return @inline scalar(mul(x, y, GradeFilter{:*}()))
 end
 
 """
