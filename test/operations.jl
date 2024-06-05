@@ -171,6 +171,17 @@ end
     @test 5 ∧ 5 == 25
     # Turns out reversing the order shouldn't change anything for odd k-vector results
     @test k1 ∧ k2 == KVector{3,VGA(3)}(-8)
+    # Wedge products for non-positive-definite metrics
+    @test iszero(γ0 ∧ γ0)
+    @test iszero(γ1 ∧ γ1)
+    @test γ0 ∧ γ1 === -γ1 ∧ γ0
+    @test γ2 ∧ γ3 === -γ3 ∧ γ2
+    @test γ0 ∧ γ1 ∧ γ2 ∧ γ3 === γ3 ∧ γ2 ∧ γ1 ∧ γ0
+    @test iszero(e0 ∧ e0)
+    @test iszero(e1 ∧ e1)
+    @test e0 ∧ e1 === -e1 ∧ e0
+    @test e2 ∧ e3 === -e3 ∧ e2
+    @test e0 ∧ e1 ∧ e2 ∧ e3 === e3 ∧ e2 ∧ e1 ∧ e0
 end
 
 @testset "Exponentiation" begin
