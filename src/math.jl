@@ -125,6 +125,45 @@ end
 
 # TODO: is it more efficient to define some more specific methods for some types?
 
+#---Scalar products--------------------------------------------------------------------------------#
+"""
+    scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
+
+Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
+`Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
+"""
+function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    # Only iterate through a minimal set of indices, known to be nonzero
+    T = promote_scalar_type(x, y)
+    result = zero(T)
+    inds = eachindex(promote_type(typeof(x), typeof(y)))
+    for i in inds
+        result += T(x[i] * y[i] * sign_of_square(i))
+    end
+    return result
+end
+
+"""
+    abs2(x::AbstractCliffordNumber{Q,T}) -> T
+
+Calculates the squared norm of `x`, equal to `scalar_product(x, x')`.
+"""
+abs2(x::AbstractCliffordNumber) = scalar_product(x, x')
+
+"""
+    abs(x::AbstractCliffordNumber{Q,T}) -> Union{Real,Complex}
+
+Calculates the norm of `x`, equal to `sqrt(scalar_product(x, x'))`.
+"""
+abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
+
+"""
+    normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
+
+Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
+"""
+normalize(x::AbstractCliffordNumber) = x / abs(x)
+
 #---Scalar multiplication and division-------------------------------------------------------------#
 
 @inline function *(x::AbstractCliffordNumber, y::BaseNumber)
@@ -336,45 +375,6 @@ end
 # Long names for operations
 const commutator = ×
 const anticommutator = ⨰
-
-#---Scalar products--------------------------------------------------------------------------------#
-"""
-    scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q})
-
-Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
-`Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
-"""
-function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    # Only iterate through a minimal set of indices, known to be nonzero
-    T = promote_scalar_type(x, y)
-    result = zero(T)
-    inds = eachindex(promote_type(typeof(x), typeof(y)))
-    for i in inds
-        result += T(x[i] * y[i] * sign_of_square(i))
-    end
-    return result
-end
-
-"""
-    abs2(x::AbstractCliffordNumber{Q,T}) -> T
-
-Calculates the squared norm of `x`, equal to `scalar_product(x, x')`.
-"""
-abs2(x::AbstractCliffordNumber) = scalar_product(x, x')
-
-"""
-    abs2(x::AbstractCliffordNumber{Q,T}) -> Union{Real,Complex}
-
-Calculates the norm of `x`, equal to `sqrt(scalar_product(x, x'))`.
-"""
-abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
-
-"""
-    normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
-
-Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
-"""
-normalize(x::AbstractCliffordNumber) = x / abs(x)
 
 #---Inverses and division--------------------------------------------------------------------------#
 """
