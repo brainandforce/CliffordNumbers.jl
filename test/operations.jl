@@ -125,9 +125,9 @@ end
     @test k * (1 / k) ≈ 1
     @test (1 / k) * k ≈ 1
     @test inv(k) ≈ 1 / k
-    @test l * (1 / l) ≈ -1
-    @test (1 / l) * l ≈ -1
-    @test inv(l) ≈ -1 / l   # This one fails for exact equality, but I don't know why
+    @test l * (1 / l) ≈ 1
+    @test (1 / l) * l ≈ 1
+    @test inv(l) ≈ 1 / l   # This one fails for exact equality, but I don't know why
     @test inv(KVector{0,VGA(2)}(2)) == KVector{0,VGA(2)}(1//2)
     @test inv(KVector{0,VGA(2)}(2)) === KVector{0,VGA(2)}(inv(2))
     @test 1 / γ0 == γ0
