@@ -178,7 +178,7 @@ for op in (:/, ://)
             return similar_type(typeof(x), eltype(data))(data)
         end
         @inline function $op(x::BaseNumber, y::AbstractCliffordNumber)
-            data = Tuple(y') .* $op(x, sum(Tuple(y) .* Tuple(y')))
+            data = Tuple(y') .* $op(x, abs2(y))
             return similar_type(typeof(y), eltype(data))(data)
         end
     end

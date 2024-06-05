@@ -12,6 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
   - Incorrect products for elements of algebras with negative-squaring elements.
+  - Incorrect normalization of division of scalars by Clifford numbers.
 
 ## [0.1.3] - 2024-06-04
 
