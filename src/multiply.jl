@@ -1,9 +1,5 @@
 #---Efficient multiplication kernels---------------------------------------------------------------#
 
-# This calculates the "inverse" of i
-# TODO: document this fully
-_inv(i::T) where T<:BitIndex = T(xor(signbit(i), signbit_of_square(i)), UInt(i))
-
 """
     CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
     CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q})

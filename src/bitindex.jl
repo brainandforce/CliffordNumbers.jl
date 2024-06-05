@@ -300,6 +300,10 @@ end
 dual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(false, typemax(UInt))
 undual(b::BitIndex{Q}) where Q = b * BitIndex{Q}(!iszero(dimension(Q) & 2), typemax(UInt))
 
+# This calculates the "inverse" of i
+# TODO: document this fully
+_inv(i::T) where T<:BitIndex = T(xor(signbit(i), signbit_of_square(i)), UInt(i))
+
 """
     left_complement(b::BitIndex{Q}) -> BitIndex{Q}
 
@@ -314,7 +318,7 @@ signature of `Q`, depending only on the dimension.
 
 Lengyel's convention for the left complement is an underbar.
 """
-left_complement(b::BitIndex{Q}) where Q = BitIndex{Q}(false, typemax(UInt)) * b'
+left_complement(b::BitIndex{Q}) where Q = BitIndex{Q}(false, typemax(UInt)) * _inv(b)
 
 """
     right_complement(b::BitIndex{Q}) -> BitIndex{Q}
@@ -330,4 +334,4 @@ of the signature of `Q`, depending only on the dimension.
 
 Lengyel's convention for the right complement is an overbar.
 """
-right_complement(b::BitIndex{Q}) where Q = b' * BitIndex{Q}(false, typemax(UInt))
+right_complement(b::BitIndex{Q}) where Q = _inv(b) * BitIndex{Q}(false, typemax(UInt))
