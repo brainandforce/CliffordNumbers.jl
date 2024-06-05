@@ -4,9 +4,9 @@ using Aqua, Test
 Aqua.test_all(CliffordNumbers; unbound_args = false)
 
 # Define basis vectors for important algebras
-const σ1 = KVector{1,VGA(3)}(0, 1, 0)
-const σ2 = KVector{1,VGA(3)}(0, 0, 1)
-const σ3 = KVector{1,VGA(3)}(0, 0, 0)
+const σ1 = KVector{1,VGA(3)}(1, 0, 0)
+const σ2 = KVector{1,VGA(3)}(0, 1, 0)
+const σ3 = KVector{1,VGA(3)}(0, 0, 1)
 
 const e0 = KVector{1,PGA(3)}(1, 0, 0, 0)
 const e1 = KVector{1,PGA(3)}(0, 1, 0, 0)
