@@ -1,13 +1,17 @@
 # Mathematical operations
 
-## Involutions, duals, and inverses
+## Involutions and duals
 
-```@docs
+```@docs; canonical=false
 Base.reverse(::BitIndex)
 CliffordNumbers.grade_involution(::BitIndex)
 Base.conj(::BitIndex)
 CliffordNumbers.left_complement(::BitIndex)
 CliffordNumbers.right_complement(::BitIndex)
+```
+
+## Inverses
+```@docs
 CliffordNumbers.versor_inverse
 Base.inv(::AbstractCliffordNumber)
 ```

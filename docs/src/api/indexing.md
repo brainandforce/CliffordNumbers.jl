@@ -27,8 +27,8 @@ CliffordNumbers.pseudoscalar_index
 Base.reverse(::BitIndex)
 CliffordNumbers.grade_involution(::BitIndex)
 Base.conj(::BitIndex)
-CliffordNumbers.left_complement
-CliffordNumbers.right_complement
+CliffordNumbers.left_complement(::BitIndex)
+CliffordNumbers.right_complement(::BitIndex)
 ```
 
 ```@docs
