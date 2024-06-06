@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.4] - 2024-06-06
+
 ### Added
   - Linear extension of left and right complements to all Clifford numbers.
   - Regressive product (`∨`) definition.
