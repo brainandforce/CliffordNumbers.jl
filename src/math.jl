@@ -237,7 +237,7 @@ end
 ∧(x::BaseNumber, y::AbstractCliffordNumber) = x * y
 ∧(x::AbstractCliffordNumber, y::BaseNumber) = y * x
 
-# Optimized versions for k-vector arguments
+# Optimized versions for 0-blade arguments
 for op in (:*, :∧)
     @eval begin
         @inline $op(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = only(Tuple(k)) * x
@@ -246,6 +246,17 @@ for op in (:*, :∧)
             return KVector{0,Q}((only(Tuple(k)) * only(Tuple(l))))
         end
     end
+end
+
+"""
+    ∨(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+    regressive(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+
+Calculates the regressive product of `x` and `y`. This is accomplished by taking the wedge product
+of the left complements of `x` and `y`, then taking the right complement of the result.
+"""
+function ∨(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+    return right_complement(left_complement(x) ∧ left_complement(y))
 end
 
 @doc """
@@ -328,6 +339,7 @@ end
 
 # Long names for operations
 const wedge = ∧
+const regressive = ∨
 const left_contraction = ⨼
 const right_contraction = ⨽
 
