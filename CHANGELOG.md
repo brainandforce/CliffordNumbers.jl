@@ -7,11 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - Linear extension of left and right complements to 
+  - Regressive product (`∨`) definition.
+
 ### Changed
-  - `scalar_product`, `abs2`, and `abs` are much faster.
+  - `scalar_product`, `abs2`, and `abs` are much faster: they just extract the scalar portion of
+    the result of `CliffordNumbers.mul(x, y, CliffordNumbers.GradeFilter{:*}())`
 
 ### Fixed
   - Incorrect products for elements of algebras with negative-squaring elements.
+  - Incorrect complements for elements of algebras with non-positive-definite signatures.
   - Incorrect normalization of division of scalars by Clifford numbers.
 
 ## [0.1.3] - 2024-06-04
