@@ -1,16 +1,13 @@
 # Mathematical operations
 
-## Grade automorphisms
+## Involutions, duals, and inverses
 
-```@docs; canonical=false
+```@docs
 Base.reverse(::BitIndex)
 CliffordNumbers.grade_involution(::BitIndex)
 Base.conj(::BitIndex)
-```
-
-## Duals and inverses
-
-```@docs
+CliffordNumbers.left_complement(::BitIndex)
+CliffordNumbers.right_complement(::BitIndex)
 CliffordNumbers.versor_inverse
 Base.inv(::AbstractCliffordNumber)
 ```
@@ -41,6 +38,7 @@ CliffordNumbers.:⨽
 CliffordNumbers.dot
 CliffordNumbers.hestenes_dot
 CliffordNumbers.:∧
+CliffordNumbers.:∨
 CliffordNumbers.:×
 CliffordNumbers.:⨰
 ```
