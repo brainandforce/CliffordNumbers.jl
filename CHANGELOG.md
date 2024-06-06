@@ -8,7 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-  - Linear extension of left and right complements to 
+  - Linear extension of left and right complements to all Clifford numbers.
   - Regressive product (`∨`) definition.
 
 ### Changed
@@ -54,6 +54,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release of CliffordNumbers.jl
 
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
+[0.1.4]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.4
 [0.1.3]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.3
 [0.1.2]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.2
 [0.1.1]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.1
