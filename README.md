@@ -108,13 +108,18 @@ The following mathematical operations are supported by this package:
     elements and scalars
   * Products of the Clifford algebra:
       * The geometric product  (`*`)
-      * The wedge product (`∧`)
+      * The wedge product (`∧`) and regressive product (`∨`)
       * Left (`⨼`) and right (`⨽`) contractions
       * The dot product and the Hestenes dot product
       * The commutator product (`×`) and anticommutator product (`⨰`)
+  * Inverses for Clifford numbers which have them
   * Scalar left (`/`) and right (`\`) division, including rational division (`//`)
   * Efficient `muladd` operations involving scalars and multivectors
-  * The reverse (`'`), grade involution, and Clifford conjugation
+  * Involutions and duals
+      * The reverse (using `Base.adjoint`/`'` or `Base.reverse`), 
+      * Main involution (`grade_involution`)
+      * Clifford conjugation (using `Base.conj`)
+      * Left and right complements (`left_complement` and `right_complement`)
   * The modulus and absolute value (with `abs2` and `abs`)
   * Exponentiation
       * Efficiently raising multivectors to integer powers
