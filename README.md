@@ -4,6 +4,7 @@
 [![Dev][docs-dev-img]][docs-dev-url]
 [![Build Status][ci-status-img]][ci-status-url]
 [![Coverage][codecov-img]][codecov-url]
+[![Aqua.jl][aqua-img]][aqua-url]
 
 A simple, statically sized multivector (Clifford number) implementation for Julia using graded
 representations. This allows for common multivector operations, particularly the various products
