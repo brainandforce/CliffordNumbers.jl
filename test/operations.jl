@@ -31,6 +31,65 @@ end
     @test conj(k3) === KVector{3,VGA(3),Float64}(1)
 end
 
+#=
+@testset "Complements and duals" begin
+    # We don't have support for the wedge product of BitIndex
+    # But assuming an orthonormal basis, the geometric product suffices
+    # VGA
+    ps = σ1 ∧ σ2 ∧ σ3
+    ps_index = BitIndex(ps, 1, 2, 3)
+    @test left_complement(σ1) ∧ σ1  === ps
+    @test σ1 ∧ right_complement(σ1) === ps
+    @test left_complement(σ1 ∧ σ2) ∧ (σ1 ∧ σ2)  === ps
+    @test (σ1 ∧ σ2) ∧ right_complement(σ1 ∧ σ2) === ps
+    @test left_complement(BitIndex(σ1, 1)) * BitIndex(σ1, 1)  === ps_index
+    @test BitIndex(σ1, 1) * right_complement(BitIndex(σ1, 1)) === ps_index
+    @test left_complement(BitIndex(σ1 ∧ σ2, 1, 2)) * BitIndex(σ1 ∧ σ2, 1, 2)  === ps_index
+    @test BitIndex(σ1 ∧ σ2, 1, 2) * right_complement(BitIndex(σ1 ∧ σ2, 1, 2)) === ps_index
+    # STA
+    ps = γ0 ∧ γ1 ∧ γ2 ∧ γ3
+    ps_index = BitIndex(ps, 0, 1, 2, 3)
+    @test left_complement(γ0) ∧ γ0  === ps
+    @test γ0 ∧ right_complement(γ0) === ps
+    @test left_complement(γ3) ∧ γ3  === ps
+    @test γ3 ∧ right_complement(γ3) === ps
+    @test left_complement(γ0 ∧ γ1) ∧ (γ0 ∧ γ1)  === ps
+    @test (γ0 ∧ γ1) ∧ right_complement(γ0 ∧ γ1) === ps
+    @test left_complement(γ2 ∧ γ3) ∧ (γ2 ∧ γ3)  === ps
+    @test (γ2 ∧ γ3) ∧ right_complement(γ2 ∧ γ3) === ps
+    @test left_complement(BitIndex(γ0, 0)) * BitIndex(γ0, 0)  === ps_index
+    @test BitIndex(γ0, 0) * right_complement(BitIndex(γ0, 0)) === ps_index
+    @test left_complement(BitIndex(γ1, 1)) * BitIndex(γ1, 1)  === ps_index
+    @test BitIndex(γ1, 1) * right_complement(BitIndex(γ1, 1)) === ps_index
+    @test left_complement(BitIndex(γ0 ∧ γ1, 0, 1)) * BitIndex(γ0 ∧ γ1, 0, 1)  === ps_index
+    @test BitIndex(γ0 ∧ γ1, 0, 1) * right_complement(BitIndex(γ0 ∧ γ1, 0, 1)) === ps_index
+    @test left_complement(BitIndex(γ2 ∧ γ3, 2, 3)) * BitIndex(γ2 ∧ γ3, 2, 3)  === ps_index
+    @test BitIndex(γ2 ∧ γ3, 2, 3) * right_complement(BitIndex(γ2 ∧ γ3, 2, 3)) === ps_index
+    # PGA
+    ps = e0 ∧ e1 ∧ e2 ∧ e3
+    ps_index = BitIndex(ps, 0, 1, 2, 3)
+    @test left_complement(e0) ∧ e0  === ps
+    @test e0 ∧ right_complement(e0) === ps
+    @test left_complement(e3) ∧ e3  === ps
+    @test e3 ∧ right_complement(e3) === ps
+    @test left_complement(e0 ∧ e1) ∧ (e0 ∧ e1)  === ps
+    @test (e0 ∧ e1) ∧ right_complement(e0 ∧ e1) === ps
+    @test left_complement(e2 ∧ e3) ∧ (e2 ∧ e3)  === ps
+    @test (e2 ∧ e3) ∧ right_complement(e2 ∧ e3) === ps
+    @test left_complement(BitIndex(e0, 0)) * BitIndex(e0, 0)  === ps_index
+    @test BitIndex(e0, 0) * right_complement(BitIndex(e0, 0)) === ps_index
+    @test left_complement(BitIndex(e1, 1)) * BitIndex(e1, 1)  === ps_index
+    @test BitIndex(e1, 1) * right_complement(BitIndex(e1, 1)) === ps_index
+    @test left_complement(BitIndex(e0 ∧ e1, 0, 1)) * BitIndex(e0 ∧ e1, 0, 1)  === ps_index
+    @test BitIndex(e0 ∧ e1, 0, 1) * right_complement(BitIndex(e0 ∧ e1, 0, 1)) === ps_index
+    @test left_complement(BitIndex(e2 ∧ e3, 2, 3)) * BitIndex(e2 ∧ e3, 2, 3)  === ps_index
+    @test BitIndex(e2 ∧ e3, 2, 3) * right_complement(BitIndex(e2 ∧ e3, 2, 3)) === ps_index
+    # Test linear extension of the complement
+    @test left_complement(6*σ1 + 9*σ2)  === 6*left_complement(σ1)  + 9*left_complement(σ2)
+    @test right_complement(6*σ1 + 9*σ2) === 6*right_complement(σ1) + 9*right_complement(σ2)
+end
+=#
+
 @testset "Addition and subtraction" begin
     x = CliffordNumber{VGA(3)}(1, 2, 3, 4, 5, 6, 7, 8)
     y = CliffordNumber{VGA(3),Float64}(9, -10, 11, -12, 13, 14, -15, 16)
