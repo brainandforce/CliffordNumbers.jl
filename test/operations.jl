@@ -31,7 +31,6 @@ end
     @test conj(k3) === KVector{3,VGA(3),Float64}(1)
 end
 
-#=
 @testset "Complements and duals" begin
     # We don't have support for the wedge product of BitIndex
     # But assuming an orthonormal basis, the geometric product suffices
@@ -88,7 +87,6 @@ end
     @test left_complement(6*σ1 + 9*σ2)  === 6*left_complement(σ1)  + 9*left_complement(σ2)
     @test right_complement(6*σ1 + 9*σ2) === 6*right_complement(σ1) + 9*right_complement(σ2)
 end
-=#
 
 @testset "Addition and subtraction" begin
     x = CliffordNumber{VGA(3)}(1, 2, 3, 4, 5, 6, 7, 8)

@@ -89,6 +89,9 @@ adjoint(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero(grade(x) & 2))
 grade_involution(x::T) where T<:KVector = T(x.data .* Int8(-1)^isodd(grade(x)))
 conj(x::T) where T<:KVector = T(x.data .* Int8(-1)^!iszero((grade(x) + 1) & 2))
 
+left_complement(x::AbstractCliffordNumber) = x[right_complement.(BitIndices(complement_type(x)))]
+right_complement(x::AbstractCliffordNumber) = x[left_complement.(BitIndices(complement_type(x)))]
+
 #---Addition, negation, and subtraction------------------------------------------------------------#
 
 +(x::T, y::T) where T<:AbstractCliffordNumber = T(map(+, Tuple(x), Tuple(y)))
