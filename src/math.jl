@@ -24,6 +24,7 @@ Returns the scalar portion of `x` as its scalar type. This is equivalent to `x[s
 To retain Clifford number semantics, use the `KVector{0}` constructor.
 """
 scalar(x::AbstractCliffordNumber) = x[scalar_index(x)]
+scalar(x::KVector{0}) = only(Tuple(x))
 
 """
     ispseudoscalar(m::AbstractCliffordNumber)
@@ -161,6 +162,11 @@ Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
 """
 normalize(x::AbstractCliffordNumber) = x / abs(x)
 
+# Optimized versions for `KVector` scalars
+abs(k::KVector{0}) = abs(scalar(k))
+abs2(k::KVector{0}) = abs2(scalar(k))
+normalize(x::KVector{0}) = one(typeof(x))
+
 #---Scalar multiplication and division-------------------------------------------------------------#
 
 @inline function *(x::AbstractCliffordNumber, y::BaseNumber)
@@ -240,11 +246,9 @@ end
 # Optimized versions for 0-blade arguments
 for op in (:*, :∧)
     @eval begin
-        @inline $op(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = only(Tuple(k)) * x
-        @inline $op(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * only(Tuple(k))
-        @inline function $op(k::KVector{0,Q}, l::KVector{0,Q}) where Q
-            return KVector{0,Q}((only(Tuple(k)) * only(Tuple(l))))
-        end
+        @inline $op(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = scalar(k) * x
+        @inline $op(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * scalar(k)
+        @inline $op(k::T, l::T) where T<:KVector{0} = T(scalar(k) * scalar(l))
     end
 end
 
@@ -436,7 +440,7 @@ function Base.inv(x::AbstractCliffordNumber)
     end
 end
 
-Base.inv(x::KVector{0,Q}) where Q = KVector{0,Q}(inv(only(Tuple(x))))
+Base.inv(x::KVector{0,Q}) where Q = KVector{0,Q}(inv(scalar(x)))
 Base.inv(x::KVector{1,Q}) where Q = versor_inverse(x)
 
 /(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q = x * inv(y)
