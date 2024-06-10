@@ -6,12 +6,12 @@
 [![Coverage][codecov-img]][codecov-url]
 [![Aqua.jl][aqua-img]][aqua-url]
 
-A simple, statically sized multivector (Clifford number) implementation for Julia using graded
-representations. This allows for common multivector operations, particularly the various products
-of geometric algebra, to be easily implemented with extremely high performance (faster than matrix
-multiplications of matrix representations) without depending on any linear algebra library.
-Additionally, the multivectors provided by this package can be stored inline in arrays or other data
-structures.
+[CliffordNumbers.jl][repo-url] is a simple, statically sized multivector (Clifford number)
+implementation for Julia using graded representations. This allows for common multivector 
+operations, particularly the various products of geometric algebra, to be easily implemented with 
+extremely high performance (faster than matrix multiplications of matrix representations) without
+depending on any linear algebra library. Additionally, the multivectors provided by this package can
+be stored inline in arrays or other data structures.
 
 # Clifford numbers
 
@@ -132,6 +132,7 @@ Note that `AbstractCliffordNumber{Q,T}` is a scalar type, so dotted operators do
 operations to each coefficient individually. However, they can be used to perform elementwise
 operations on collections of Clifford numbers.
 
+[repo-url]:         https://github.com/brainandforce/CliffordNumbers.jl
 [docs-stable-img]:  https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]:  https://brainandforce.github.io/CliffordNumbers.jl/stable
 [docs-dev-img]:     https://img.shields.io/badge/docs-dev-blue.svg
