@@ -11,6 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
   - Missing exports for `regressive` and `∨` (#14 - thanks @ajahraus!)
+  - Actually changed the implementations of `scalar_product`, `abs2`, and `abs`.
 
 ## [0.1.4] - 2024-06-06
 
