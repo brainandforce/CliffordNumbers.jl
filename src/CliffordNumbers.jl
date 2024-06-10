@@ -64,8 +64,8 @@ include("multiply.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
 include("math.jl")
 export isscalar, ispseudoscalar, scalar,  scalar_product, normalize, left_contraction, 
-    right_contraction, wedge, commutator, anticommutator, versor_inverse, exppi, exptau
-export ⨼, ⨽, ∧, ×, ⨰
+    right_contraction, wedge, commutator, anticommutator, versor_inverse, exppi, exptau, regressive
+export ⨼, ⨽, ∧, ×, ⨰, ∨
 # Pretty printing
 include("show.jl")
 
