@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.5] - 2024-06-10
+
 ### Fixed
   - Missing exports for `regressive` and `∨` (#14 - thanks @ajahraus!)
 
@@ -59,6 +61,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release of CliffordNumbers.jl
 
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
+[0.1.5]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.5
 [0.1.4]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.4
 [0.1.3]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.3
 [0.1.2]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.2
