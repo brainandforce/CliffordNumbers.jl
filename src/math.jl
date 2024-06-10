@@ -248,7 +248,7 @@ for op in (:*, :∧)
     @eval begin
         @inline $op(k::KVector{0,Q}, x::AbstractCliffordNumber{Q}) where Q = scalar(k) * x
         @inline $op(x::AbstractCliffordNumber{Q}, k::KVector{0,Q}) where Q = x * scalar(k)
-        @inline $op(k::T, l::T) where T<:KVector{0} = T(scalar(k) * scalar(l))
+        @inline $op(k::KVector{0,Q}, l::KVector{0,Q}) where Q = KVector{0,Q}(scalar(k) * scalar(l))
     end
 end
 
