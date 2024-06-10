@@ -117,6 +117,16 @@ form must be wrapped in a `Val` to preserve type stability.
 
 This function must be defined with all its arguments for each concrete type subtyping
 `AbstractCliffordNumber`.
+
+# Note on function export
+
+This function is nearly identical in semantics to `StaticArraysCore.similar_type`. However, since
+this package does not depend on `StaticArraysCore`, this function is not exported to avoid name
+conflicts whenever any package exporting `StaticArraysCore.similar_type` is loaded.
+
+If a package exports `StaticArraysCore.similar_type`, that function will have methods added which
+match the methods in this package with the same signature. This may be triggered explicitly if
+desired with a `using` or `import` directive.
 """
 function similar_type(x::AbstractCliffordNumber, T::Type{<:BaseNumber}, Q::Val)
     return similar_type(typeof(x), T, Q)
