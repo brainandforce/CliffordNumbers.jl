@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+  - Missing exports for `regressive` and `∨` (#14 - thanks @ajahraus!)
+
 ## [0.1.4] - 2024-06-06
 
 ### Added
