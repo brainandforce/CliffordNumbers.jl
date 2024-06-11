@@ -100,6 +100,34 @@ complement_type(::Type{KVector{K,Q}}) where {K,Q} = KVector{dimension(Q)-K,Q}
 
 short_typename(::Type{<:KVector{K,Q,T}}) where {K,Q,T} = KVector{K,Q,T}
 
+#---Aliases for special KVector types--------------------------------------------------------------#
+"""
+    CliffordScalar{Q,T} (alias for KVector{0,Q,T,1})
+
+Represents a scalar of the Clifford algebra described by `Q`.
+"""
+const CliffordScalar{Q,T} = KVector{0,Q,T,1}
+
+"""
+    CliffordVector{Q,T,L} (alias for KVector{1,Q,T,L})
+
+Represents a 1-vector (or equivalently, a 1-blade) of the Clifford algebra described by `Q`. `L` is
+constrained to be equal to `dimension(Q)`.
+"""
+const CliffordVector{Q,T,L} = KVector{1,Q,T,L}
+
+"""
+    CliffordBivector{Q,T,L} (alias for KVector{2,Q,T,L})
+
+Represents a bivector of the Clifford algebra described by `Q`. `L` is constrained to be equal to
+`binomial(dimension(Q), 2)`.
+
+Note that when `dimension(Q) > 3`, bivectors are *not* always 2-blades, meaning that they cannot
+always be described as the wedge product of two 1-blades. An example is
+`CliffordBivector{VGA(4)}(1, 0, 0, 0, 0, 1)`.
+"""
+const CliffordBivector{Q,T,L} = KVector{2,Q,T,L}
+
 #---Special Z2CliffordNumber constructor-----------------------------------------------------------#
 
 # Automatically infer if we want an even or odd Clifford number

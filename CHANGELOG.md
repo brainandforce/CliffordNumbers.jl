@@ -9,6 +9,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
   - Definition of `signature(::BitIndex{Q})`.
+  - Unexported aliases `CliffordNumbers.CliffordScalar{Q,T} === KVector{0,Q,T,1}`, 
+    `CliffordNumbers.CliffordVector{Q,T,L} === KVector{1,Q,T,L}`, and
+    `CliffordNumbers.CliffordBivector{Q,T,L} === KVector{2,Q,T,L}`.
 
 ### Changed
   - Split up `src/math.jl` to separate files in `src/math/`.
