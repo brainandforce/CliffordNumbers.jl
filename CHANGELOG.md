@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## Changed
+  - Split up `src/math.jl` to separate files in `src/math/`.
+
 ## [0.1.5] - 2024-06-10
 
 ### Fixed

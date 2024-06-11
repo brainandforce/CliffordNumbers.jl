@@ -59,13 +59,26 @@ include("convert.jl")
 export scalar_convert
 include("promote.jl")
 export widen_grade, scalar_promote
-# Fast multiplication kernels
-include("multiply.jl")
 # Mathematical operations defined for all AbstractCliffordNumber instances
-include("math.jl")
-export isscalar, ispseudoscalar, scalar,  scalar_product, normalize, left_contraction, 
-    right_contraction, wedge, regressive, commutator, anticommutator, versor_inverse, exppi, exptau
+# Fast multiplication kernels
+include("math/multiply.jl")
+# Addition, subtraction, (approximate) equality
+include("math/arithmetic.jl")
+# Grade automorphisms, complements, duals, etc.
+include("math/duals.jl")
+# Scalar products, absolute values, scalar multiplication
+include("math/scalar.jl")
+export isscalar, scalar, ispseudoscalar, scalar_product, normalize
+# Definitions of operators for products
+include("math/products.jl")
+export left_contraction, right_contraction, wedge, regressive, commutator, anticommutator
 export ⨼, ⨽, ∧, ∨, ×, ⨰
+# Inverses, if they exist
+include("math/inverse.jl")
+export versor_inverse
+# Exponentiation
+include("math/exponential.jl")
+export exppi, exptau
 # Pretty printing
 include("show.jl")
 
