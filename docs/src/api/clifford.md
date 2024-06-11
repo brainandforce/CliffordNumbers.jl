@@ -44,3 +44,8 @@ CliffordNumbers.ispseudoscalar
 CliffordNumbers.scalar
 CliffordNumbers.pseudoscalar
 ```
+
+## Defining basis variables
+```@docs
+CliffordNumbers.@basis_vars
+```
