@@ -111,6 +111,8 @@ end
 
 #---Other useful functions-------------------------------------------------------------------------#
 
+signature(::BitIndex{Q}) where Q = Q
+
 signbit(i::BitIndex) = !iszero(i.i & signmask(UInt))
 sign(i::BitIndex) = Int8(-1)^signbit(i)
 
