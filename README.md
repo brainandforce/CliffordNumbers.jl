@@ -1,4 +1,4 @@
-# CliffordNumbers
+# [CliffordNumbers.jl][repo-url]
 
 [![Stable][docs-stable-img]][docs-stable-url]
 [![Dev][docs-dev-img]][docs-dev-url]
@@ -13,9 +13,7 @@ extremely high performance (faster than matrix multiplications of matrix represe
 depending on any linear algebra library. Additionally, the multivectors provided by this package can
 be stored inline in arrays or other data structures.
 
-# Clifford numbers
-
-## Why use them?
+## Why use Clifford numbers?
 
 Clifford algebras are algebras of orthonormality: they expand a real or complex vector space with a
 notion of normal vectors (those with unit square, or unit magnitude) and orthogonal vectors.
