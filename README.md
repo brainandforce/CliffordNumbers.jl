@@ -130,6 +130,25 @@ Note that `AbstractCliffordNumber{Q,T}` is a scalar type, so dotted operators do
 operations to each coefficient individually. However, they can be used to perform elementwise
 operations on collections of Clifford numbers.
 
+## Acknowledgements
+
+The inspiration for this work was the textbook [*Geometric Algebra for Computer Science*][ga4cs]
+(popularly abberviated to GA4CS) by Leo Dorst, Daniel Fontijne, and Stephen Mann. Originally, this
+package was written as an exercise to implement much of the library described in the book, but I
+decided to publish it once I was able to figure out how to optimize multivector products.
+
+I also want to acknowledge the community at [bivector.net][bivector], particularly its associated
+[Discord server][bivector-discord], for providing me with a large amount of knowledge regarding
+geometric algebras. Particular community members I'd like to acknowledge include:
+  - [sudgylacmoe](@sudgy), who put together the video
+    [A Swift Introduction to Geometric Algebra][swift-intro] which helped me discover geometric
+    algebra; he has many other excellent introductory YouTube videos and a document of 
+    counterexamples in geometric algebra that informed much of the testing of this package.
+  - [Eelco Hoogendoorn](@EelcoHoogendoorn) for numerous discussions of the Dirac-Hestenes equation
+    and the application of geometric algebra to problems in quantum mechanics.
+  - [Joseph Wilson](@jollywatt), author of the currently unregistered Julia package
+    [GeometricAlgebra.jl](https://github.com/Jollywatt/GeometricAlgebra.jl).
+
 [repo-url]:         https://github.com/brainandforce/CliffordNumbers.jl
 [docs-stable-img]:  https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]:  https://brainandforce.github.io/CliffordNumbers.jl/stable
@@ -144,3 +163,7 @@ operations on collections of Clifford numbers.
 [aps-wikipedia]:    https://en.wikipedia.org/wiki/Algebra_of_physical_space
 [sta-wikipedia]:    https://en.wikipedia.org/wiki/Spacetime_algebra
 [ga-wikipedia]:     https://en.wikipedia.org/wiki/Geometric_algebra
+[ga4cs]:            https://geometricalgebra.org/
+[bivector]:         https://bivector.net/
+[bivector-discord]: https://discord.gg/vGY6pPk
+[swift-intro]:      https://www.youtube.com/watch?v=60z_hpEAtD8
