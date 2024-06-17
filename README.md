@@ -140,14 +140,15 @@ decided to publish it once I was able to figure out how to optimize multivector 
 I also want to acknowledge the community at [bivector.net][bivector], particularly its associated
 [Discord server][bivector-discord], for providing me with a large amount of knowledge regarding
 geometric algebras. Particular community members I'd like to acknowledge include:
-  - [sudgylacmoe](@sudgy), who put together the video
+  - sudgylacmoe (@sudgy), who put together the video
     [A Swift Introduction to Geometric Algebra][swift-intro] which helped me discover geometric
     algebra; he has many other excellent introductory YouTube videos and a document of 
     counterexamples in geometric algebra that informed much of the testing of this package.
-  - [Eelco Hoogendoorn](@EelcoHoogendoorn) for numerous discussions of the Dirac-Hestenes equation
+  - Eelco Hoogendoorn (@EelcoHoogendoorn) for numerous discussions of the Dirac-Hestenes equation
     and the application of geometric algebra to problems in quantum mechanics.
-  - [Joseph Wilson](@jollywatt), author of the currently unregistered Julia package
+  - Joseph Wilson (@jollywatt), author of the currently unregistered Julia package
     [GeometricAlgebra.jl](https://github.com/Jollywatt/GeometricAlgebra.jl).
+  - Chris Doran (@chrisjldoran) for discussion about this package's development and implementation.
 
 [repo-url]:         https://github.com/brainandforce/CliffordNumbers.jl
 [docs-stable-img]:  https://img.shields.io/badge/docs-stable-blue.svg
