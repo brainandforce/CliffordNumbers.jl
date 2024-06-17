@@ -159,6 +159,7 @@ end
 
 @testset "Scalars" begin
     k = KVector{2,VGA(3)}(3, 4, 0)
+    @test 2(k) === KVector{2,VGA(3)}(6, 8, 0)
     @test abs2(k) === 25
     @test abs(k) == 5
     @test normalize(k) == k / 5
@@ -213,7 +214,7 @@ end
 @testset "Wedge product" begin
     k1 = 3*σ1 + 4*σ2
     k2 = 4*(σ1 ∧ σ2) + 2*(σ1 ∧ σ3)
-    five = 5 * one(CliffordNumber{VGA(3)})
+    five = CliffordNumber{VGA(3)}(5)
     # Self wedges should be zero
     @test iszero(σ1 ∧ σ1)
     @test iszero(σ2 ∧ σ2)
@@ -227,6 +228,7 @@ end
     @test iszero(σ1 ∧ σ2 ∧ σ3 ∧ σ1)
     # Ensure the behavior of scalars (both CliffordNumber and normal) are correct
     @test 5 ∧ σ1 == 5 * σ1
+    @test 5 ∧ σ1 == σ1 ∧ 5
     @test five ∧ σ1 == σ1 ∧ five
     @test 5 ∧ 5 == 25
     # Turns out reversing the order shouldn't change anything for odd k-vector results
