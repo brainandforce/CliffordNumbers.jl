@@ -166,6 +166,9 @@ end
     # Testing non-positive definite and degenerate metrics
     @test abs2(KVector{1,STA}(0, 2, 3, 4)) == -29
     @test abs2(KVector{1,PGA(3)}(1, 0, 0, 0)) == 0
+    @test abs2(KVector{0,VGA(2)}(2)) === 4
+    @test abs(KVector{0,VGA(2)}(-2)) === 2
+    @test normalize(KVector{0,VGA(2),Float16}(3)) === one(KVector{0,VGA(2),Float16})
     # Testing with KVector{0}
     @test KVector{0,VGA(3)}(2) * k === 2 * k
     @test k * KVector{0,VGA(3)}(2) === k * 2
