@@ -150,6 +150,9 @@ geometric algebras. Particular community members I'd like to acknowledge include
     [GeometricAlgebra.jl](https://github.com/Jollywatt/GeometricAlgebra.jl).
   - Chris Doran (@chrisjldoran) for discussion about this package's development and implementation.
 
+This work is dedicated to my best friends: Dr. Michael Davies (@medav), Kristel Forlano, and Danica 
+Gressel (@DanicaGressel).
+
 [repo-url]:         https://github.com/brainandforce/CliffordNumbers.jl
 [docs-stable-img]:  https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]:  https://brainandforce.github.io/CliffordNumbers.jl/stable
