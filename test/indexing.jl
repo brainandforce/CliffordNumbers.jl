@@ -123,6 +123,8 @@ end
 end
 
 @testset "Type lengths" begin
+    @test nblades(Int) === 1
+    @test nblades(ComplexF64) === 1
     @test nblades(KVector{2,STA}) === nblades(KVector{2,STA,Int,6})
     @test nblades(zero(KVector{2,STA})) === nblades(KVector{2,STA,Int,6})
     @test nblades(CliffordNumber{STA}) === nblades(CliffordNumber{STA,Int,16})

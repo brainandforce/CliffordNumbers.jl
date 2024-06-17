@@ -94,6 +94,10 @@ end
     @test widen_grade(KVector{1,VGA(3),Int}(4, 5, 6)) === OddCliffordNumber{VGA(3),Int}(4, 5, 6, 0)
 end
 
+@testset "Complex algebras" begin
+    @test complex(CliffordNumber{VGA(1)}(1, 1)) === CliffordNumber{VGA(1),Complex{Int}}(1,1)
+end
+
 @testset "float() and big()" begin
     @test float(CliffordNumber{STA,Int}) <: CliffordNumber{STA,Float64}
     @test float(CliffordNumber{STA,Complex{Bool}}) <: CliffordNumber{STA,ComplexF64}
