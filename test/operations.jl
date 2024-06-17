@@ -115,6 +115,7 @@ end
 end
 
 @testset "Geometric product" begin
+    import CliffordNumbers.AlgebraMismatch as GAMismatch
     x = CliffordNumber{VGA(3)}(0, 2, 0, 0, 0, 0, 0, 0)
     y = CliffordNumber{VGA(3)}(0, 3, 4, 0, 0, 0, 0, 0)
     k1 = KVector{1,VGA(3)}(4, 2, 0)
@@ -152,6 +153,8 @@ end
     @test γ0 * γ0 === EvenCliffordNumber{STA}(1)
     @test γ1 * γ1 === EvenCliffordNumber{STA}(-1)
     @test γ0 * γ1 === -γ1 * γ0
+    # Test where we attempt to multiply elements of different algebras
+    @test_throws GAMismatch zero(EvenCliffordNumber{VGA(3),Int}) * zero(KVector{1,STA,Int})
 end
 
 @testset "Scalars" begin
