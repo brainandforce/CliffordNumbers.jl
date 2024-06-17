@@ -13,7 +13,7 @@ end
 # Scalars in wedge products
 ∧(x::BaseNumber, y::BaseNumber) = x * y
 ∧(x::BaseNumber, y::AbstractCliffordNumber) = x * y
-∧(x::AbstractCliffordNumber, y::BaseNumber) = y * x
+∧(x::AbstractCliffordNumber, y::BaseNumber) = x * y
 
 # Optimized versions for 0-blade arguments
 for op in (:*, :∧)
