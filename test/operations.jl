@@ -157,7 +157,7 @@ end
     @test_throws GAMismatch zero(EvenCliffordNumber{VGA(3),Int}) * zero(KVector{1,STA,Int})
 end
 
-@testset "Scalars" begin
+@testset "Scalars and pseudoscalars" begin
     k = KVector{2,VGA(3)}(3, 4, 0)
     @test 2(k) === KVector{2,VGA(3)}(6, 8, 0)
     @test abs2(k) === 25
@@ -170,6 +170,11 @@ end
     @test KVector{0,VGA(3)}(2) * k === 2 * k
     @test k * KVector{0,VGA(3)}(2) === k * 2
     @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
+    # Extracting scalars
+    @test scalar(EvenCliffordNumber{VGA(3)}(4, 3, 2, 1)) === 4
+    @test scalar(KVector{0,VGA(3),Float64}(5)) === 5.0
+    @test scalar(OddCliffordNumber{VGA(3),Float32}(6, 7, 8, 9)) === zero(Float32)
+    # Testing if a multivector is a scalar
     @test isscalar(CliffordNumber{VGA(3)}(1))
     @test isscalar(EvenCliffordNumber{VGA(3)}(1, 0, 0, 0))
     @test !isscalar(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4))
@@ -178,6 +183,10 @@ end
     @test isscalar(KVector{1,STA}(0, 0, 0, 0))
     @test !isscalar(KVector{3,STA}(1, 3, 3, 7))
     @test isscalar(complex(420, 69))
+    @test ispseudoscalar(KVector{4,STA}(69))
+    @test ispseudoscalar(CliffordNumber{VGA(2)}(0, 0, 0, -69))
+    @test !ispseudoscalar(OddCliffordNumber{VGA(3)}(1, 3, 3, 7))
+    @test !ispseudoscalar(KVector{1,VGA(3)}(4, 2, 0))
 end
 
 @testset "Inverses and division" begin
