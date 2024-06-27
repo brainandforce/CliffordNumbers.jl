@@ -1,4 +1,4 @@
-module LinearAlgebraExt
+module CliffordNumbersLinearAlgebraExt
 
 using CliffordNumbers
 using LinearAlgebra
