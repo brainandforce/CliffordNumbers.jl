@@ -1,4 +1,4 @@
-module StaticArraysCoreExt
+module CliffordNumbersStaticArraysCoreExt
 
 using CliffordNumbers
 using StaticArraysCore
