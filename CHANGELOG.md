@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.6] - 2024-06-27
+
 ### Added
   - Definition of `signature(::BitIndex{Q})`.
   - Unexported aliases `CliffordNumbers.CliffordScalar{Q,T} === KVector{0,Q,T,1}`, 
@@ -72,6 +74,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release of CliffordNumbers.jl
 
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
+[0.1.6]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.6
 [0.1.5]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.5
 [0.1.4]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.4
 [0.1.3]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.3
