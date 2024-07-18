@@ -40,34 +40,11 @@ isapprox(x::Number, y::AbstractCliffordNumber; kwargs...) = isapprox(promote(y, 
 
 +(x::T, y::T) where T<:AbstractCliffordNumber = T(map(+, Tuple(x), Tuple(y)))
 
-function +(x::AbstractCliffordNumber, y::BaseNumber)
-    T = promote_type(typeof(x), typeof(y))
-    b = BitIndices(T)
-    data = ntuple(i -> x[b[i]] + (iszero(grade(b[i])) * y), Val(nblades(T)))
-    return T(data)
-end
-
-+(x::BaseNumber, y::AbstractCliffordNumber) = y + x
-
 function -(x::AbstractCliffordNumber)
     data = (-).(Tuple(x))
     return similar_type(x, eltype(data))(data)
 end
 
--(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = x + (-y)
-
-function -(x::AbstractCliffordNumber, y::BaseNumber)
-    T = promote_type(typeof(x), typeof(y))
-    b = BitIndices(T)
-    data = ntuple(i -> x[b[i]] - (iszero(grade(b[i])) * y), Val(nblades(T)))
-    return T(data)
-end
-
-function -(x::BaseNumber, y::AbstractCliffordNumber)
-    T = promote_type(typeof(x), typeof(y))
-    b = BitIndices(T)
-    data = ntuple(i -> (iszero(grade(b[i])) * x) - y[b[i]], Val(nblades(T)))
-    return T(data)
-end
+-(x::T, y::T) where T<:AbstractCliffordNumber = x + (-y)
 
 # TODO: is it more efficient to define some more specific methods for some types?
