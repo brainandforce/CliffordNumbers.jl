@@ -207,6 +207,12 @@ end
     @test 1 / γ1 == -γ1
     @test inv(γ0) == γ0
     @test inv(γ1) == -γ1
+    @test inv(γ0 * γ1) == γ0 * γ1
+    @test inv(γ1 * γ2) == -γ1 * γ2
+    @test γ0 / γ1 == -γ0 * γ1
+    @test γ0 \ γ1 == γ0 * γ1
+    @test γ1 / γ0 == -γ0 * γ1
+    @test γ1 \ γ0 == γ0 * γ1
     @test_throws CliffordNumbers.InverseException inv(1 + KVector{1,VGA(2)}(1, 0))
 end
 
