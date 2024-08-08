@@ -57,6 +57,17 @@ end
 # Convert real/complex numbers to CliffordNumber
 (::Type{T})(x::BaseNumber) where {T<:Z2CliffordNumber} = T(ntuple(i -> x*isone(i), Val(nblades(T))))
 
+function (::Type{T})(x::BaseNumber) where {T<:OddCliffordNumber}
+    isone(nblades(T)) && return T(ntuple(i -> x*isone(i), Val(nblades(T))))
+    throw(
+        DomainError(
+            x,
+            "An OddCliffordNumber cannot be constructed from a scalar unless the algebra " *
+            "contains exactly one odd element."
+        )
+    )
+end
+
 #---Number of elements-----------------------------------------------------------------------------#
 
 nblades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = div(blade_count(Q), 2)

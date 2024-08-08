@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+  - `OddCliffordNumber` constructors now fail to operate on scalars unless there is exactly one odd
+    element in the algebra.
+
 ## [0.1.6] - 2024-06-27
 
 ### Added

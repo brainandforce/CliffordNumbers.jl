@@ -60,6 +60,9 @@ end
     k2 = KVector{2,VGA(3)}(1, 2, 3)
     @test CliffordNumber{VGA(3)}(1337) === CliffordNumber{VGA(3)}(1337, 0, 0, 0, 0, 0, 0, 0)
     @test EvenCliffordNumber{VGA(3)}(1337) === EvenCliffordNumber{VGA(3)}(1337, 0, 0, 0)
+    # If there is more than one odd element of the subalgebra, this should throw
+    @test_throws DomainError OddCliffordNumber{VGA(3)}(1337)
+    @test OddCliffordNumber{VGA(1)}(1337) == KVector{1,VGA(1)}(1337)
     # Mixed types in input
     @test CliffordNumber{VGA(3)}(0.0, 0, 0, 0, 0, 0, 0, 0) === zero(CliffordNumber{VGA(3),Float64})
     @test CliffordNumber{VGA(3)}(0, 0, 0, 0, 0, 0, 0, 0.0) === zero(CliffordNumber{VGA(3),Float64})
