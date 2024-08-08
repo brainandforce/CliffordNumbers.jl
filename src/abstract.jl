@@ -12,15 +12,15 @@ arrays or other data structures.
 
 All subtypes `C` of `AbstractCliffordNumber{Q}` must implement the following functions:
   * `CliffordNumbers.similar_type(::Type{C}, ::Type{T}, ::Type{Q}) where {C,T,Q}` should construct a
-new type similar to `C` which subtypes `AbstractCliffordNumber{Q,T}` that may serve as a
-constructor.
+    new type similar to `C` which subtypes `AbstractCliffordNumber{Q,T}` that may serve as a
+    constructor.
   * `Base.getindex(x::C, b::BitIndex{Q})` should allow one to recover the coefficients associated
-with each basis blade represented by `C`.
+    with each basis blade represented by `C`.
   * `nblades(::Type{C})` should be defined to return the number of basis blades represented by the
-type. By default, `nblades(x::AbstractCliffordNumber) = nblades(typeof(x))`.
+    type. By default, `nblades(x::AbstractCliffordNumber) = nblades(typeof(x))`.
   * `Base.Tuple(x::C)` should return the tuple used to construct `x`. The fallback is
-`getfield(x, :data)::Tuple`, so any type declared with a `NTuple` field named `data` should have
-this defined automatically.
+    `getfield(x, :data)::Tuple`, so any type declared with a `NTuple` field named `data` should have
+    this defined automatically.
 """
 abstract type AbstractCliffordNumber{Q,T<:BaseNumber} <: Number
 end
