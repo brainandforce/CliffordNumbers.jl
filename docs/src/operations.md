@@ -36,11 +36,11 @@ Base.reverse(::BitIndex)
 *Grade involution* changes the sign of all odd grades, an operation equivalent to mirroring every
 basis vector of the space. This can be acheived with the `grade_involution` function.
 
-When interpreting even multivectors as elements of the even subalgebra of the algebra of interest,
-the grade involution in the even subalgebra is equivalent to the reverse in the algebra of interest.
+When interpreting even multivectors as elements of the even subalgebra of a given algebra, the
+reverse operation of the algebra is equivalent to grade involution in the even subalgebra.
 
 Grade involution is equivalent to complex conjugation in when dealing with the even subalgebra of 2D
-space, which is isomorphic to the complex numbers, but this is *not* true for quaternion
+space (which is isomorphic to the complex numbers), but this is *not* true for quaternion
 conjugation. Instead, use the Clifford conjugate (described below).
 
 ```@docs; canonical=false
@@ -49,8 +49,10 @@ CliffordNumbers.grade_involution(::BitIndex)
 
 #### Clifford conjugation
 
-The *Clifford conjugate* is the combination of the reverse and grade involution. This is available
-via an overload of `Base.conj`.
+The *Clifford conjugate* is the combination of the reverse and grade involution. This is implemented
+as `Base.conj(::AbstractCliffordNumber)`. This operation arises in the application of a
+transformation, because the grade involution accounts for the sign change associated with the parity
+of the isometry, and it is combined with the reverse to perform the final operation.
 
 !!! warning
     `conj(::AbstractCliffordNumber)` implements the Clifford conjugate, not the reverse!
@@ -62,6 +64,16 @@ or quaternion conjugation. Otherwise, this is a less widely used operation than 
 ```@docs; canonical=false
 Base.conj(::BitIndex)
 ```
+
+#### Inverse
+
+Many elements of a Clifford algebra have an inverse. In general, the inverse of a rotor `R` is equal
+to `R' / abs2(R)`. It is possible to use other methods to find inverses of arbitrary multivectors of
+certain Clifford algebras, but this has not been implemented yet.
+
+Inverses *cannot* exist for multivectors which square to zero. This is trivially true in any 
+Clifford algebra with a degenerate metric, but it is possible to encounter these kinds of elements
+in algebras with positive-definite metrics.
 
 ## Binary operations
 
