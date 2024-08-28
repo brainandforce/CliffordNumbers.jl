@@ -16,5 +16,6 @@ The goal of this package is to provide a multivector implementation that:
 - Provides data structures of fixed sizes that represent multivectors. This allows for instances to be allocated on the stack or stored inline in an `Array` rather than as pointers to individually allocated instances.
 - Provides dense representations of multivectors, as well as convenient sparse representations, which can be constructed from each other, converted in a way that guarantees representability, and allows for promotion between instances.
 - Subtypes `Number`: The term "Clifford number" emphasizes the perspective of multivectors as an extension of the real numbers, in the same way that complex numbers and quaternions extend them. (It should be noted that both complex numbers and quaternions are Clifford algebras themselves!)
-- Aggressively optimizes all mathematical operations, utilizing `fma` operations and SIMD instructions whenever possible.
+- Aggressively optimizes all mathematical operations, utilizing `fma` operations and SIMD instructions whenever possible, but without sacrificing numerical precision.
 - Interoperates with automatic differentiation tools and other packages which allow for the implementation of operations from geometric calculus.
+- Allows Julia to be used as a calculator for geometric algebra.
