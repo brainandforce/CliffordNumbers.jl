@@ -22,7 +22,8 @@ exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
     # Handle negative cases: invert x, flip the sign of n, and retry
     n < 0 && return Base.literal_pow(^, inv(x), Val(abs(n)))
     # Handle positive cases: force promotion to even multivectors
-    n > 0 && return (x*x)^(div(n,2)) * Base.literal_pow(^, x, Val(rem(n,2)))
+    # Avoid using div/rem for the sake of speed
+    n > 0 && return (x*x)^(n >> 1) * Base.literal_pow(^, x, Val(isodd(n)))
     return one(x)
 end
 
