@@ -279,6 +279,7 @@ end
     # Integer exponentiation of a multivector
     k = KVector{1,VGA(3)}(4, 2, 0)
     l = KVector{2,VGA(3)}(0, 6, 9)
+    m = KVector{0,VGA(3)}(20)
     # Base.literal_pow tests
     if k^-2 === Base.literal_pow(^, k, Val(2)) && l^-2 === Base.literal_pow(^, l, Val(2))
         # These tests break on Julia 1.8: it seems that Base.literal_pow is not invoked
@@ -291,14 +292,19 @@ end
     end
     @test k^-1 === inv(k)
     @test l^-1 === inv(l)
+    @test m^-1 === inv(m)
     @test k^0 === one(k)
     @test l^0 === one(l)
+    @test m^0 === one(m)
     @test k^1 === k
     @test l^1 === l
-    @test k^2 isa EvenCliffordNumber
-    @test l^2 isa EvenCliffordNumber
-    @test k^3 isa OddCliffordNumber
+    @test m^1 === m
+    @test k^2 == 20
+    @test l^2 == -117
+    @test m^2 == 400
+    @test k^3 isa KVector{1}
     @test l^3 isa EvenCliffordNumber
+    @test m^3 isa KVector{0}
     # Base.literal_pow only works for integers, apparently, but these are defined
     @test Base.literal_pow(^, k, Val(false)) === one(k)
     @test Base.literal_pow(^, l, Val(false)) === one(l)
