@@ -19,12 +19,22 @@ exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
 
 # If the exponent is a constant, we can leverage that information to promote conservatively
 @inline function Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{n}) where n
-    # Handle negative cases: invert x, flip the sign of n, and retry
-    n < 0 && return Base.literal_pow(^, inv(x), Val(abs(n)))
-    # Handle positive cases: force promotion to even multivectors
-    # Avoid using div/rem for the sake of speed
-    n > 0 && return (x*x)^(n >> 1) * Base.literal_pow(^, x, Val(isodd(n)))
-    return one(x)
+    if !(n isa Real && isinteger(n))
+        throw(DomainError(n, "Clifford numbers can only be raised to integer powers."))
+    elseif iszero(n)
+        # Return a unit scalar instance of the type, if it can be constructed
+        # Or if that's not possible, just a KVector{0} of the algebra
+        return one(x)
+    elseif n < 0
+        # Handle negative cases: invert x, flip the sign of n, and retry
+        result = Base.literal_pow(^, inv(x), Val(abs(Int(n))))
+    elseif n > 0 
+        # Handle positive cases: calculate the power by squaring
+        # Avoid using div/rem for the sake of speed
+        sq = Base.literal_pow(^, x, Val(2))
+        return Base.literal_pow(^, sq, Val(Int(n) >> 1)) * Base.literal_pow(^, x, Val(isodd(n)))
+    end
+    return result
 end
 
 # Overload Base.literal_pow for common powers
