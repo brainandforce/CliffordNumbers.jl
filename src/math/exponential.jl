@@ -27,7 +27,7 @@ exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
     return one(x)
 end
 
-# Overload Base.literal_pow for common cases
+# Overload Base.literal_pow for common powers
 @inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{0}) = one(x)
 @inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{1}) = x
 @inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{2}) = x*x
@@ -44,6 +44,19 @@ end
 # See this issue: https://github.com/JuliaLang/julia/issues/53504
 ^(x::C, n::Integer) where C<:Union{KVector,OddCliffordNumber} = convert(exponential_type(C), x)^n
 
+#---Special cases for exponentiation---------------------------------------------------------------#
+
+# KVector of orders 0 and 1 are guaranteed to square to scalars
+@inline ^(x::KVector{0,Q}, n::Integer) where Q = KVector{0,Q}(x^n)
+
+@inline function Base.literal_pow(::typeof(^), x::KVector{1,Q}, ::Val{2}) where Q
+    return KVector{0,Q}(x * x)
+end
+
+# TODO: In 3 or fewer dimensions, all k-vectors are k-blades, so promote to KVector{0}
+# TODO: pseudoscalars and pseudovectors should automatically square to scalars
+
+#---Natural exponentials of Clifford numbers-------------------------------------------------------#
 """
     CliffordNumbers.exp_taylor(x::AbstractCliffordNumber, order = Val(16))
 
