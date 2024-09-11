@@ -57,7 +57,7 @@ end
 #---Special cases for exponentiation---------------------------------------------------------------#
 
 # KVector of orders 0 and 1 are guaranteed to square to scalars
-@inline ^(x::KVector{0,Q}, n::Integer) where Q = KVector{0,Q}(x^n)
+@inline ^(x::KVector{0,Q}, n::Integer) where Q = KVector{0,Q}(scalar(x)^n)
 
 @inline function Base.literal_pow(::typeof(^), x::KVector{1,Q}, ::Val{2}) where Q
     return KVector{0,Q}(x * x)
