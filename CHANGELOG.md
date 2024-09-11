@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - `Base.literal_pow` definitions for `KVector{1}` that produce `KVector` results.
+
 ### Fixed
   - `OddCliffordNumber` constructors now fail to operate on scalars unless there is exactly one odd
     element in the algebra.
