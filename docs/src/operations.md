@@ -162,3 +162,108 @@ In general, it is also strongly recommended to promote the types of the argument
 `CliffordNumbers.Z2CliffordNumber` or `CliffordNumber` for higher performance. Currently, the
 implementation of `CliffordNumbers.mul` is asymmetric, and does not consider which input is longer.
 Even in the preferred order, we find that `KVector` incurs a significant performance penalty.
+
+### Exponentiation
+
+Exponentiation can be done using either a Clifford number as a base and an integer exponent,
+corresponding to iterations of the geometric product, or a Clifford number may be the exponent
+associated with a scalar.
+
+#### Integer powers of Clifford numbers
+
+As with all other `Number` instances, this can be done with the `^` infix operator:
+```
+julia> k = KVector{1,VGA(3)}(4,2,0)
+3-element KVector{1, VGA(3), Int64}:
+4e₁ + 2e₂
+
+julia> k^2
+1-element KVector{0, VGA(3), Int64}:
+20
+```
+However, it may be worth noting that the types may seem to vary based on what Clifford number is
+being exponentiated. The bivector `l` squares to an `EvenCliffordNumber` rather than a `KVector{0}`:
+```
+julia> l = KVector{2,VGA(3)}(0, 6, 9)
+3-element KVector{2, VGA(3), Int64}:
+6e₁e₃ + 9e₂e₃
+
+julia> l^2
+4-element EvenCliffordNumber{VGA(3), Int64}:
+-117
+```
+This is to be expected: only ``k``-blades (``k``-vectors that are the wedge product of ``k``
+1-vectors) can be guaranteed to square to a scalar. In dimensions less than 4, all ``k``-vectors are
+``k``-blades, but this cannot be assumed in general: the classic example is ``e_1 e_2 + e_3 e_4`` in
+4D VGA, whose square contains a 4-vector term. However, in all dimensions, 0-vectors (scalars) and
+1-vectors are guaranteed to be blades, and therefore square to scalars. This is also true of 
+pseudoscalars and pseudovectors (``n``-blades and ``(n-1)``-blades in an ``n``-dimensional algebra),
+but these cases are not recognized yet.
+
+Furthermore, the types will differ if we exponentiate using a variable rather than a literal 
+integer:
+```
+julia> z = 2
+2
+
+julia> k^z
+8-element CliffordNumber{VGA(3), Float64}:
+20.0
+
+julia> l^z
+4-element EvenCliffordNumber{VGA(3), Float64}:
+-117.0
+```
+Although the results compare as equal with `==`, they do not with `===`. The reason for this is type
+stability, and the mechanisms Julia provides to reduce unnecessary type conversion when enough
+information is known at compile time.
+
+Exponentiation is an inherently problematic operation with regards to type stability. This is simply
+illustrated when raising integers to integer powers: if the exponent is a positive integer, or zero,
+the result should be an integer, but if the exponent is negative, the result cannot be expressed as
+an integer unless the number being exponentiated is a unit.
+
+It may seem like we have to promote every Clifford number that isn't a `KVector{0}` to either
+`EvenCliffordNumber` or `CliffordNumber`, but Julia gives us a way to work around this. When any
+exponentation occurs with a literal number, Julia replaces the expression with `Base.literal_pow`,
+and the exponentiation can be converted to a series of multiplications. This package provides these
+definitions so that all Clifford numbers can be efficiently exponentiated. In particular, we deal
+with the cases of `KVector{0}` and `KVector{1}` explicitly, so that all of their even powers result
+in a `KVector{0}`, and the odd powers of a `KVector{1}` are also a `KVector{1}`. In the future, we
+will extend these optimizations to pseudoscalars and pseudovectors.
+
+#### Natural exponentiation
+
+It is also possible to raise a real number to a Clifford number power with the `exp` function, or by
+raising the irrational constant `ℯ` to an exponent with `^`.
+```
+julia> exp(KVector{2,VGA(3)}(pi/2, 0, 0))
+4-element EvenCliffordNumber{VGA(3), Float64}:
+6.123233995736766e-17 + 1.0e₁e₂
+
+julia> e^KVector{2,VGA(3)}(pi/2, 0, 0)
+4-element EvenCliffordNumber{VGA(3), Float64}:
+6.123233995736766e-17 + 1.0e₁e₂
+```
+The most common use case for this operation is to construct rotors from bivectors, as illustrated
+above.
+
+Internally, exponentiation is done by a Taylor expansion in the general case, but it is also
+possible to simplify the exponetiation of `KVector` instances by identifying the sign of the square
+of the input. 
+
+Julia provides the `sinpi`, `cospi`, and related functions that allow for the calculation of 
+`sin(pi*x)` or `cos(pi * x)`, respectively, with greater accuracy, especially for large `x`.
+Although there is no `exppi` function provided by Julia Base, this packages provides one for use
+with Clifford numbers, and the accuracy of exponentiation can be expected to be better for 
+negative-squaring blades.
+```
+julia> exppi(KVector{2,VGA(3)}(1/2, 0, 0))
+4-element EvenCliffordNumber{VGA(3), Float64}:
+1.0e₁e₂
+
+julia> exptau(KVector{2,VGA(3)}(1/4, 0, 0))
+4-element EvenCliffordNumber{VGA(3), Float64}:
+1.0e₁e₂
+```
+This package also provides `exptau`, which calculates `exp(2pi * x)`.
