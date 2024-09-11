@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.7] - 2024-09-11
+
 ### Added
   - `Base.literal_pow` definitions for `KVector{1}` that produce `KVector` results.
 
@@ -90,6 +92,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release of CliffordNumbers.jl
 
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
+[0.1.7]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.7
 [0.1.6]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.6
 [0.1.5]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.5
 [0.1.4]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.4
