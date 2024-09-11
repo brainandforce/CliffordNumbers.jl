@@ -53,6 +53,15 @@ end
 # See this issue: https://github.com/JuliaLang/julia/issues/53504
 ^(x::C, n::Integer) where C<:Union{KVector,OddCliffordNumber} = convert(exponential_type(C), x)^n
 
+# If this is not defined, negative exponentiation fails even for Float cases
+function ^(x::AbstractCliffordNumber, n::Integer)
+    # But throw the error anyway for Integer scalar types
+    if n < 0 && !(scalar_type(x) <: Union{Integer,Complex{<:Integer}})
+        return Base.power_by_squaring(inv(x), -n)
+    end
+    return Base.power_by_squaring(x, n)
+end
+
 #---Special cases for exponentiation---------------------------------------------------------------#
 
 # KVector of orders 0 and 1 are guaranteed to square to scalars
