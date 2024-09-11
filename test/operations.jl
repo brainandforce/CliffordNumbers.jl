@@ -343,7 +343,12 @@ end
     @test Base.literal_pow(^, k, Val(true)) === k
     @test Base.literal_pow(^, l, Val(true)) === l
     # These are not defined and should error
-    @test_throws DomainError Base.literal_pow(^, m, Val(1//2))
-    @test_throws DomainError Base.literal_pow(^, m, Val(1/2))
-    @test_throws DomainError Base.literal_pow(^, m, Val(2*im))
+    @test_throws DomainError Base.literal_pow(^, k, Val(1//2))
+    @test_throws DomainError Base.literal_pow(^, l, Val(1/3))
+    @test_throws DomainError Base.literal_pow(^, CliffordNumber(m), Val(2*im))
+    #= If KVector{0} passes through exponentiation, these *are* defined
+    @test Base.literal_pow(^, m, Val(1//2)) === Base.literal_pow(^, scalar(m), Val(1//2))
+    @test Base.literal_pow(^, m, Val(1/3)) === Base.literal_pow(^, scalar(m), Val(1/3))
+    @test Base.literal_pow(^, m, Val(2*im)) === Base.literal_pow(^, scalar(m), Val(2*im))
+    =#
 end
