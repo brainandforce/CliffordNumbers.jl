@@ -317,8 +317,8 @@ end
     # The types of some of the results should change due to type stability considerations
     let z
         z = -1
-        @test_broken k^z === CliffordNumber(inv(k))
-        @test_broken l^z === EvenCliffordNumber(inv(l))
+        @test k^z === inv(CliffordNumber(k))
+        @test l^z === inv(EvenCliffordNumber(l))
         @test m^z === inv(m)
         z = 0
         @test k^z === one(CliffordNumber(k))
