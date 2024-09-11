@@ -342,4 +342,8 @@ end
     @test Base.literal_pow(^, l, Val(false)) === one(l)
     @test Base.literal_pow(^, k, Val(true)) === k
     @test Base.literal_pow(^, l, Val(true)) === l
+    # These are not defined and should error
+    @test_throws DomainError Base.literal_pow(^, m, Val(1//2))
+    @test_throws DomainError Base.literal_pow(^, m, Val(1/2))
+    @test_throws DomainError Base.literal_pow(^, m, Val(2*im))
 end
