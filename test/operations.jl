@@ -10,6 +10,14 @@
     @test 1 == one(EvenCliffordNumber{VGA(3)})
     @test one(EvenCliffordNumber{VGA(3)}) ≈ 1
     @test 1 ≈ one(EvenCliffordNumber{VGA(3)})
+    # NaNs should be unequal with ==
+    @test KVector{2,VGA(3)}(NaN, 6, 9) != KVector{2,VGA(3)}(NaN, 6, 9)
+    # Signed zeros should be equal with ==
+    @test KVector{2,VGA(3)}(0.0, 6, 9) == KVector{2,VGA(3)}(-0.0, 6, 9)
+    # NaNs should be equal with isequal
+    @test isequal(KVector{2,VGA(3)}(NaN, 6, 9), KVector{2,VGA(3)}(NaN, 6, 9))
+    # Signed zeros should be unequal with ==
+    @test !isequal(KVector{2,VGA(3)}(0.0, 6, 9), KVector{2,VGA(3)}(-0.0, 6, 9))
 end
 
 @testset "Grade automorphisms" begin

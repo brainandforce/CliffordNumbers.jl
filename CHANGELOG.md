@@ -20,6 +20,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Broken bullets in `AbstractCliffordNumber` docstring.
   - `StackOverflowError` in `KVector{0}` exponentiation.
   - Incorrect natural exponentials in algebras with non-uniform sign signatures.
+  - `isequal(x::AbstractCliffordNumber, y::AbstractCliffordNumber)` gives the correct result, no
+    longer equal to `x == y` for signed zeros and NaNs.
 
 ## [0.1.6] - 2024-06-27
 
