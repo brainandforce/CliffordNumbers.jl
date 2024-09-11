@@ -34,7 +34,6 @@ exponential_type(x::AbstractCliffordNumber) = exponential_type(typeof(x))
         sq = Base.literal_pow(^, x, Val(2))
         return Base.literal_pow(^, sq, Val(Int(n) >> 1)) * Base.literal_pow(^, x, Val(isodd(n)))
     end
-    return result
 end
 
 # Overload Base.literal_pow for common powers
