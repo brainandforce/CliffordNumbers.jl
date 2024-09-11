@@ -19,8 +19,8 @@ The *reverse* is an operation which reverses the order of the wedge product that
 basis blade. This is implemented with methods for `Base.reverse` and `Base.:~`.
 
 !!! note "Syntax changes"
-    In the future, `Base.:~` will no longer be used for this operation; instead `Base.adjoint` will
-    be overloaded, providing `'` as a syntax for the reverse.
+    `Base.:~` for the reverse is deprecated and will be removed. `Base.adjoint` provides `'` as a
+    syntax for the reverse, and is the preferred method for performing the reverse.
 
 This is the most commonly used automorphism, and in a sense can be thought of as equivalent to
 complex conjugation. When working with even elements of the algebras of 2D or 3D space, this
