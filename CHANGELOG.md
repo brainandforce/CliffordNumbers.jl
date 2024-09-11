@@ -10,11 +10,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
   - `Base.literal_pow` definitions for `KVector{1}` that produce `KVector` results.
 
+### Changed
+  - Natural exponential are only optimized for `KVector` types whose `BitIndices` uniformly square
+    to the same value.
+
 ### Fixed
   - `OddCliffordNumber` constructors now fail to operate on scalars unless there is exactly one odd
     element in the algebra.
   - Broken bullets in `AbstractCliffordNumber` docstring.
   - `StackOverflowError` in `KVector{0}` exponentiation.
+  - Incorrect natural exponentials in algebras with non-uniform sign signatures.
 
 ## [0.1.6] - 2024-06-27
 

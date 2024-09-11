@@ -145,11 +145,11 @@ See also: [`exppi`](@ref), [`exptau`](@ref).
 function exp(x::AbstractCliffordNumber)
     T = exponential_type(x)
     Tx = convert(T, x)
-    sq = mul(Tx, Tx)
-    if isscalar(sq)
-        mag = abs(x)
-        scalar(sq) < 0 && return T(cos(mag))  + Tx * (sin(mag) / mag)
-        scalar(sq) > 0 && return T(cosh(mag)) + Tx * (sinh(mag) / mag)
+    # Check that all basis blades of the type square to the same sign, too
+    if allequal(sign_of_square(b) for b in BitIndices(x)) && isscalar(x^2)
+        mag = abs(x)    # should be faster to calculate directly from input type (it may be shorter)
+        scalar(x^2) < 0 && return T(cos(mag))  + Tx * (sin(mag) / mag)
+        scalar(x^2) > 0 && return T(cosh(mag)) + Tx * (sinh(mag) / mag)
         return one(T) + Tx
     end
     return exp_taylor(x)
