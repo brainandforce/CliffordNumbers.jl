@@ -146,7 +146,7 @@ the `⨰` operator, which is not an operator generally used for this purpose, bu
 looks similar to the commutator product, with the dot indicating the similarity with the dot
 product, which is also symmetric.
 
-### Defining new products: Multiplication internals
+#### Defining new products: Multiplication internals
 
 Products are implemented with the fast multiplication kernel `CliffordNumbers.mul`, which accepts
 two Clifford numbers with the same scalar type and a `CliffordNumbers.GradeFilter` object. This
