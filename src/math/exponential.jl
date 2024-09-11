@@ -58,6 +58,12 @@ end
 # KVector of orders 0 and 1 are guaranteed to square to scalars
 @inline ^(x::KVector{0,Q}, n::Integer) where Q = KVector{0,Q}(scalar(x)^n)
 
+#= TODO: resolve method ambiguities if we define this
+@inline function Base.literal_pow(::typeof(^), x::KVector{0,Q}, ::Val{n}) where {Q,n}
+    return KVector{0,Q}(Base.literal_pow(^, scalar(x), Val(n)))
+end
+=#
+
 @inline function Base.literal_pow(::typeof(^), x::KVector{1,Q}, ::Val{2}) where Q
     return KVector{0,Q}(x * x)
 end
