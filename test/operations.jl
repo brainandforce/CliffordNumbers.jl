@@ -277,9 +277,10 @@ end
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exppi(1//2 * k)
     @test CliffordNumbers.exp_taylor(pi/2 * k) ≈ exptau(1//4 * k)
     # Integer exponentiation of a multivector
-    k = KVector{1,VGA(3)}(4, 2, 0)
-    l = KVector{2,VGA(3)}(0, 6, 9)
-    m = KVector{0,VGA(3)}(20)
+    # All must consist of float types to avoid issues with negative integer exponentiation
+    k = KVector{1,VGA(3),Float64}(4, 2, 0)
+    l = KVector{2,VGA(3),Float64}(0, 6, 9)
+    m = KVector{0,VGA(3),Float64}(20)
     # Base.literal_pow tests
     if k^-2 === Base.literal_pow(^, k, Val(2)) && l^-2 === Base.literal_pow(^, l, Val(2))
         # These tests break on Julia 1.8: it seems that Base.literal_pow is not invoked
@@ -290,6 +291,7 @@ end
         @test k^-2 ≈ inv(k) * inv(k)
         @test l^-2 ≈ inv(l) * inv(l)
     end
+    # These tests all use Base.literal_pow because the exponents are literal integers
     @test k^-1 === inv(k)
     @test l^-1 === inv(l)
     @test m^-1 === inv(m)
@@ -299,12 +301,42 @@ end
     @test k^1 === k
     @test l^1 === l
     @test m^1 === m
-    @test k^2 == 20
+    @test k^2 === KVector{0,VGA(3),Float64}(20)
     @test l^2 == -117
-    @test m^2 == 400
-    @test k^3 isa KVector{1}
-    @test l^3 isa EvenCliffordNumber
-    @test m^3 isa KVector{0}
+    @test m^2 === KVector{0,VGA(3),Float64}(400)
+    # These examples are a little more complicated
+    # 1-vectors raised to odd powers can always be represented as KVector{1}, so k^3 is a KVector{1}
+    # But this is not true for arbitrary k-vectors, so l^3 is a Z2CliffordNumber
+    # Also, multiplying by x as opposed to EvenCliffordNumber{Q}(x) can have unexpected effects on
+    # the signs of the result
+    # TODO: try to ensure signs are propagated correctly in these tests
+    @test k^3 === k * 20 
+    @test l^3 === EvenCliffordNumber(l) * EvenCliffordNumber{VGA(3)}(-117)
+    @test m^3 === KVector{0,VGA(3),Float64}(8000)
+    # Redo the same tests with an exponent variable
+    # The types of some of the results should change due to type stability considerations
+    let z
+        z = -1
+        @test_broken k^z === CliffordNumber(inv(k))
+        @test_broken l^z === EvenCliffordNumber(inv(l))
+        @test m^z === inv(m)
+        z = 0
+        @test k^z === one(CliffordNumber(k))
+        @test l^z === one(EvenCliffordNumber(l))
+        @test m^z === one(m)
+        z = 1
+        @test k^z === CliffordNumber(k)
+        @test l^z === EvenCliffordNumber(l)
+        @test m^z === m
+        z = 2
+        @test k^z === CliffordNumber{VGA(3),Float64}(20)
+        @test l^z === EvenCliffordNumber{VGA(3),Float64}(-117)
+        @test m^z === KVector{0,VGA(3),Float64}(400)
+        z = 3
+        @test k^z === CliffordNumber(k) * 20
+        @test l^z === EvenCliffordNumber(l) * EvenCliffordNumber{VGA(3)}(-117)
+        @test m^z === KVector{0,VGA(3)}(float(8000))
+    end
     # Base.literal_pow only works for integers, apparently, but these are defined
     @test Base.literal_pow(^, k, Val(false)) === one(k)
     @test Base.literal_pow(^, l, Val(false)) === one(l)
