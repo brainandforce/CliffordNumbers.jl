@@ -1,10 +1,9 @@
 #---Equality and approximate equality--------------------------------------------------------------#
 
-function ==(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
-    return all(x[i] == y[i] for i in BitIndices(promote_type(typeof(x), typeof(y))))
-end
+==(x::T, y::T) where T<:AbstractCliffordNumber = Tuple(x) == Tuple(y)
+isequal(x::T, y::T) where T<:AbstractCliffordNumber = isequal(Tuple(x), Tuple(y))
 
-# Define equality with scalar values in terms of scalar operations above
+# TODO: does this avoid unnecessary comparisons or construction?
 ==(x::AbstractCliffordNumber, y::BaseNumber) = isscalar(x) && (scalar(x) == y)
 ==(x::BaseNumber, y::AbstractCliffordNumber) = isscalar(y) && (x == scalar(y))
 
