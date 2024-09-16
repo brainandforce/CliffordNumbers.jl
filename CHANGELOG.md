@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+  - Geometric products of `BitIndex` objects are faster.
+
 ## [0.1.7] - 2024-09-11
 
 ### Added

@@ -4,8 +4,8 @@
 Generates a signmask, or a string of bits where the only 1 bit is the sign bit. If `signbit` is set
 to false, this returns zero (or whatever value is represented by all bits being 0).
 """
-signmask(T::Type{<:Integer}, signbit::Bool = true) = bitreverse(T(signbit))
-signmask(x::Integer, signbit::Bool = true) = bitreverse(typeof(x)(signbit))
+@inline signmask(T::Type{<:Integer}, signbit::Bool = true) = bitreverse(T(signbit))
+@inline signmask(x::Integer, signbit::Bool = true) = bitreverse(typeof(x)(signbit))
 
 """
     BitIndex{Q}
@@ -74,7 +74,7 @@ function _bitindex(::Val{S}, t::NTuple) where S
     (t, parity) = _sort_with_parity(t)
     i = signmask(UInt, parity)
     for x in t
-        i = xor(i, 2^(x - firstindex(S)))
+        i = xor(i, <<(1, x - firstindex(S)))
     end
     return BitIndex{S}(i)
 end
@@ -100,7 +100,7 @@ function show(io::IO, b::BitIndex{Q}) where Q
     iszero(UInt(b)) && return nothing
     found_first_vector = false
     for a in 1:min(dimension(Q), 8*sizeof(UInt) - 1)
-        if !iszero(UInt(b) & 2^(a-1))
+        if !iszero(UInt(b) & <<(1, a-1))
             found_first_vector && print(io, ", ")
             print(io, eachindex(Q)[a])
             found_first_vector = true
@@ -185,16 +185,18 @@ conj(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero((grade(i) + 1) & 2)), UInt
 
 #---Multiplication tools---------------------------------------------------------------------------#
 
+# NOTE: <<(UInt(1), x) is faster/easier to inline than UInt(2)^x
+
 function positive_square_bits(S::Metrics.AbstractSignature)
-    return sum((S[x] === Int8(+1)) * UInt(2)^(x - firstindex(S)) for x in eachindex(S))
+    return sum((S[x] === Int8(+1)) * <<(UInt(1), x - firstindex(S)) for x in eachindex(S))
 end
 
 function negative_square_bits(S::Metrics.AbstractSignature)
-    return sum((S[x] === Int8(-1)) * UInt(2)^(x - firstindex(S)) for x in eachindex(S))
+    return sum((S[x] === Int8(-1)) * <<(UInt(1), x - firstindex(S)) for x in eachindex(S))
 end
 
 function zero_square_bits(S::Metrics.AbstractSignature)
-    return sum((S[x] === Int8(0)) * UInt(2)^(x - firstindex(S)) for x in eachindex(S))
+    return sum((S[x] === Int8(0)) * <<(UInt(1), x - firstindex(S)) for x in eachindex(S))
 end
 
 """
@@ -237,7 +239,7 @@ As with `Base.signbit()`, `true` represents a negative sign and `false` a positi
 in degenerate metrics (such as those of projective geometric algebras) the sign bit may be
 irrelevant as the multiplication of those basis blades would result in zero.
 """
-function signbit_of_mult(a::Unsigned, b::Unsigned)
+@inline function signbit_of_mult(a::Unsigned, b::Unsigned)
     a = abs(a) >>> 1
     sum = 0
     while !iszero(a)
@@ -250,7 +252,7 @@ end
 # Account for the sign bits of signed integers
 signbit_of_mult(a::Integer, b::Integer) = xor(signbit_of_mult(unsigned.(a,b)...), signbit(xor(a,b)))
 
-function signbit_of_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+@inline function signbit_of_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     base_signbit = xor(signbit_of_mult(UInt(a), UInt(b)), signbit(a), signbit(b))
     return xor(base_signbit, isodious(UInt(a) & UInt(b) & negative_square_bits(Q)))
 end
@@ -261,7 +263,7 @@ end
 Returns `false` if the product of `a` and `b` is zero due to the squaring of a degenerate component,
 `true` otherwise. This function always returns `true` if `R === 0`.
 """
-function nondegenerate_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+@inline function nondegenerate_mult(a::BitIndex{Q}, b::BitIndex{Q}) where Q
     return iszero(UInt(a) & UInt(b) & zero_square_bits(Q))
 end
 
