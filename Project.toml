@@ -3,8 +3,15 @@ uuid = "3998ac73-6bd4-4031-8035-f167dd3ed523"
 authors = ["Brandon Flores"]
 version = "0.1.9-dev"
 
+[weakdeps]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+
+[extensions]
+CliffordNumbersChainRulesCoreExt = "ChainRulesCore"
+
 [compat]
 Aqua = "0.8"
+ChainRulesCore = "1"
 Test = "1"
 julia = "1.8"
 
@@ -13,4 +20,4 @@ Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "Test"]
+test = ["Aqua", "ChainRulesCore", "Test"]
