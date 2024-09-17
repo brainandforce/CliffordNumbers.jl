@@ -182,6 +182,7 @@ Clifford number of type `C`, or a similar type from `CliffordNumbers.similar_typ
 """
 @generated function getindex_as_tuple(x::AbstractCliffordNumber{Q}, ::BitIndices{Q,C}) where {Q,C}
     inds = to_index.(x, BitIndices(C))
+    inds = ntuple(i -> inds[i] + iszero(inds[i]), Val(length(inds)))
     # The mask is needed for the KVector case.
     # BitIndex objects that don't map to a tuple index just get to turned to index 1
     mask = in.(BitIndices(C), tuple(BitIndices(x)))

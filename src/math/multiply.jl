@@ -255,6 +255,8 @@ kernel just returns the geometric product.
                 # But all values are known at compile time, so interpolate them into expressions
                 ib = to_index(y, b)
                 tuple_inds = to_index.(x, inds)
+                # to_index(::KVector, ::BitIndex) can return 0 if the index is not present
+                tuple_inds = ntuple(i -> tuple_inds[i] + iszero(tuple_inds[i]), Val(length(inds)))
                 signs = mul_signs(F(), inds, b)
                 # Construct the tuples that contribute to the product
                 x_tuple_ex = :(getindex.(tuple(Tuple(x)), $tuple_inds))
@@ -280,6 +282,8 @@ kernel just returns the geometric product.
                 # But all values are known at compile time, so interpolate them into expressions
                 ia = to_index(x, a)
                 tuple_inds = to_index.(y, inds)
+                # to_index(::KVector, ::BitIndex) can return 0 if the index is not present
+                tuple_inds = ntuple(i -> tuple_inds[i] + iszero(tuple_inds[i]), Val(length(inds)))
                 signs = mul_signs(F(), a, inds)
                 # Construct the tuples that contribute to the product
                 x_tuple_ex = :(Tuple(x)[$ia] .* $(signs .* mask))
