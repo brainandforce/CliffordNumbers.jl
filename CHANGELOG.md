@@ -10,6 +10,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
   - Geometric products of `BitIndex` objects are faster.
 
+### Fixed
+  - `scalar_product` had no method to handle mismatched scalar types.
+
 ## [0.1.7] - 2024-09-11
 
 ### Added
