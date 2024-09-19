@@ -46,9 +46,14 @@ ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
 """
-function scalar_product(x::AbstractCliffordNumber{Q,T}, y::AbstractCliffordNumber{Q,T}) where {Q,T}
-    # This is so much faster than anything else I can come up with
-    return @inline scalar(mul(x, y, GradeFilter{:*}()))
+@inline function scalar_product(x::T, y::T) where T<:AbstractCliffordNumber
+    return sum(Tuple(x) .* Tuple(y) .* map(sign_of_square, BitIndices(T)))
+end
+
+@inline function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+    # TODO: we could actually demote types here.
+    # Indices not represented by both x and y should be skipped and add zero.
+    return scalar_product(promote(x, y)...)
 end
 
 """
