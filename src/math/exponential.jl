@@ -74,7 +74,7 @@ end
 =#
 
 @inline function Base.literal_pow(::typeof(^), x::KVector{1,Q}, ::Val{2}) where Q
-    return KVector{0,Q}(x * x)
+    return KVector{0,Q}(scalar_product(x, x))
 end
 
 # TODO: In 3 or fewer dimensions, all k-vectors are k-blades, so promote to KVector{0}
