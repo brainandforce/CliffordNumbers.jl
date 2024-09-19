@@ -206,7 +206,7 @@ Returns the signbit associated with squaring the basis blade indexed by `b`.
 
 For basis blades squaring to zero, the result is not meaningful.
 """
-function signbit_of_square(b::BitIndex{Q}) where Q
+@inline function signbit_of_square(b::BitIndex{Q}) where Q
     return xor(!iszero(grade(b) & 2), isodd(count_ones(UInt(b) & negative_square_bits(Q))))
 end
 
@@ -216,7 +216,7 @@ end
 Returns `false` if squaring the basis blade `b` is zero due to a degenerate component, `true` 
 otherwise. For a nondegenerate metric, this is always `true`.
 """
-nondegenerate_square(b::BitIndex{Q}) where Q = iszero(UInt(b) & zero_square_bits(Q))
+@inline nondegenerate_square(b::BitIndex{Q}) where Q = iszero(UInt(b) & zero_square_bits(Q))
 
 """
     CliffordNumbers.sign_of_square(b::BitIndex) -> Int8
