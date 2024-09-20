@@ -47,7 +47,7 @@ BitIndices(Q::Metrics.AbstractSignature) = BitIndices{Q}()
 @inline to_index(x::CliffordNumber{Q}, i::BitIndex{Q}) where Q = to_index(typeof(x), i)
 
 @inline function getindex(x::CliffordNumber{Q}, b::BitIndex{Q}) where Q 
-    return sign(b) * (@inbounds x.data[to_index(x, b)])
+    return flipsign((@inbounds x.data[to_index(x, b)]), b)
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#

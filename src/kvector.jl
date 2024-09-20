@@ -59,7 +59,7 @@ end
 @inline to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
 
 @inline function getindex(k::KVector{K,Q,T}, b::BitIndex{Q}) where {K,Q,T}
-    return ifelse(grade(b) === K, (@inbounds k.data[to_index(k, b)]) * sign(b), zero(T))
+    return ifelse(grade(b) === K, flipsign((@inbounds k.data[to_index(k, b)]), b), zero(T))
 end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
