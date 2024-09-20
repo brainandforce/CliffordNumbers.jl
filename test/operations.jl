@@ -200,6 +200,17 @@ end
     @test !ispseudoscalar(KVector{1,VGA(3)}(4, 2, 0))
 end
 
+@testset "Scalar product" begin
+    k = KVector{1,VGA(3)}(1, 2, 3)
+    l = KVector{2,VGA(3)}(4, 5, 6)
+    @test scalar_product(k, k) === 14
+    @test scalar_product(OddCliffordNumber(k), CliffordNumber(k)) === 14
+    @test scalar_product(l, l) === -77
+    @test scalar_product(EvenCliffordNumber(l), EvenCliffordNumber(l)) === -77
+    # Must be zero because BitIndices(k) and BitIndices(l) have no common elements
+    @test iszero(scalar_product(k, l))
+end
+
 @testset "Inverses and division" begin
     k = KVector{1,VGA(3)}(1, 2, 3)
     l = KVector{2,VGA(3)}(4, 5, 6)
