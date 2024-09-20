@@ -67,7 +67,9 @@ end
 """
     abs2(x::AbstractCliffordNumber{Q,T}) -> T
 
-Calculates the squared norm of `x`, equal to `scalar_product(x, x')`.
+Calculates the modulus of `x` by calculating the scalar product of `x` with its reverse:
+`scalar_product(x, x')`. In positive-definite metrics, this value is positive for any nonzero 
+multivector and equal to `zero(T)` for any multivector equal to zero.
 """
 abs2(x::AbstractCliffordNumber) = scalar_product(x, x')
 
@@ -86,7 +88,8 @@ abs(x::AbstractCliffordNumber) = sqrt(abs(abs2(x)))
 """
     normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
 
-Normalizes `x` so that its magnitude (as calculated by `abs2`) is 1, 0, or -1.
+Normalizes `x` so that its modulus (as calculated by `abs2`) is 1, 0, or -1. This procedure cannot
+change the sign of the modulus.
 
 If `abs2(x)` is zero (possible in any non-positive-definite metric), `x` is returned unchanged.
 """
