@@ -10,9 +10,14 @@ function isscalar(x::AbstractCliffordNumber)
     return all(iszero, x[i] for i in inds)
 end
 
+# TODO: how to test the fallback method which is not used by any internal types?
+
+# The first index of these types is the scalar index
 isscalar(x::Union{CliffordNumber,EvenCliffordNumber}) = all(iszero, Tuple(x)[2:end])
+# These types cannot be scalars unless they are zero
 isscalar(x::OddCliffordNumber) = iszero(x)
 isscalar(x::KVector) = iszero(x)
+# These types are definitely scalars
 isscalar(::KVector{0}) = true
 isscalar(::BaseNumber) = true
 
