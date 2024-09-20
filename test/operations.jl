@@ -126,6 +126,7 @@ end
     import CliffordNumbers.AlgebraMismatch as GAMismatch
     x = CliffordNumber{VGA(3)}(0, 2, 0, 0, 0, 0, 0, 0)
     y = CliffordNumber{VGA(3)}(0, 3, 4, 0, 0, 0, 0, 0)
+    @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
     k1 = KVector{1,VGA(3)}(4, 2, 0)
     k2 = KVector{2,VGA(3)}(4, 2, 0)
     l1 = KVector{1,VGA(3)}(0, 6, 9)
@@ -165,13 +166,7 @@ end
     @test_throws GAMismatch zero(EvenCliffordNumber{VGA(3),Int}) * zero(KVector{1,STA,Int})
 end
 
-@testset "Scalars and pseudoscalars" begin
-    k = KVector{2,VGA(3)}(3, 4, 0)
-    @test 2(k) === KVector{2,VGA(3)}(6, 8, 0)
-    # Testing with KVector{0}
-    @test KVector{0,VGA(3)}(2) * k === 2 * k
-    @test k * KVector{0,VGA(3)}(2) === k * 2
-    @test KVector{0,VGA(3)}(2) * KVector{0,VGA(3)}(3) === KVector{0,VGA(3)}(6)
+@testset "Scalar and pseudoscalar components" begin
     # Extracting scalars
     @test scalar(EvenCliffordNumber{VGA(3)}(4, 3, 2, 1)) === 4
     @test scalar(KVector{0,VGA(3),Float64}(5)) === 5.0
@@ -221,6 +216,19 @@ end
     @test normalize(KVector{1,STA}(2, 2, 0, 0)) === KVector{1,STA}(2, 2, 0, 0)
     @test normalize(KVector{0,STA,Float32}(420)) === one(KVector{0,STA,Float32})
     @test normalize(KVector{0,STA,Int8}(0)) === zero(KVector{0,STA,Int8})
+end
+
+@testset "Addition and multiplication with scalars" begin
+    k = KVector{1,VGA(3)}(4, 2, 0)
+    l = KVector{2,VGA(3)}(0, 6, 9)
+    @test 1 + k === CliffordNumber{VGA(3)}(1, 4, 2, 0, 0, 0, 0, 0)
+    @test k - 1 === CliffordNumber{VGA(3)}(-1, 4, 2, 0, 0, 0, 0, 0)
+    @test 1 + l === EvenCliffordNumber{VGA(3)}(1, 0, 6, 9)
+    @test l - 1 === EvenCliffordNumber{VGA(3)}(-1, 0, 6, 9)
+    @test 2 * k === KVector{1,VGA(3)}(8, 4, 0)
+    @test 2(k)  === KVector{1,VGA(3)}(8, 4, 0)
+    @test k(2)  === KVector{1,VGA(3)}(8, 4, 0)
+    @test k * 2 === k * KVector{0,VGA(3)}(2)
 end
 
 @testset "Inverses and division" begin
