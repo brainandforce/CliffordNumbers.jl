@@ -7,14 +7,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - Implementations of `flipsign` and `copysign` for `BitIndex`.
+  - `+(::BitIndex)` returns the input.
+
 ### Changed
   - Geometric products of `BitIndex` objects are faster.
   - `scalar_product` is implemented with a generated function independent of `CliffordNumbers.mul`.
   - `normalize` returns `x` if `abs2(x)` is zero.
+  - Indexing of Clifford numbers with `Rational` scalar types is significantly faster due to the use
+    of `flipsign` instead of multiplication.
+  - `KVector` indexing is now faster.
 
 ### Fixed
   - `scalar_product` had no method to handle mismatched scalar types.
   - `abs` now returns a `Real` result: it is equal to `sqrt(abs(abs2(x)))`.
+  - Indexing `KVector` does not throw an error if the first entry is `1//0`.
 
 ## [0.1.7] - 2024-09-11
 
