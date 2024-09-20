@@ -110,6 +110,7 @@ end
 
 @testset "Indexing" begin
     k = KVector{2,VGA(3)}(4, 2, 0)
+    k_inf = KVector{1,STA}(1//0, 2, 3, 4)
     x = CliffordNumber{VGA(3)}(0, 0, 0, 4, 0, 2, 0, 0)
     @test iszero(k[BitIndex(Val{VGA(3)}())])
     @test iszero(k[BitIndex(Val{VGA(3)}(), 1)])
@@ -120,6 +121,11 @@ end
     @test k[BitIndices(VGA(3))] === x
     @test x[BitIndices(k)] === k
     @test x[BitIndices(KVector{2,VGA(3)})] === k
+    # Testing for cases where the first element is 1//0
+    # This caused problems before commit 528636f4496785253be9807b17df1f028ef7a5f0
+    @test k_inf[BitIndex(Val(STA))] === 0//1
+    @test k_inf[BitIndex(Val(STA), 0)] === 1//0
+    @test k_inf[BitIndex(Val(STA), 1)] === 2//1
 end
 
 @testset "Type lengths" begin
