@@ -116,10 +116,14 @@ end
     ee = EvenCliffordNumber{VGA(3),Float64}(0, 4, 2, 0)
     f = EvenCliffordNumber{VGA(3),Float32}(0, 0, 6, 9)
     ff = EvenCliffordNumber{VGA(3),Float64}(0, 0, 6, 9)
-    @test muladd(2, ee, ff) === EvenCliffordNumber{VGA(3),Float64}(0, 8, 10, 9)
-    @test muladd(2, ff, ee) === EvenCliffordNumber{VGA(3),Float64}(0, 4, 14, 18)
-    @test muladd(2, e, f) === muladd(e, 2, f)
-    @test muladd(2, e, ff) == muladd(2, ee, f)
+    @test muladd(2,  ee, ff) === EvenCliffordNumber{VGA(3),Float64}(0, 8, 10, 9)
+    @test muladd(2,  ff, ee) === EvenCliffordNumber{VGA(3),Float64}(0, 4, 14, 18)
+    @test muladd(2,  e,  f) === muladd(e, 2, f)
+    @test muladd(2,  e,  ff) == muladd(2, ee, f)
+    @test muladd(ee, 2,  ff) === EvenCliffordNumber{VGA(3),Float64}(0, 8, 10, 9)
+    @test muladd(ff, 2,  ee) === EvenCliffordNumber{VGA(3),Float64}(0, 4, 14, 18)
+    @test muladd(e,  2,  f) === muladd(e, 2, f)
+    @test muladd(e,  2,  ff) == muladd(2, ee, f)
 end
 
 @testset "Geometric product" begin
