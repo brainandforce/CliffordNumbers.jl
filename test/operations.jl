@@ -168,15 +168,6 @@ end
 @testset "Scalars and pseudoscalars" begin
     k = KVector{2,VGA(3)}(3, 4, 0)
     @test 2(k) === KVector{2,VGA(3)}(6, 8, 0)
-    @test abs2(k) === 25
-    @test abs(k) == 5
-    @test normalize(k) == k / 5
-    # Testing non-positive definite and degenerate metrics
-    @test abs2(KVector{1,STA}(0, 2, 3, 4)) == -29
-    @test abs2(KVector{1,PGA(3)}(1, 0, 0, 0)) == 0
-    @test abs2(KVector{0,VGA(2)}(2)) === 4
-    @test abs(KVector{0,VGA(2)}(-2)) === 2
-    @test normalize(KVector{0,VGA(2),Float16}(3)) === one(KVector{0,VGA(2),Float16})
     # Testing with KVector{0}
     @test KVector{0,VGA(3)}(2) * k === 2 * k
     @test k * KVector{0,VGA(3)}(2) === k * 2
@@ -200,15 +191,36 @@ end
     @test !ispseudoscalar(KVector{1,VGA(3)}(4, 2, 0))
 end
 
-@testset "Scalar product" begin
-    k = KVector{1,VGA(3)}(1, 2, 3)
-    l = KVector{2,VGA(3)}(4, 5, 6)
-    @test scalar_product(k, k) === 14
-    @test scalar_product(OddCliffordNumber(k), CliffordNumber(k)) === 14
-    @test scalar_product(l, l) === -77
-    @test scalar_product(EvenCliffordNumber(l), EvenCliffordNumber(l)) === -77
-    # Must be zero because BitIndices(k) and BitIndices(l) have no common elements
-    @test iszero(scalar_product(k, l))
+@testset "Scalar products and normalization" begin
+    k = KVector{1,VGA(3)}(3, 4, 0)
+    l = KVector{2,VGA(3)}(0, 5, 12)
+    # In case we decide scalar_product should return a KVector{0}, the tests shouldn't break
+    @test scalar_product(k, k) == 25
+    @test scalar_product(OddCliffordNumber(k), CliffordNumber(k)) == 25
+    @test scalar_product(l, l) == -169
+    @test scalar_product(EvenCliffordNumber(l), EvenCliffordNumber(l)) == -169
+    @test_throws CliffordNumbers.AlgebraMismatch scalar_product(one(KVector{0,STA}), k)
+    @test iszero(scalar_product(k, l))  # no indices in commmon between k and l
+    @test abs2(k) === 25
+    @test abs(k) == 5
+    @test abs2(l) === 169
+    @test abs(l) == 13
+    @test normalize(k) === k / 5
+    @test normalize(l) === l / 13
+    @test normalize(zero(k)) === zero(k)
+    # Testing non-positive definite and degenerate metrics
+    @test abs2(KVector{1,STA}(0, 2, 3, 4)) == -29
+    @test abs2(KVector{1,PGA(3)}(1, 0, 0, 0)) == 0
+    @test abs2(KVector{0,VGA(2)}(2)) === 4
+    @test abs(KVector{0,VGA(2)}(-2)) === 2
+    @test normalize(KVector{0,VGA(2),Float16}(3)) === one(KVector{0,VGA(2),Float16})
+    @test normalize(KVector{1,STA}(3, 0, 0, 0)) === KVector{1,STA}(3, 0, 0, 0) / 3
+    @test normalize(KVector{1,STA}(-3, 0, 0, 0)) === KVector{1,STA}(-3, 0, 0, 0) / 3
+    @test normalize(KVector{1,STA}(0, 0, 0, 3)) === KVector{1,STA}(0, 0, 0, 3) / 3
+    @test normalize(KVector{1,STA}(0, 0, 0, -3)) === KVector{1,STA}(0, 0, 0, -3) / 3
+    @test normalize(KVector{1,STA}(2, 2, 0, 0)) === KVector{1,STA}(2, 2, 0, 0)
+    @test normalize(KVector{0,STA,Float32}(420)) === one(KVector{0,STA,Float32})
+    @test normalize(KVector{0,STA,Int8}(0)) === zero(KVector{0,STA,Int8})
 end
 
 @testset "Inverses and division" begin
