@@ -48,7 +48,7 @@ nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 end
 
 @inline function to_index(C::Type{<:KVector{K,Q}}, b::BitIndex{Q}) where {K,Q}
-    # Default to 1 as a valid index for any KVector instance
+    # Default to 1 as a valid index for the Tuple backing any KVector instance
     i = 1
     for n in 1:nblades(C)
         is_same_blade(b, (@inbounds BitIndices(C)[n])) && (i = n)
@@ -58,8 +58,8 @@ end
 
 @inline to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
 
-@inline function getindex(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q}
-    return (@inbounds k.data[to_index(k, b)]) * sign(b) * (grade(b) === K)
+@inline function getindex(k::KVector{K,Q,T}, b::BitIndex{Q}) where {K,Q,T}
+    return ifelse(grade(b) === K, (@inbounds k.data[to_index(k, b)]) * sign(b), zero(T))
 end
 
 #---Multiplicative identity and pseudoscalar-------------------------------------------------------#
