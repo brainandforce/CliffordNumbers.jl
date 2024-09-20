@@ -86,14 +86,16 @@ abs(x::AbstractCliffordNumber) = sqrt(abs(abs2(x)))
 """
     normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
 
-Normalizes `x` so that its magnitude (as calculated by `abs2(x)`) is 1.
+Normalizes `x` so that its magnitude (as calculated by `abs2`) is 1, 0, or -1.
+
+If `abs2(x)` is zero (possible in any non-positive-definite metric), `x` is returned unchanged.
 """
-normalize(x::AbstractCliffordNumber) = x / abs(x)
+normalize(x::AbstractCliffordNumber) = (n = abs(x); ifelse(iszero(n), x, x / n))
 
 # Optimized versions for `KVector` scalars
 abs(k::KVector{0}) = abs(scalar(k))
 abs2(k::KVector{0}) = abs2(scalar(k))
-normalize(x::KVector{0}) = one(typeof(x))
+normalize(x::KVector{0}) = ifelse(iszero(x), zero(x), one(x))
 
 #---Scalar multiplication and division-------------------------------------------------------------#
 
