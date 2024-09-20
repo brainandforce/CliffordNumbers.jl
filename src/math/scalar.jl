@@ -72,11 +72,16 @@ Calculates the squared norm of `x`, equal to `scalar_product(x, x')`.
 abs2(x::AbstractCliffordNumber) = scalar_product(x, x')
 
 """
-    abs(x::AbstractCliffordNumber{Q,T}) -> Union{Real,Complex}
+    abs(x::AbstractCliffordNumber{Q}) -> Union{Real,Complex}
 
-Calculates the norm of `x`, equal to `sqrt(scalar_product(x, x'))`.
+Calculates the norm of `x`, equal to `sqrt(abs(abs2(x)))`.
+
+The inclusion of `abs` in this expression accounts for the possibility that the algebra `Q` contains
+1-blades with a negative square, which would result in `abs(x)` being imaginary. In these cases,
+`abs(x)` may not be a norm, but it is used internally by `normalize(x)` to calculate a
+normalization factor.
 """
-abs(x::AbstractCliffordNumber) = hypot(Tuple(x)...)
+abs(x::AbstractCliffordNumber) = sqrt(abs(abs2(x)))
 
 """
     normalize(x::AbstractCliffordNumber{Q}) -> AbstractCliffordNumber{Q}
