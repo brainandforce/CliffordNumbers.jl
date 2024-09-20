@@ -47,13 +47,13 @@ nonzero_grades(::Type{<:KVector{K}}) where K = K:K
     return BitIndex{Q}(signbit(i-1), unsigned(hamming_number(K, i)))
 end
 
-@inline function to_index(C::Type{<:KVector{K,Q}}, b::BitIndex{Q}) where {K,Q}
-    # Default to 1 as a valid index for the Tuple backing any KVector instance
-    i = 1
+@inline @generated function to_index(::Type{C}, b::BitIndex{Q}) where {K,Q,C<:KVector{K,Q}}
+    ex = :(i = 1)
     for n in 1:nblades(C)
-        is_same_blade(b, (@inbounds BitIndices(C)[n])) && (i = n)
+        a = BitIndices(C)[n]
+        ex = :($ex; is_same_blade($a, b) && (i = $n))
     end
-    return i
+    return :($ex; return i)
 end
 
 @inline to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
