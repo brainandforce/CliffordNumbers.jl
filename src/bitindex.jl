@@ -116,6 +116,9 @@ signature(::BitIndex{Q}) where Q = Q
 signbit(i::BitIndex) = !iszero(i.i & signmask(UInt))
 sign(i::BitIndex) = Int8(-1)^signbit(i)
 
+copysign(x, i::BitIndex) = copysign(x, sign(i))
+flipsign(x, i::BitIndex) = flipsign(x, sign(i))
+
 -(i::BitIndex) = typeof(i)(!signbit(i), UInt(i))
 abs(i::BitIndex) = typeof(i)(UInt(i))
 
