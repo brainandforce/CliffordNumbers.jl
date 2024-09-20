@@ -9,6 +9,23 @@
     @test BitIndex(Val{VGA(3)}(), 1, 2) === -BitIndex(Val{VGA(3)}(), 2, 1)
     @test abs(BitIndex(Val{VGA(3)}(), 1, 2)) === BitIndex(Val{VGA(3)}(), 1, 2)
     @test abs(BitIndex(Val{VGA(3)}(), 2, 1)) === BitIndex(Val{VGA(3)}(), 1, 2)
+    # Sign manipulation
+    @test copysign(+a, +1) === +a
+    @test copysign(+a, -1) === -a
+    @test copysign(-a, +1) === +a
+    @test copysign(-a, -1) === -a
+    @test flipsign(+b, +1) === +b
+    @test flipsign(+b, -1) === -b
+    @test flipsign(-b, +1) === -b
+    @test flipsign(-b, -1) === +b
+    @test copysign(+c, +a) === +c
+    @test copysign(+c, -a) === -c
+    @test copysign(-c, +a) === +c
+    @test copysign(-c, -a) === -c
+    @test flipsign(+c, +b) === +c
+    @test flipsign(+c, -b) === -c
+    @test flipsign(-c, +b) === -c
+    @test flipsign(-c, -b) === +c
     # Euclidean multiplications
     @test signbit_of_mult(a, b) === false
     @test signbit_of_mult(b, a) === true

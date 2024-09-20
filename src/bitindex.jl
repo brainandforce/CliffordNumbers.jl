@@ -123,6 +123,13 @@ flipsign(x, i::BitIndex) = flipsign(x, sign(i))
 -(i::BitIndex) = typeof(i)(!signbit(i), UInt(i))
 abs(i::BitIndex) = typeof(i)(UInt(i))
 
+copysign(b::BitIndex, i) = ifelse(sign(i) < 0, -abs(b), abs(b))
+flipsign(b::BitIndex, i) = ifelse(sign(i) < 0, -b, b)
+
+# Needed to resolve method ambiguities
+copysign(b::BitIndex, i::BitIndex) = typeof(b)(signbit(i), UInt(b))
+flipsign(b::BitIndex, i::BitIndex) = typeof(b)(xor(signbit(i), signbit(b)), UInt(b))
+
 """
     grade(i::BitIndex) -> Int
 
