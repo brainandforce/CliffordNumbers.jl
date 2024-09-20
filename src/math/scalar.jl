@@ -45,15 +45,23 @@ ispseudoscalar(x::KVector{K,Q}) where {K,Q} = (iszero(x) || K == dimension(Q))
 
 Calculates the scalar product of two Clifford numbers with quadratic form `Q`. The result is a
 `Real` or `Complex` number. This can be converted back to an `AbstractCliffordNumber`.
+
+The result is equal to `scalar(x * y)`, but does not calculate the coefficients associated with any
+other basis blades.
 """
-@inline function scalar_product(x::T, y::T) where T<:AbstractCliffordNumber
-    return sum(Tuple(x) .* Tuple(y) .* map(sign_of_square, BitIndices(T)))
+@inline @generated function scalar_product(x::T, y::T) where T<:AbstractCliffordNumber
+    ind_signs = map(sign_of_square, BitIndices(T))
+    return :(mapreduce(*, +, Tuple(x), Tuple(y), $ind_signs))
 end
 
-@inline function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
+function scalar_product(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q
     # TODO: we could actually demote types here.
     # Indices not represented by both x and y should be skipped and add zero.
-    return scalar_product(promote(x, y)...)
+    return @inline scalar_product(promote(x, y)...)
+end
+
+function scalar_product(x::AbstractCliffordNumber, y::AbstractCliffordNumber)
+    throw(AlgebraMismatch(scalar_product, (x, y)))
 end
 
 """
