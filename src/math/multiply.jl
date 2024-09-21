@@ -309,6 +309,56 @@ function mul(
     return @inline mul(scalar_promote(x, y)..., F)
 end
 
+#= Rational multiplication is slow without some optimization
+
+function gcd_rescale(t::Tuple{Vararg{Rational{T}}}) where T
+    g = lcm(denominator.(t)...)
+    return (convert.(T, t .* g), g)
+end
+
+gcd_rescale(t::Tuple{Vararg{T}}) where T<:Integer = (t, one(T))
+
+function gcd_rescale(x::AbstractCliffordNumber{Q,Rational{T}}) where {Q,T}
+    C = similar_type(x, T)
+    (t, g) = gcd_rescale(x)
+    return (C(t), g)
+end
+=#
+
+function mul(
+    x::AbstractCliffordNumber{Q,Rational{S}},
+    y::AbstractCliffordNumber{Q,Rational{T}},
+    F::GradeFilter = GradeFilter{:*}()
+) where {Q,S<:Integer,T<:Integer}
+    gx = lcm(denominator.(Tuple(x))...)
+    gy = lcm(denominator.(Tuple(y))...)
+    sx = scalar_convert(promote_type(S, T), x * gx)
+    sy = scalar_convert(promote_type(S, T), y * gy)
+    return (@inline mul(sx, sy, F)) // (gx * gy)
+end
+
+function mul(
+    x::AbstractCliffordNumber{Q,Rational{S}},
+    y::AbstractCliffordNumber{Q,T},
+    F::GradeFilter = GradeFilter{:*}()
+) where {Q,S<:Integer,T<:Integer}
+    gx = lcm(denominator.(Tuple(x))...)
+    sx = scalar_convert(promote_type(S, T), x * gx)
+    return (@inline mul(sx, y, F)) // gx
+end
+
+function mul(
+    x::AbstractCliffordNumber{Q,S},
+    y::AbstractCliffordNumber{Q,Rational{T}},
+    F::GradeFilter = GradeFilter{:*}()
+) where {Q,S<:Integer,T<:Integer}
+    gy = lcm(denominator.(Tuple(y))...)
+    sy = scalar_convert(promote_type(S, T), y * gy)
+    return (@inline mul(x, sy, F)) // gy
+end
+
+# Throw an error if the algebras are different
+
 function mul(
     x::AbstractCliffordNumber,
     y::AbstractCliffordNumber,
