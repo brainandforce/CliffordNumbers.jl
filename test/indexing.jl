@@ -99,6 +99,10 @@ end
     @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
     @test Broadcast.BroadcastStyle(BitIndices) === Broadcast.Style{Tuple}()
     @test Broadcast.BroadcastStyle(TransformedBitIndices) === Broadcast.Style{Tuple}()
+    # Efficient == methods
+    @test BitIndices(KVector{1,VGA(3)}) == BitIndices{VGA(3), KVector{1,VGA(3)}}()
+    @test BitIndices(KVector{1,VGA(3)}) == BitIndices{VGA(3), KVector{1,VGA(3),Int}}()
+    @test BitIndices(KVector{1,VGA(3)}) == BitIndices{VGA(3), KVector{1,VGA(3),Int,3}}()
 end
 
 @testset "Transformed BitIndices" begin
