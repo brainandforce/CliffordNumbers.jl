@@ -91,7 +91,9 @@ BitIndices{Q}(::Type{C}) where {Q,C<:AbstractCliffordNumber} = BitIndices{Q,biti
 BitIndices(::Type{C}) where C<:AbstractCliffordNumber = BitIndices{signature(C)}(C)
 (::Type{B})(x::AbstractCliffordNumber) where B<:BitIndices = B(typeof(x))
 
-# TODO: more efficient defintion of equality
+# Very fast equality checks
+==(::B, ::B) where B<:BitIndices = true
+==(::BitIndices{Q,S}, ::BitIndices{Q,T}) where {Q,S,T} = (bitindices_type(S) === bitindices_type(T))
 
 @inline function getindex(b::BitIndices{Q}, i::Integer) where Q
     @boundscheck checkbounds(b, i)
