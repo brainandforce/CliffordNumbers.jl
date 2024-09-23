@@ -91,6 +91,11 @@ basis bivectors are {e₁e₂, e₁e₃, e₂e₃}. The sign of the `BitIndex{Q}
 the basis vector permutation is odd.
 """
 BitIndex(S::Val, i::Integer...) = _bitindex(S, promote(i...))
+# Optimized versions for 0 or 1 integer argument
+BitIndex(::Val{Q}) where Q = BitIndex{Q}(UInt(0))
+BitIndex(::Val{Q}, i::Integer) where Q = BitIndex{Q}(<<(UInt(1), i - firstindex(Q)))
+
+# Extract signature parameter from first argument
 BitIndex(x, i::Integer...) = BitIndex(Val(signature(x)), i...)
 
 #---Show method------------------------------------------------------------------------------------#
