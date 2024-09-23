@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+# [0.1.8] - 2024-09-23
+
 ### Added
   - Implementations of `flipsign` and `copysign` for `BitIndex`.
   - `+(::BitIndex)` returns the input.
