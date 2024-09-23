@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
   - Implementations of `flipsign` and `copysign` for `BitIndex`.
   - `+(::BitIndex)` returns the input.
+  - Faster multiplication methods for `Rational` coefficients.
 
 ### Changed
   - Geometric products of `BitIndex` objects are faster.
