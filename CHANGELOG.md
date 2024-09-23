@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+  - Indexing and equality checking of `BitIndices` is slightly more efficient.
+
 # [0.1.8] - 2024-09-23
 
 ### Added
