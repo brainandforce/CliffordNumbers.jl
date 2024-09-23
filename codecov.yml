@@ -2,7 +2,7 @@ coverage:
   status:
     project:
       default:
-        target: 80%    # the required coverage value
-        threshold: 5%  # the leniency in hitting the target
+        target: 85%    # the required coverage value
+        threshold: 10%  # the leniency in hitting the target
 ignore:
   - src/show.jl
