@@ -93,9 +93,9 @@ BitIndices(::Type{C}) where C<:AbstractCliffordNumber = BitIndices{signature(C)}
 
 # TODO: more efficient defintion of equality
 
-function getindex(b::BitIndices{Q}, i::Integer) where Q
+@inline function getindex(b::BitIndices{Q}, i::Integer) where Q
     @boundscheck checkbounds(b, i)
-    return BitIndex{Q}(signbit(i-1), unsigned(i-1))
+    return BitIndex{Q}(UInt(i-1))
 end
 
 # Very efficient tuple generation

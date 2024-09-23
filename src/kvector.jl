@@ -44,7 +44,7 @@ nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 
 @inline function getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
     @boundscheck checkbounds(b, i)
-    return BitIndex{Q}(signbit(i-1), unsigned(hamming_number(K, i)))
+    return BitIndex{Q}(UInt(hamming_number(K, i)))
 end
 
 @inline @generated function to_index(::Type{C}, b::BitIndex{Q}) where {K,Q,C<:KVector{K,Q}}

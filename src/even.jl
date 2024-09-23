@@ -80,7 +80,7 @@ bitindices_type(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = Z2CliffordNumber{
 @inline function getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
     @boundscheck checkbounds(b, i)
     n = number_of_parity(i, P)
-    return BitIndex{Q}(signbit(n), unsigned(n))
+    return BitIndex{Q}(UInt(n))
 end
 
 @inline to_index(::Type{<:Z2CliffordNumber{P,Q}}, b::BitIndex{Q}) where {P,Q} = div(Int(b), 2) + 1
