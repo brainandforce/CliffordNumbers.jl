@@ -24,6 +24,7 @@ makedocs(;
         "Metric signatures" => "metrics.md",
         "Indexing" => "indexing.md",
         "Operations" => "operations.md",
+        "Performance tips" => "performance.md",
         "API" => Any[
             "CliffordNumbers" => "api/clifford.md",
             "Indexing" => "api/indexing.md",
