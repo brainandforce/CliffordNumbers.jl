@@ -170,6 +170,17 @@ end
     @test_throws GAMismatch zero(EvenCliffordNumber{VGA(3),Int}) * zero(KVector{1,STA,Int})
 end
 
+@testset "Rational kernels" begin
+    import CliffordNumbers: mul, GradeFilter
+    x = EvenCliffordNumber{VGA(3)}(1//2, 3//4, 5//6, 7//8)
+    y = OddCliffordNumber{VGA(3)}(2//1, 4//3, 6//5, 8//7)
+    z = EvenCliffordNumber{VGA(3)}(1, 3, 3, 7)
+    @test x * y === CliffordNumbers.mul(x, y)
+    @test x ∧ y === CliffordNumbers.mul(x, y, GradeFilter{:∧}())
+    @test y * z === CliffordNumbers.mul(y, z)
+    @test z * y === CliffordNumbers.mul(z, y)
+end
+
 @testset "Scalar and pseudoscalar components" begin
     # Extracting scalars
     @test scalar(EvenCliffordNumber{VGA(3)}(4, 3, 2, 1)) === 4
