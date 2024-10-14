@@ -1,22 +1,28 @@
 #---Tools for determining which grades of a Clifford number are nonzero----------------------------#
 """
-    nonzero_grades(::Type{<:AbstractCliffordNumber})
-    nonzero_grades(::AbstractCliffordNumber)
+    nonzero_grades(::Type{<:AbstractCliffordNumber{Q}}) -> AbstractVector{Int}
+    nonzero_grades(::Number)
 
-A function returning an indexable object representing all nonzero grades of a Clifford number
-representation.
+Returns an `AbstractVector{Int}` whose elements are all nonzero grades of a Clifford number or type.
+Any subtype `T` of `AbstractCliffordNumber` should define this method for `Type{T}`; it is
+automatically implemented for instance arguments.
 
-This function is used to define the indexing of `RepresentedGrades`, and should be defined for any
-subtypes of `AbstractCliffordNumber`.
+For arguments that are `Real` or `Complex`, this function returns `0:0`.
 
 # Examples
 
 ```julia-repl
-julia> CliffordNumbers.nonzero_grades(CliffordNumber{APS})
+julia> CliffordNumbers.nonzero_grades(CliffordNumber{VGA(3)})
 0:3
 
-julia> CliffordNumbers.nonzero_grades(KVector{2,APS})
+julia> CliffordNumbers.nonzero_grades(EvenCliffordNumber{VGA(3)})
+0:2:2
+
+julia> CliffordNumbers.nonzero_grades(KVector{2,VGA(3)})
 2:2
+
+julia> nonzero_grades(Float64)
+0:0
 ```
 """
 nonzero_grades(x::Number) = nonzero_grades(typeof(x))
