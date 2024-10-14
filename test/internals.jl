@@ -44,3 +44,82 @@ end
     @test short_typename(zero(KVector{2,VGA(3),Bool})) === KVector{2,VGA(3),Bool}
     @test short_typename(AbstractCliffordNumber{STA,Bool}) === AbstractCliffordNumber{STA,Bool}
 end
+
+@testset "MulMask type" begin
+    import CliffordNumbers.MulMask
+    # Construction and signs
+    @test MulMask(0) === zero(MulMask)
+    @test MulMask(1) === one(MulMask)
+    @test +MulMask(0) === zero(MulMask)
+    @test +MulMask(1) === one(MulMask)
+    @test -MulMask(0) === -zero(MulMask)
+    @test -MulMask(1) === -one(MulMask)
+    @test -MulMask(1) === MulMask(-1)
+    @test MulMask(-0.0) === -zero(MulMask)
+    # iszero
+    @test iszero(zero(MulMask))
+    @test !iszero(one(MulMask))
+    @test iszero(-zero(MulMask))
+    @test !iszero(-one(MulMask))
+    # flipsign
+    # Signed integer
+    @test flipsign(1, zero(MulMask)) === 1
+    @test flipsign(1, one(MulMask)) === 1
+    @test flipsign(1, -zero(MulMask)) === -1
+    @test flipsign(1, -one(MulMask)) === -1
+    @test flipsign(0, zero(MulMask)) === 0
+    @test flipsign(0, one(MulMask)) === 0
+    @test flipsign(0, -zero(MulMask)) === 0
+    @test flipsign(0, -one(MulMask)) === 0
+    # Unsigned integer
+    @test flipsign(UInt(1), zero(MulMask)) === UInt(1)
+    @test flipsign(UInt(1), one(MulMask)) === UInt(1)
+    @test flipsign(UInt(1), -zero(MulMask)) === -UInt(1)
+    @test flipsign(UInt(1), -one(MulMask)) === -UInt(1)
+    @test flipsign(UInt(0), zero(MulMask)) === UInt(0)
+    @test flipsign(UInt(0), one(MulMask)) === UInt(0)
+    @test flipsign(UInt(0), -zero(MulMask)) === UInt(0)
+    @test flipsign(UInt(0), -one(MulMask)) === UInt(0)
+    # Floating point
+    @test flipsign(1.0, zero(MulMask)) === 1.0
+    @test flipsign(1.0, one(MulMask)) === 1.0
+    @test flipsign(1.0, -zero(MulMask)) === -1.0
+    @test flipsign(1.0, -one(MulMask)) === -1.0
+    @test flipsign(0.0, zero(MulMask)) === 0.0
+    @test flipsign(0.0, one(MulMask)) === 0.0
+    @test flipsign(0.0, -zero(MulMask)) === -0.0
+    @test flipsign(0.0, -one(MulMask)) === -0.0
+    # Multiplication
+    # Signed integer
+    @test +1 * zero(MulMask) === 0
+    @test +1 * one(MulMask) === +1
+    @test +1 * -zero(MulMask) === 0
+    @test +1 * -one(MulMask) === -1
+    @test -1 * zero(MulMask) === 0
+    @test -1 * one(MulMask) === -1
+    @test -1 * -zero(MulMask) === 0
+    @test -1 * -one(MulMask) === +1
+    # Unsigned integer
+    @test +UInt(1) * zero(MulMask) === UInt(0)
+    @test +UInt(1) * one(MulMask) === UInt(1)
+    @test +UInt(1) * -zero(MulMask) === UInt(0)
+    @test +UInt(1) * -one(MulMask) === -UInt(1)
+    @test -UInt(1) * zero(MulMask) === UInt(0)
+    @test -UInt(1) * one(MulMask) === -UInt(1)
+    @test -UInt(1) * -zero(MulMask) === UInt(0)
+    @test -UInt(1) * -one(MulMask) === UInt(1)
+    # Floating point
+    @test +1.0 * zero(MulMask) === +0.0
+    @test +1.0 * one(MulMask) === +1.0
+    @test +1.0 * -zero(MulMask) === -0.0
+    @test +1.0 * -one(MulMask) === -1.0
+    @test -1.0 * zero(MulMask) === -0.0
+    @test -1.0 * one(MulMask) === -1.0
+    @test -1.0 * -zero(MulMask) === +0.0
+    @test -1.0 * -one(MulMask) === +1.0
+    # Printing
+    @test eval(Meta.parse(repr("text/plain", zero(MulMask)))) === zero(MulMask)
+    @test eval(Meta.parse(repr("text/plain", one(MulMask)))) === one(MulMask)
+    @test eval(Meta.parse(repr("text/plain", -zero(MulMask)))) === -zero(MulMask)
+    @test eval(Meta.parse(repr("text/plain", -one(MulMask)))) === -one(MulMask)
+end
