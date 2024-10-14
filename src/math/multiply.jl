@@ -83,6 +83,58 @@ end
 
 const ContractionGradeFilters = Union{GradeFilter{:⨼},GradeFilter{:⨽},GradeFilter{:dot}}
 
+#---Multipliation mask-----------------------------------------------------------------------------#
+"""
+    CliffordNumbers.MulMask
+
+An implementation of a one's complement signed 2-bit integer used to describe the effect of a
+multiplication between two BitIndex objects.
+  * `0x00` represents +0
+  * `0x01` represents +1
+  * `0x81` represents -1
+  * `0x80` represents -0
+
+# Promotion
+
+`CliffordNumbers.MulMask` promotes to whatever type it is multiplied with, even if the type does not
+represent a sign. The result of multiplying `-CliffordNumbers.MulMask(1)` with an unsigned
+representation depends on the semantics of negation for that type.
+"""
+primitive type MulMask 8
+end
+
+MulMask(x::Real) = reinterpret(MulMask, (signbit(x) * 0x80) + (!iszero(x) * 0x01))
+
+zero(::Union{MulMask,Type{MulMask}}) = reinterpret(MulMask, 0x00)
+one(::Union{MulMask,Type{MulMask}}) = reinterpret(MulMask, 0x01)
+
+# Must be defined separately when a signed zero representation exists
+iszero(x::MulMask) = iseven(reinterpret(UInt8, x))
+
+signbit(x::MulMask) = !iszero(reinterpret(UInt8, x) & 0x80)
+sign(x::MulMask) = x
+
++(x::MulMask) = x
+-(x::MulMask) = reinterpret(MulMask, xor(reinterpret(UInt8, x), 0x80))
+
+# Not needed because MulMask does not currently subtype Number
+# promote_rule(::Type{MulMask}, ::Type{T}) where T<:BaseNumber = T
+
+flipsign(x, y::MulMask) = ifelse(signbit(y), -x, x)
+# Needed to resolve method ambiguity
+flipsign(x::BitIndex, y::MulMask) = ifelse(signbit(y), -x, x)
+
+# Perform sign flip at the end to propagate sign information correctly
+# This should also preserve signs for signed zero representations, like floats
+*(x::MulMask, y::Number) = flipsign(y * !iszero(x), x)
+*(x::Number, y::MulMask) = flipsign(x * !iszero(y), y)
+
+function Base.show(io::IO, x::MulMask)
+    signbit(x) && print(io, -)
+    iszero(x) ? print(io, zero) : print(io, one)
+    print(io, '(', MulMask, ')')
+end
+
 """
     CliffordNumbers.mul_mask(F::GradeFilter, a::BitIndex{Q}, B::NTuple{L,BitIndices{Q}})
     CliffordNumbers.mul_mask(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BitIndex{Q})
