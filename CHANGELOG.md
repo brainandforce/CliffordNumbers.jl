@@ -13,7 +13,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
   - Indexing and equality checking of `BitIndices` is slightly more efficient.
 
-# [0.1.8] - 2024-09-23
+## [0.1.8] - 2024-09-23
 
 ### Added
   - Implementations of `flipsign` and `copysign` for `BitIndex`.
@@ -118,6 +118,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release of CliffordNumbers.jl
 
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
+[0.1.8]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.8
 [0.1.7]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.7
 [0.1.6]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.6
 [0.1.5]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.5
