@@ -1,7 +1,7 @@
 module CliffordNumbers
 
 import Base: length, size, axes, getindex, to_index
-import Base: zero, one, oneunit
+import Base: zero, one, oneunit, iszero, isone
 import Base: signbit, sign, copysign, flipsign
 import Base: reverse, adjoint, conj, ~
 import Base: ==, isequal, isapprox, +, -, *, /, //, muladd, abs, abs2, exp, ^
