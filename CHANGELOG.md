@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - `nonzero_grades(::Complex)` is defined and returns `0:0`, like `nonzero_grades(::Real)`.
+
 ### Changed
   - Indexing and equality checking of `BitIndices` is slightly more efficient.
 

@@ -26,8 +26,7 @@ julia> nonzero_grades(Float64)
 ```
 """
 nonzero_grades(x::Number) = nonzero_grades(typeof(x))
-# TODO: define for Complex?
-nonzero_grades(::Type{<:Real}) = 0:0
+nonzero_grades(::Type{<:BaseNumber}) = 0:0
 
 """
     has_grades_of(S::Type{<:AbstractCliffordNumber}, T::Type{<:AbstractCliffordNumber}) -> Bool
