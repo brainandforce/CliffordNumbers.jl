@@ -11,6 +11,7 @@ is_ci_env = (get(ENV, "CI", nothing) == true)
 makedocs(;
     sitename="CliffordNumbers.jl",
     modules=[CliffordNumbers],
+    doctest=false,
     checkdocs = :exports,
     format=Documenter.HTML(;
         prettyurls = is_ci_env,
