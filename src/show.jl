@@ -49,9 +49,7 @@ function print_clifford_coefficient(io::IO, c::Real, ffn::Bool)
     print(io, sign_str, abs(c), "*"^(c isa Bool))
 end
 
-# Generic pretty-print method for all AbstractCliffordNumber instances
-function show(io::IO, ::MIME"text/plain", x::AbstractCliffordNumber{Q}) where Q
-    summary(io, x)
+function print(io::IO, x::AbstractCliffordNumber{Q}) where Q
     # Flag to mark when we've *found the first nonzero (ffn)* element
     ffn = false
     s = scalar(x)
@@ -73,5 +71,11 @@ function show(io::IO, ::MIME"text/plain", x::AbstractCliffordNumber{Q}) where Q
     end
     # If we got through the whole process, just print the zero
     # We reference the actual element so we can print signed zero if needed
-    ffn || print(io, s)
+    return ffn ? nothing : print(io, s)
+end
+
+# Generic pretty-print method for all AbstractCliffordNumber instances
+function show(io::IO, ::MIME"text/plain", x::AbstractCliffordNumber)
+    summary(io, x)
+    print(io, x)
 end

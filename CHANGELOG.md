@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
   - `nonzero_grades(::Complex)` is defined and returns `0:0`, like `nonzero_grades(::Real)`.
+  - `print(::IO, ::AbstractCliffordNumber)` shows a prettier (but not parseable) representation.
 
 ### Changed
   - Indexing and equality checking of `BitIndices` is slightly more efficient.

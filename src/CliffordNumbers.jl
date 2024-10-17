@@ -6,7 +6,7 @@ import Base: signbit, sign, copysign, flipsign
 import Base: reverse, adjoint, conj, ~
 import Base: ==, isequal, isapprox, +, -, *, /, //, muladd, abs, abs2, exp, ^
 import Base: promote_rule, convert, similar, float, big
-import Base: summary, show
+import Base: print, show, summary
 
 import Base.Broadcast
 
