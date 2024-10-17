@@ -4,6 +4,7 @@
 
 ```@docs; canonical=false
 Base.reverse(::BitIndex)
+Base.adjoint(::BitIndex)
 CliffordNumbers.grade_involution(::BitIndex)
 Base.conj(::BitIndex)
 CliffordNumbers.left_complement(::BitIndex)
