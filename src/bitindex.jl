@@ -169,16 +169,22 @@ pseudoscalar_index(x::AbstractCliffordNumber) = pseudoscalar_index(typeof(x))
 
 #---Grade dependent sign inversion-----------------------------------------------------------------#
 """
-    adjoint(i::BitIndex) = reverse(i::BitIndex) = i' -> BitIndex
-    adjoint(x::AbstractCliffordNumber) = reverse(x::AbstractCliffordNumber) = x' -> typeof(x)
+    reverse(i::BitIndex) = i' -> BitIndex
+    reverse(x::AbstractCliffordNumber) = x' -> typeof(x)
 
 Performs the reverse operation on the basis blade indexed by `b` or the Clifford number `x`. The 
 sign of the reverse depends on the grade of the basis blade `g`, and is positive for `g % 4 in 0:1`
 and negative for `g % 4 in 2:3`.
 """
-adjoint(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i) & 2)), UInt(i))
-reverse(i::BitIndex) = adjoint(i)
-@doc (@doc adjoint(::BitIndex)) reverse(::BitIndex)
+reverse(i::BitIndex) = typeof(i)(xor(signbit(i), !iszero(grade(i) & 2)), UInt(i))
+
+"""
+    adjoint(i::BitIndex) = i' -> BitIndex
+    adjoint(x::AbstractCliffordNumber) = x' -> typeof(x)
+
+An alias for [`reverse(i::BitIndex)`](@ref) used to implement operator notation.
+"""
+adjoint(i::BitIndex) = reverse(i)
 
 """
     grade_involution(i::BitIndex) -> BitIndex
