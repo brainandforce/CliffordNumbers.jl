@@ -185,7 +185,6 @@ const VGA2D = VGA(2)
 
 """
     VGA3D (alias for VGA(3))
-    const APS = VGA3D
 
 The algebra of physical space, a 3D VGA which is commonly used (explicitly and implicitly) to model
 non-relativistic physics. It also serves as the subalgebra of both signature conventions of the
@@ -194,8 +193,15 @@ spacetime algebra (available as [`STAEast`](@ref) and [`STAWest`](@ref)).
 The even subalgebra of this algebra is isomorphic to ℍ, the quaternions.
 """
 const VGA3D = VGA(3)
+
+"""
+    CliffordNumbers.Metrics.APS
+
+An alias for `VGA(3)` or [`VGA3D`](@ref), referring to the algebra of physical space.
+
+In the future, this may refer to a different object from the values it currently aliases.
+"""
 const APS = VGA3D
-@doc (@doc VGA3D) APS
 
 """
     PGA <: Metrics.AbstractSignature
@@ -328,7 +334,6 @@ const STAEast = LGAEast(3)
 
 """
     STAWest (alias for LGAWest(3))
-    const STA = STAWest
 
 The spacetime algebra using the West Coast sign convention (spatial dimensions square negative,
 temporal dimensions square positive), with the temporal dimension at index 0.
@@ -338,6 +343,13 @@ This convention is the default STA convention in this package, since the signatu
 [the 2D conformal geometric algebra](@ref CGA2D).
 """
 const STAWest = LGAWest(3)
+
+"""
+    STA
+
+An alias for [`STAWest`](@ref), referring to the spacetime algebra with the West Coast (mostly 
+negative) signature convention.
+"""
 const STA = STAWest
 @doc (@doc STAWest) STA
 
@@ -389,8 +401,14 @@ As with `STA`, the default convention for `STAP` is the West Coast metric. For a
 see [`STA`](@ref).
 """
 const STAPWest = Signature(5, 0b11100, 0b00001, -1)
+
+"""
+    STAP
+
+An alias for [`STAPWest`](@ref), referring to the projective spacetime algebra with the West Coast
+(mostly negative) signature convention.
+"""
 const STAP = STAPWest
-@doc (@doc STAPWest) STAP
 
 export dimension, blade_count, grades, is_degenerate, is_positive_definite
 export Signature, VGA, PGA, CGA, LGA, LGAEast, LGAWest, Exterior
