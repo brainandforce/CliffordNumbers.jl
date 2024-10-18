@@ -1,5 +1,5 @@
 using CliffordNumbers
-using Aqua, Test
+using Aqua, Test, Unitful
 
 Aqua.test_all(CliffordNumbers; unbound_args = false)
 
@@ -15,4 +15,5 @@ Aqua.test_all(CliffordNumbers; unbound_args = false)
     include("indexing.jl")
     include("conversion.jl")
     include("operations.jl")
+    include("ext/Unitful.jl")
 end
