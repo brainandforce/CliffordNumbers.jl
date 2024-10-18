@@ -26,6 +26,7 @@ makedocs(;
         "Indexing" => "indexing.md",
         "Operations" => "operations.md",
         "Performance tips" => "performance.md",
+        "Extensions" => "extensions.md",
         "API" => Any[
             "CliffordNumbers" => "api/clifford.md",
             "Indexing" => "api/indexing.md",
