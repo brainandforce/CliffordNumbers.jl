@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+  - A package extension for interoperability with [Unitful.jl] (only supported on julia 1.9 and up).
+    It provides support for wedge products for `Quantity`, including `Quantity{<:Real}` and
+    `Quantity{<:AbstractCliffordNumber}` (geometric products were already supported).
   - `nonzero_grades(::Complex)` is defined and returns `0:0`, like `nonzero_grades(::Real)`.
   - `print(::IO, ::AbstractCliffordNumber)` shows a prettier (but not parseable) representation.
 
@@ -128,3 +131,4 @@ Initial release of CliffordNumbers.jl
 [0.1.2]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.2
 [0.1.1]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.1
 [0.1.0]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.0
+[Unitful.jl]: https://github.com/PainterQubits/Unitful.jl
