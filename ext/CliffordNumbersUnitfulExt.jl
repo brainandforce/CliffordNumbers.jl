@@ -6,6 +6,36 @@ using Unitful
 import CliffordNumbers: ∧, ∨, ⨼, ⨽, dot, ×, ⨰
 import Unitful: AbstractQuantity, AffineError, AffineQuantity
 
+#---Constructors-----------------------------------------------------------------------------------#
+
+# Error thrown when units are incommensurate
+function (::Type{<:AbstractCliffordNumber})(::Tuple{Vararg{Quantity}})
+    throw(
+        ArgumentError(
+            "\n$(Quantity) does not subtype $(Real) or $(Complex), so it cannot be used as the " *
+            "scalar type for $(AbstractCliffordNumber) instances.\n" *
+            "Additionally, mixed units are disallowed because $(AbstractCliffordNumber) " *
+            "currently assumes an orthonormal basis."
+        )
+    )
+end
+
+# Error thrown when units are commensurate
+function (::Type{C})(x::Tuple{Vararg{Quantity{<:Number,D,U}}}) where {C<:AbstractCliffordNumber,D,U}
+    unit_string = "u\"" * replace(repr(unit(first(x))), " " => " * ") * "\""
+    multivector_string = "$C$(ustrip.(x))"
+    throw(
+        ArgumentError(
+            "\n$(Quantity) does not subtype $(Real) or $(Complex), so it cannot be used as the " *
+            "scalar type for $(AbstractCliffordNumber) instances.\n" *
+            "Instead, construct a $(Quantity{<:C}) by multiplying a $C by a unit:\n" *
+            "\n  " * multivector_string * unit_string * "\n"
+        )
+    )
+end
+
+(::Type{C})(x::Quantity...) where C<:AbstractCliffordNumber = C(x)
+
 #---Fixing printing methods------------------------------------------------------------------------#
 
 # Probably not needed, but included anyway
