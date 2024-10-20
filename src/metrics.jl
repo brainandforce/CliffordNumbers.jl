@@ -351,7 +351,6 @@ An alias for [`STAWest`](@ref), referring to the spacetime algebra with the West
 negative) signature convention.
 """
 const STA = STAWest
-@doc (@doc STAWest) STA
 
 """
     Exterior <: Metrics.AbstractSignature
