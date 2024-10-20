@@ -15,5 +15,7 @@ Aqua.test_all(CliffordNumbers; unbound_args = false)
     include("indexing.jl")
     include("conversion.jl")
     include("operations.jl")
-    include("ext/Unitful.jl")
+    if VERSION >= v"1.9.0"
+        include("ext/Unitful.jl")
+    end
 end
