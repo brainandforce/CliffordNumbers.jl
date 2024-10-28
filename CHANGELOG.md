@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.9] - 2024-10-28
+
 ### Added
   - A package extension for interoperability with [Unitful.jl] (only supported on julia 1.9 and up).
     It provides support for wedge products for `Quantity`, including `Quantity{<:Real}` and
@@ -122,6 +124,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release of CliffordNumbers.jl
 
 [Unreleased]: https://github.com/brainandforce/CliffordNumbers.jl
+[0.1.9]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.9
 [0.1.8]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.8
 [0.1.7]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.7
 [0.1.6]: https://github.com/brainandforce/CliffordNumbers.jl/releases/tag/v0.1.6
