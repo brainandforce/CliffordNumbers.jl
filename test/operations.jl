@@ -406,3 +406,36 @@ end
     @test Base.literal_pow(^, m, Val(2*im)) === Base.literal_pow(^, scalar(m), Val(2*im))
     =#
 end
+
+@testset "Miscellaneous properties" begin
+    # Finiteness
+    @test isfinite(EvenCliffordNumber{VGA(3)}(0, 1, 2, 3))
+    @test !isfinite(EvenCliffordNumber{VGA(3)}(Inf, 1, 2, 3))
+    @test isinf(EvenCliffordNumber{VGA(3)}(Inf, 1, 2, 3))
+    @test !isinf(EvenCliffordNumber{VGA(3)}(0, 1, 2, 3))
+    # NaN presence
+    @test isnan(EvenCliffordNumber{VGA(3)}(NaN, 1, 2, 3))
+    @test !isnan(EvenCliffordNumber{VGA(3)}(0, 1, 2, 3))
+    # Equivalence to real values
+    @test isreal(one(EvenCliffordNumber{VGA(3),Int}))
+    @test isreal(one(EvenCliffordNumber{VGA(3),Float64}))
+    @test isreal(one(EvenCliffordNumber{VGA(3),Complex{Float64}}))
+    @test !isreal(EvenCliffordNumber{VGA(3)}(0, 1, 2, 3))
+    @test !isreal(EvenCliffordNumber{VGA(3)}(im, 1, 2, 3))
+    @test !isreal(EvenCliffordNumber{VGA(3)}(1 + 0im, 1, 2, 3))
+    # Equivalence to integer values
+    @test isinteger(zero(KVector{1,VGA(3)}))
+    @test isinteger(one(EvenCliffordNumber{VGA(3),Int}))
+    @test isinteger(one(EvenCliffordNumber{VGA(3),Float64}))
+    @test isinteger(one(EvenCliffordNumber{VGA(3),Complex{Float64}}))
+    @test !isinteger(π * one(EvenCliffordNumber{VGA(3),Float64}))
+    @test !isinteger(EvenCliffordNumber{VGA(3)}(0, 1, 2, 3))
+    @test !isinteger(KVector{0,VGA(3)}(1 + im))
+    # Even and odd values
+    @test iseven(KVector{0,VGA(3)}(0))
+    @test !iseven(KVector{0,VGA(3)}(1))
+    @test isodd(KVector{0,VGA(3)}(1))
+    @test !isodd(KVector{0,VGA(3)}(0))
+    @test !iseven(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4))
+    @test !isodd(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4))
+end
