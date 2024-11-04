@@ -43,4 +43,7 @@ end
     @test short_typename(zero(KVector{1,VGA(3),Bool,3})) === KVector{1,VGA(3),Bool}
     @test short_typename(zero(KVector{2,VGA(3),Bool})) === KVector{2,VGA(3),Bool}
     @test short_typename(AbstractCliffordNumber{STA,Bool}) === AbstractCliffordNumber{STA,Bool}
+    x = EvenCliffordNumber{VGA(3)}(1, 2, 3, 4)
+    @test repr("text/plain", x) == summary(x) * "1 + 2e₁e₂ + 3e₁e₃ + 4e₂e₃"
+    @test eval(Meta.parse(repr(x))) === x
 end
