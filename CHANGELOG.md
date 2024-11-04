@@ -7,6 +7,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+  - [Contribution guidelines.](CONTRIBUTING.md)
+
+### Fixed
+  - `isinf`, `isnan`, `isreal`, `isinteger`, `iseven`, and `isodd` did not have working methods for
+    `AbstractCliffordNumber` arguments.
+
 ## [0.1.9] - 2024-10-28
 
 ### Added
