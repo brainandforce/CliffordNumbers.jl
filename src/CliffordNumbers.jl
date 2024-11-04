@@ -5,6 +5,7 @@ import Base: zero, one, oneunit
 import Base: signbit, sign, copysign, flipsign
 import Base: reverse, adjoint, conj, ~
 import Base: ==, isequal, isapprox, +, -, *, /, //, muladd, abs, abs2, exp, ^
+import Base: isfinite, isinf, isnan, isreal, isinteger, iseven, isodd
 import Base: promote_rule, convert, similar, float, big
 import Base: print, show, summary
 

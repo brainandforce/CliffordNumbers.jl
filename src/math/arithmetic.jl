@@ -35,6 +35,21 @@ end
 isapprox(x::AbstractCliffordNumber, y::Number; kwargs...) = isapprox(promote(x, y)...; kwargs...)
 isapprox(x::Number, y::AbstractCliffordNumber; kwargs...) = isapprox(promote(y, x)...; kwargs...)
 
+#---Other properties-------------------------------------------------------------------------------#
+
+# Already works: Base.isfinite(x::AbstractCliffordNumber) = all(isfinite, Tuple(x))
+isinf(x::AbstractCliffordNumber) = any(isinf, Tuple(x))
+isnan(x::AbstractCliffordNumber) = any(isnan, Tuple(x))
+
+isreal(x::AbstractCliffordNumber) = isreal(scalar(x)) && isscalar(x)
+isreal(x::AbstractCliffordNumber{<:Any,<:Real}) = isscalar(x)
+
+isinteger(x::AbstractCliffordNumber) = isinteger(scalar(x)) && isscalar(x)
+isinteger(x::AbstractCliffordNumber{<:Any,<:Integer}) = isscalar(x)
+
+iseven(x::AbstractCliffordNumber) = isreal(x) && iseven(real(scalar(x)))
+isodd(x::AbstractCliffordNumber) = isreal(x) && isodd(real(scalar(x)))
+
 #---Addition, negation, and subtraction------------------------------------------------------------#
 
 +(x::T, y::T) where T<:AbstractCliffordNumber = T(map(+, Tuple(x), Tuple(y)))
