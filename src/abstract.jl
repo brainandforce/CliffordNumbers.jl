@@ -14,7 +14,7 @@ All subtypes `C` of `AbstractCliffordNumber{Q}` must implement the following fun
   * `CliffordNumbers.similar_type(::Type{C}, ::Type{T}, ::Type{Q}) where {C,T,Q}` should construct a
     new type similar to `C` which subtypes `AbstractCliffordNumber{Q,T}` that may serve as a
     constructor.
-  * `Base.getindex(x::C, b::BitIndex{Q})` should allow one to recover the coefficients associated
+  * `Base.getindex(x::C, b::BladeIndex{Q})` should allow one to recover the coefficients associated
     with each basis blade represented by `C`.
   * `nblades(::Type{C})` should be defined to return the number of basis blades represented by the
     type. By default, `nblades(x::AbstractCliffordNumber) = nblades(typeof(x))`.

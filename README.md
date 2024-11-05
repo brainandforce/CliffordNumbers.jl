@@ -61,10 +61,10 @@ multivectors with algebra `Q` and scalar type `T<:Union{Real,Complex}`. This is 
 provide an `nblades` function separate from `Base.length` to count the number of blades represented
 by a type.
 
-To index an `AbstractCliffordNumber`, we provide the `BitIndex{Q}` type, which allows for arbitrary
-components to be indexed, and the `BitIndices{Q,C<:AbstractCliffordNumber{Q}}` type, which provides
-all valid indices of instances of `C` that are not constrained to be zero. Indexing with ordinary
-integers is disallowed, but `Tuple(::AbstractCliffordNumber)` obtains the backing `Tuple`.
+To index an `AbstractCliffordNumber`, we provide the `BladeIndex{Q}` type, which allows for 
+arbitrary components to be indexed, and the `BitIndices{Q,C<:AbstractCliffordNumber{Q}}` type, which
+provides all valid indices of instances of `C` that are not constrained to be zero. Indexing with
+ordinary integers is disallowed, but `Tuple(::AbstractCliffordNumber)` obtains the backing `Tuple`.
 
 `AbstractCliffordNumber{Q,T}` includes the following concrete subtypes:
   * `CliffordNumber{Q,T,L}`, which represents the coefficients associated with all basis blades.
@@ -89,16 +89,16 @@ types backing an `AbstractCliffordNumber` without needlessly expanding the repre
 
 ## Indexing
 
-Although `AbstractCliffordNumber` instances are scalars, the `BitIndex{Q}` type can be used to
-retrieve coefficients associated with specific basis blades. The full set of `BitIndex{Q}` types for
-some `x::AbstractCliffordNumber` can be generated with `BitIndices(x)`, and this is a binary ordered
-vector of `BitIndex{Q}` objects.
+Although `AbstractCliffordNumber` instances are scalars, the `BladeIndex{Q}` type can be used to
+retrieve coefficients associated with specific basis blades. The full set of `BladeIndex{Q}` types
+for some `x::AbstractCliffordNumber` can be generated with `BitIndices(x)`, and this is a binary 
+ordered vector of `BladeIndex{Q}` objects.
 
-Mathematical operations are defined generically by working with the `BitIndex{Q}` objects associated
-with an `AbstractCliffordNumber{Q,T}`. Elementwise operations on each element of a `BitIndices`
-instance returns a `TransformedBitIndices`, a wrapper which lazily associates a function with a
-`BitIndices` object, and this can be used to implement grade dependent operations, such as
-(anti)automorphisms.
+Mathematical operations are defined generically by working with the `BladeIndex{Q}` objects
+associated with an `AbstractCliffordNumber{Q,T}`. Elementwise operations on each element of a
+`BitIndices` instance returns a `TransformedBitIndices`, a wrapper which lazily associates a 
+function with a `BitIndices` object, and this can be used to implement grade dependent operations,
+such as (anti)automorphisms.
 
 ## Operations
 

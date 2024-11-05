@@ -10,7 +10,7 @@ to elements of their scalar field and to each other.
 Grade automorphisms are operations which preserves the grades of each basis blade, but changes their
 sign depending on the grade. All of these operations are their own inverse.
 
-All grade automorphisms are applicable to `BitIndex` objects, and the way they are implemented is
+All grade automorphisms are applicable to `BladeIndex` objects, and the way they are implemented is
 through constructors that use `TransformedBitIndices` objects to alter each grade.
 
 #### Reverse
@@ -28,7 +28,7 @@ behaves identically to complex conjugation and quaternion conjugation. However, 
 case when working in the even subalgebras.
 
 ```@docs; canonical=false
-Base.reverse(::BitIndex)
+Base.reverse(::BladeIndex)
 ```
 
 #### Grade involution
@@ -44,7 +44,7 @@ space (which is isomorphic to the complex numbers), but this is *not* true for q
 conjugation. Instead, use the Clifford conjugate (described below).
 
 ```@docs; canonical=false
-CliffordNumbers.grade_involution(::BitIndex)
+CliffordNumbers.grade_involution(::BladeIndex)
 ```
 
 #### Clifford conjugation
@@ -62,7 +62,7 @@ numbers and quaternions, respectively, the Clifford conjugate is equivalent to c
 or quaternion conjugation. Otherwise, this is a less widely used operation than the above two.
 
 ```@docs; canonical=false
-Base.conj(::BitIndex)
+Base.conj(::BladeIndex)
 ```
 
 #### Inverse
@@ -150,8 +150,8 @@ product, which is also symmetric.
 
 Products are implemented with the fast multiplication kernel `CliffordNumbers.mul`, which accepts
 two Clifford numbers with the same scalar type and a `CliffordNumbers.GradeFilter` object. This
-`GradeFilter` object defines a method that takes two or more `BitIndex` objects and returns `false`
-if their product is constrained to be zero.
+`GradeFilter` object defines a method that takes two or more `BladeIndex` objects and returns
+`false` if their product is constrained to be zero.
 
 `CliffordNumbers.mul` requires that the coefficient types of the numbers being multiplied are the
 same. Methods which leverage `CliffordNumbers.mul` should promote the coefficient types of the

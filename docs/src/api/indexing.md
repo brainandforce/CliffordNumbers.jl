@@ -7,10 +7,10 @@ CliffordNumbers.nonzero_grades
 CliffordNumbers.has_grades_of
 ```
 
-## `BitIndex`
+## `BladeIndex`
 
 ```@docs
-CliffordNumbers.BitIndex
+CliffordNumbers.BladeIndex
 CliffordNumbers.is_same_blade
 ```
 
@@ -24,22 +24,22 @@ CliffordNumbers.pseudoscalar_index
 ### Tools for implementing mathematical operations
 
 ```@docs
-Base.reverse(::BitIndex)
-CliffordNumbers.grade_involution(::BitIndex)
-Base.conj(::BitIndex)
-CliffordNumbers.left_complement(::BitIndex)
-CliffordNumbers.right_complement(::BitIndex)
+Base.reverse(::BladeIndex)
+CliffordNumbers.grade_involution(::BladeIndex)
+Base.conj(::BladeIndex)
+CliffordNumbers.left_complement(::BladeIndex)
+CliffordNumbers.right_complement(::BladeIndex)
 ```
 
 ```@docs
-CliffordNumbers.grade(::BitIndex)
+CliffordNumbers.grade(::BladeIndex)
 CliffordNumbers.sign_of_square
 CliffordNumbers.signbit_of_square
 CliffordNumbers.nondegenerate_square
 CliffordNumbers.sign_of_mult
 CliffordNumbers.signbit_of_mult
 CliffordNumbers.nondegenerate_mult
-Base.:*(::T, ::T) where T<:BitIndex
+Base.:*(::T, ::T) where T<:BladeIndex
 CliffordNumbers.has_wedge
 ```
 
