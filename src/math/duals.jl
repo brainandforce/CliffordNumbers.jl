@@ -11,5 +11,12 @@ adjoint(x::KVector{K}) where K = ifelse(iszero(K & 2), x, -x)
 grade_involution(x::KVector{K}) where K = ifelse(iseven(K), x, -x)
 conj(x::KVector{K}) where K = ifelse(iszero((K + 1) & 2), x, -x)
 
+function (::CyclicGradeNegation{N,I,R})(x::AbstractCliffordNumber) where {N,I,R}
+    x = ifelse(N, x, -x)
+    x = ifelse(I, x, grade_involution(x))
+    x = ifelse(R, x, reverse(x))
+    return x
+end
+
 left_complement(x::AbstractCliffordNumber) = x[right_complement.(BitIndices(complement_type(x)))]
 right_complement(x::AbstractCliffordNumber) = x[left_complement.(BitIndices(complement_type(x)))]

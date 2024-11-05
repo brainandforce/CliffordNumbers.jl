@@ -361,3 +361,56 @@ of the signature of `Q`, depending only on the dimension.
 Lengyel's convention for the right complement is an overbar.
 """
 right_complement(b::BitIndex)= _inv(b) * typeof(b)(false, typemax(UInt))
+
+#---Compositions of common involutions-------------------------------------------------------------#
+"""
+    CliffordNumbers.CyclicGradeNegation{N,I,R}
+
+Stores information about the application of three common involution operations: negation, the grade
+(main) involution, and the reverse, as Boolean values in the type parameters `N`, `I`, and `R`,
+respectively.
+
+The implementation as a parametric type allows for the operations to be describe statically and
+therefore resolved at compile time.
+
+Objects of this type can be composed arbitrarily as functors:
+```julia-repl
+julia> Involution{true, true, false}()(Involution{true, false, false}())
+Involution{false, true, false}()
+```
+They can also be applied to `AbstractCliffordNumber` or `BitIndex` instances.
+"""
+struct CyclicGradeNegation{N,I,R}
+    function CyclicGradeNegation{N,I,R}() where {N,I,R}
+        @assert (N, I, R) isa NTuple{3,Bool} "Type parameters must be Boolean values."
+        return new()
+    end
+end
+
+#=
+Enumerated names, if we need them later:
+    Identity
+    Negation
+    Involution
+    NegatedInvolution
+    Reverse
+    NegatedReverse
+    CliffordConjugate
+    NegatedCliffordConjugate
+=#
+
+# Compositions of involutions
+function (::CyclicGradeNegation{M,H,Q})(::CyclicGradeNegation{N,I,R}) where {M,H,Q,N,I,R}
+    return CyclicGradeNegation{xor(M,N),xor(H,I),xor(Q,R)}()
+end
+
+(-)(::CyclicGradeNegation{N,I,R}) = CyclicGradeNegation{!N,I,R}()
+grade_involution(::CyclicGradeNegation{N,I,R}) = CyclicGradeNegation{N,!I,R}()
+reverse(::CyclicGradeNegation{N,I,R}) = CyclicGradeNegation{N,I,!R}()
+adjoint(::CyclicGradeNegation{N,I,R}) = CyclicGradeNegation{N,I,!R}()
+conj(::CyclicGradeNegation{N,I,R}) = CyclicGradeNegation{N,!I,!R}()
+
+# Application of involutions
+function (::CyclicGradeNegation{N,I,R})(b::BitIndex) where {N,I,R}
+    return ifelse(xor(N, (I && isodd(grade(b))), (R && isodd(grade(b) >> 1))), -b, b)
+end
