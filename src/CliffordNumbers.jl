@@ -38,8 +38,8 @@ export nblades, signature, scalar_type
 include("grades.jl")
 export nonzero_grades, has_grades_of
 # Indexing each graded element of an AbstractCliffordNumber
-include("bitindex.jl")
-export BitIndex
+include("bladeindex.jl")
+export BladeIndex
 export grade, scalar_index, pseudoscalar_index, grade_involution, dual, undual, left_complement,
     right_complement
 include("bitindices.jl")

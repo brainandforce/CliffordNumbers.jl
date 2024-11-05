@@ -1,11 +1,11 @@
-#---Sets of `BitIndex` objects that index specific types-------------------------------------------#
+#---Sets of `BladeIndex` objects that index specific types-----------------------------------------#
 """
-    AbstractBitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractVector{BitIndex{Q}}
+    AbstractBitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractVector{BladeIndex{Q}}
 
-Supertype for vectors containing all valid `BitIndex{Q}` objects for the basis elements represented
-by `C`.
+Supertype for vectors containing all valid `BladeIndex{Q}` objects for the basis elements
+represented by `C`.
 """
-abstract type AbstractBitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractVector{BitIndex{Q}}
+abstract type AbstractBitIndices{Q,C<:AbstractCliffordNumber{Q}} <: AbstractVector{BladeIndex{Q}}
 end
 
 size(::Type{<:AbstractBitIndices{Q,C}}) where {Q,C} = tuple(nblades(C))
@@ -44,10 +44,10 @@ bitindices_type(x::AbstractCliffordNumber) = bitindices_type(typeof(x))
 
 #---Clifford number iteration----------------------------------------------------------------------#
 """
-    BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BitIndex{Q}}
+    BitIndices{Q,C<:AbstractCliffordNumber{Q,<:Any}} <: AbstractVector{BladeIndex{Q}}
 
-Represents a range of valid `BitIndex` objects for the nonzero components of a given multivector of
-algebra `Q`.
+Represents a range of valid `BladeIndex` objects for the nonzero components of a given multivector
+of algebra `Q`.
 
 For a generic `AbstractCliffordNumber{Q}`, this returns `BitIndices{Q,CliffordNumber{Q}}`, which
 contains all possible indices for a multivector associated with the algebra parameter `Q`. For
@@ -97,7 +97,7 @@ BitIndices(::Type{C}) where C<:AbstractCliffordNumber = BitIndices{signature(C)}
 
 @inline function getindex(b::BitIndices{Q}, i::Integer) where Q
     @boundscheck checkbounds(b, i)
-    return BitIndex{Q}(UInt(i-1))
+    return BladeIndex{Q}(UInt(i-1))
 end
 
 # Very efficient tuple generation
@@ -171,8 +171,8 @@ ConjugatedBitIndices(x) = TransformedBitIndices(conj, x)
 
 #---Indexing an AbstractCliffordNumber with BitIndices of a type-----------------------------------#
 
-# Indexing with an NTuple returns an NTuple of the coefficients at the BitIndex members
-@inline function getindex(x::AbstractCliffordNumber{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+# Indexing with an NTuple returns an NTuple of the coefficients at the BladeIndex members
+@inline function getindex(x::AbstractCliffordNumber{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q}
     return map((@inline b -> x[b]), B)
 end
 
@@ -185,7 +185,7 @@ Clifford number of type `C`, or a similar type from `CliffordNumbers.similar_typ
 @generated function getindex_as_tuple(x::AbstractCliffordNumber{Q}, ::BitIndices{Q,C}) where {Q,C}
     inds = to_index.(x, BitIndices(C))
     # The mask is needed for the KVector case.
-    # BitIndex objects that don't map to a tuple index just get to turned to index 1
+    # BladeIndex objects that don't map to a tuple index just get to turned to index 1
     mask = in.(BitIndices(C), tuple(BitIndices(x)))
     return :(map(*, getindex.(tuple(Tuple(x)), $inds), $mask))
 end

@@ -1,14 +1,14 @@
-@testset "BitIndex" begin
+@testset "BladeIndex" begin
     import CliffordNumbers: signbit_of_square, nondegenerate_square, sign_of_square
     import CliffordNumbers: signbit_of_mult, nondegenerate_mult, sign_of_mult
-    a = BitIndex(Val{VGA(3)}(), 1)
-    b = BitIndex(Val{VGA(3)}(), 2)
-    c = BitIndex(Val{VGA(3)}(), 3)
-    @test BitIndex(Val{VGA(3)}(), 1, 2) === BitIndex{VGA(3)}(false, UInt(3))
-    @test BitIndex(Val{VGA(3)}(), 2, 1) === BitIndex{VGA(3)}(true, UInt(3))
-    @test BitIndex(Val{VGA(3)}(), 1, 2) === -BitIndex(Val{VGA(3)}(), 2, 1)
-    @test abs(BitIndex(Val{VGA(3)}(), 1, 2)) === BitIndex(Val{VGA(3)}(), 1, 2)
-    @test abs(BitIndex(Val{VGA(3)}(), 2, 1)) === BitIndex(Val{VGA(3)}(), 1, 2)
+    a = BladeIndex(Val{VGA(3)}(), 1)
+    b = BladeIndex(Val{VGA(3)}(), 2)
+    c = BladeIndex(Val{VGA(3)}(), 3)
+    @test BladeIndex(Val{VGA(3)}(), 1, 2) === BladeIndex{VGA(3)}(false, UInt(3))
+    @test BladeIndex(Val{VGA(3)}(), 2, 1) === BladeIndex{VGA(3)}(true, UInt(3))
+    @test BladeIndex(Val{VGA(3)}(), 1, 2) === -BladeIndex(Val{VGA(3)}(), 2, 1)
+    @test abs(BladeIndex(Val{VGA(3)}(), 1, 2)) === BladeIndex(Val{VGA(3)}(), 1, 2)
+    @test abs(BladeIndex(Val{VGA(3)}(), 2, 1)) === BladeIndex(Val{VGA(3)}(), 1, 2)
     # Sign manipulation
     @test copysign(+a, +1) === +a
     @test copysign(+a, -1) === -a
@@ -32,18 +32,18 @@
     @test signbit_of_mult(-a, b) === true
     @test signbit_of_mult(a, -b) === true
     @test signbit_of_mult(-a, -b) === false
-    @test signbit_of_square(BitIndex(Val{VGA(3)}())) === false
-    @test sign_of_square(BitIndex(Val{VGA(3)}())) > 0
+    @test signbit_of_square(BladeIndex(Val{VGA(3)}())) === false
+    @test sign_of_square(BladeIndex(Val{VGA(3)}())) > 0
     @test signbit_of_square(a) === false
     @test sign_of_square(a) > 0
-    @test signbit_of_square(BitIndex(Val{VGA(3)}(), 1, 2)) === true
-    @test sign_of_square(BitIndex(Val{VGA(3)}(), 1, 2)) < 0
-    @test signbit_of_square(BitIndex(Val{VGA(3)}(), 1, 2, 3)) === true
-    @test sign_of_square(BitIndex(Val{VGA(3)}(), 1, 2, 3)) < 0
-    @test a * b === BitIndex(Val{VGA(3)}(), 1, 2)
-    @test b * a === BitIndex(Val{VGA(3)}(), 2, 1)
-    @test b * a === -BitIndex(Val{VGA(3)}(), 1, 2)
-    @test CliffordNumbers.has_wedge(a, BitIndex(Val{VGA(3)}())) === true
+    @test signbit_of_square(BladeIndex(Val{VGA(3)}(), 1, 2)) === true
+    @test sign_of_square(BladeIndex(Val{VGA(3)}(), 1, 2)) < 0
+    @test signbit_of_square(BladeIndex(Val{VGA(3)}(), 1, 2, 3)) === true
+    @test sign_of_square(BladeIndex(Val{VGA(3)}(), 1, 2, 3)) < 0
+    @test a * b === BladeIndex(Val{VGA(3)}(), 1, 2)
+    @test b * a === BladeIndex(Val{VGA(3)}(), 2, 1)
+    @test b * a === -BladeIndex(Val{VGA(3)}(), 1, 2)
+    @test CliffordNumbers.has_wedge(a, BladeIndex(Val{VGA(3)}())) === true
     @test CliffordNumbers.has_wedge(a, b) === true
     @test CliffordNumbers.has_wedge(b, a) === true
     @test CliffordNumbers.has_wedge(a, a) === false
@@ -61,22 +61,22 @@
     @test nondegenerate_square(a*b) === true
     # Degenerate multiplications with Cl(3, 1, 2)
     QF = Signature(6, 0b001000, 0b110000, 1)
-    @test nondegenerate_mult(BitIndex(Val{VGA(3)}(), 1, 3), BitIndex(Val{VGA(3)}(), 2, 3)) === true
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 5), BitIndex(Val{QF}(), 5)) === false
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 1, 5), BitIndex(Val{QF}(), 1, 5)) === false
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 1, 5), BitIndex(Val{QF}(), 2, 5)) === false
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 2, 5), BitIndex(Val{QF}(), 1, 5)) === false
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 6), BitIndex(Val{QF}(), 5)) === true
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 1, 6), BitIndex(Val{QF}(), 1, 5)) === true
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 1, 6), BitIndex(Val{QF}(), 2, 5)) === true
-    @test nondegenerate_mult(BitIndex(Val{QF}(), 2, 6), BitIndex(Val{QF}(), 1, 5)) === true
-    @test nondegenerate_square(BitIndex(Val{QF}(), 1, 3)) === true
-    @test nondegenerate_square(BitIndex(Val{QF}(), 1, 5)) === false
-    @test nondegenerate_square(BitIndex(Val{QF}(), 5, 6)) === false
-    @test Base.Broadcast.broadcastable(BitIndex(Val(VGA(3)))) === tuple(BitIndex(Val(VGA(3))))
-    @test eval(Meta.parse(repr(BitIndex(Val{VGA(3)}())))) === BitIndex(Val(VGA(3)))
-    @test eval(Meta.parse(repr(BitIndex(Val{VGA(3)}(), 1, 2)))) === BitIndex(Val(VGA(3)), 1, 2)
-    @test eval(Meta.parse(repr(BitIndex(Val{VGA(3)}(), 2, 1)))) === BitIndex(Val(VGA(3)), 2, 1)
+    @test nondegenerate_mult(BladeIndex(Val{VGA(3)}(), 1, 3), BladeIndex(Val{VGA(3)}(), 2, 3))
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 5), BladeIndex(Val{QF}(), 5)) === false
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 1, 5), BladeIndex(Val{QF}(), 1, 5)) === false
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 1, 5), BladeIndex(Val{QF}(), 2, 5)) === false
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 2, 5), BladeIndex(Val{QF}(), 1, 5)) === false
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 6), BladeIndex(Val{QF}(), 5)) === true
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 1, 6), BladeIndex(Val{QF}(), 1, 5)) === true
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 1, 6), BladeIndex(Val{QF}(), 2, 5)) === true
+    @test nondegenerate_mult(BladeIndex(Val{QF}(), 2, 6), BladeIndex(Val{QF}(), 1, 5)) === true
+    @test nondegenerate_square(BladeIndex(Val{QF}(), 1, 3)) === true
+    @test nondegenerate_square(BladeIndex(Val{QF}(), 1, 5)) === false
+    @test nondegenerate_square(BladeIndex(Val{QF}(), 5, 6)) === false
+    @test Base.Broadcast.broadcastable(BladeIndex(Val(VGA(3)))) === tuple(BladeIndex(Val(VGA(3))))
+    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}())))) === BladeIndex(Val(VGA(3)))
+    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 1, 2)))) === BladeIndex(Val(VGA(3)), 1, 2)
+    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 2, 1)))) === BladeIndex(Val(VGA(3)), 2, 1)
 end
 
 @testset "BitIndices" begin
@@ -86,16 +86,16 @@ end
     @test BitIndices(CliffordNumber{VGA(3),Complex{Int}}) === BitIndices(CliffordNumber{VGA(3)})
     @test BitIndices(CliffordNumber{VGA(3),Bool,8}) === BitIndices(CliffordNumber{VGA(3)})
     APS_bivector_indices = [
-        BitIndex(Val{VGA(3)}(), 1, 2),
-        BitIndex(Val{VGA(3)}(), 1, 3),
-        BitIndex(Val{VGA(3)}(), 2, 3)
+        BladeIndex(Val{VGA(3)}(), 1, 2),
+        BladeIndex(Val{VGA(3)}(), 1, 3),
+        BladeIndex(Val{VGA(3)}(), 2, 3)
     ]
     @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == APS_bivector_indices
     @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == APS_bivector_indices
     @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == BitIndices(KVector{2,VGA(3)}(4,2,0))
     @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
-    @test scalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(Val{VGA(3)}())
-    @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BitIndex(Val{VGA(3)}(), 1, 2, 3)
+    @test scalar_index(zero(CliffordNumber{VGA(3)})) === BladeIndex(Val{VGA(3)}())
+    @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BladeIndex(Val{VGA(3)}(), 1, 2, 3)
     @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
     @test Broadcast.BroadcastStyle(BitIndices) === Broadcast.Style{Tuple}()
     @test Broadcast.BroadcastStyle(TransformedBitIndices) === Broadcast.Style{Tuple}()
@@ -133,20 +133,20 @@ end
     k = KVector{2,VGA(3)}(4, 2, 0)
     k_inf = KVector{1,STA}(1//0, 2, 3, 4)
     x = CliffordNumber{VGA(3)}(0, 0, 0, 4, 0, 2, 0, 0)
-    @test iszero(k[BitIndex(Val{VGA(3)}())])
-    @test iszero(k[BitIndex(Val{VGA(3)}(), 1)])
-    @test iszero(k[BitIndex(Val{VGA(3)}(), 2)])
-    @test iszero(k[BitIndex(Val{VGA(3)}(), 3)])
-    @test iszero(k[BitIndex(Val{VGA(3)}(), 1, 2, 3)])
+    @test iszero(k[BladeIndex(Val{VGA(3)}())])
+    @test iszero(k[BladeIndex(Val{VGA(3)}(), 1)])
+    @test iszero(k[BladeIndex(Val{VGA(3)}(), 2)])
+    @test iszero(k[BladeIndex(Val{VGA(3)}(), 3)])
+    @test iszero(k[BladeIndex(Val{VGA(3)}(), 1, 2, 3)])
     @test k[BitIndices(k)] === k
     @test k[BitIndices(VGA(3))] === x
     @test x[BitIndices(k)] === k
     @test x[BitIndices(KVector{2,VGA(3)})] === k
     # Testing for cases where the first element is 1//0
     # This caused problems before commit 528636f4496785253be9807b17df1f028ef7a5f0
-    @test k_inf[BitIndex(Val(STA))] === 0//1
-    @test k_inf[BitIndex(Val(STA), 0)] === 1//0
-    @test k_inf[BitIndex(Val(STA), 1)] === 2//1
+    @test k_inf[BladeIndex(Val(STA))] === 0//1
+    @test k_inf[BladeIndex(Val(STA), 0)] === 1//0
+    @test k_inf[BladeIndex(Val(STA), 1)] === 2//1
 end
 
 @testset "Type lengths" begin

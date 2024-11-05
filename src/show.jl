@@ -15,7 +15,7 @@ function subscript_string(x::Number)
 end
 
 """
-    CliffordNumbers.to_basis_str(b::BitIndex; [label], [pseudoscalar])
+    CliffordNumbers.to_basis_str(b::BladeIndex; [label], [pseudoscalar])
 
 Creates a string representation of the basis element given by `b`.
 
@@ -27,7 +27,7 @@ to `e`, but a few special cases use different symbols:
 If `pseudoscalar` is set, the pseudoscalar may be printed using a different symbol from the rest of
 the basis elements.
 """
-function to_basis_str(b::BitIndex{Q}; label = nothing, pseudoscalar = nothing) where Q
+function to_basis_str(b::BladeIndex{Q}; label = nothing, pseudoscalar = nothing) where Q
     if iszero(grade(b))
         return ""
     elseif grade(b) === dimension(Q) && !(isnothing(pseudoscalar) || isempty(pseudoscalar))

@@ -14,6 +14,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     for interoperability of the `Quaternion` type with `AbstractCliffordNumber`.
   - `sqrt` is now defined for `KVector{0}`.
 
+### Changed
+  - **[BREAKING]** `BitIndex` has been renamed to `BladeIndex`.
+
 ### Removed
   - **[BREAKING]** `CliffordNumbers.normalize` is no longer exported to avoid a name conflict with
     `LinearAlgebra.normalize`.

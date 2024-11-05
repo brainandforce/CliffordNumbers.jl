@@ -49,10 +49,10 @@ nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 
 @inline function getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
     @boundscheck checkbounds(b, i)
-    return BitIndex{Q}(UInt(hamming_number(K, i)))
+    return BladeIndex{Q}(UInt(hamming_number(K, i)))
 end
 
-@inline @generated function to_index(::Type{C}, b::BitIndex{Q}) where {K,Q,C<:KVector{K,Q}}
+@inline @generated function to_index(::Type{C}, b::BladeIndex{Q}) where {K,Q,C<:KVector{K,Q}}
     ex = :(i = 1)
     for n in 1:nblades(C)
         a = BitIndices(C)[n]
@@ -61,9 +61,9 @@ end
     return :($ex; return i)
 end
 
-@inline to_index(k::KVector{K,Q}, b::BitIndex{Q}) where {K,Q} = to_index(typeof(k), b)
+@inline to_index(k::KVector{K,Q}, b::BladeIndex{Q}) where {K,Q} = to_index(typeof(k), b)
 
-@inline function getindex(k::KVector{K,Q,T}, b::BitIndex{Q}) where {K,Q,T}
+@inline function getindex(k::KVector{K,Q,T}, b::BladeIndex{Q}) where {K,Q,T}
     return ifelse(grade(b) === K, flipsign((@inbounds k.data[to_index(k, b)]), b), zero(T))
 end
 

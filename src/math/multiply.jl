@@ -1,34 +1,33 @@
 #---Efficient multiplication kernels---------------------------------------------------------------#
-
 """
-    CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
-    CliffordNumbers.bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q})
+    CliffordNumbers.bitindex_shuffle(a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}})
+    CliffordNumbers.bitindex_shuffle(a::BladeIndex{Q}, B::BitIndices{Q})
     
-    CliffordNumbers.bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q})
-    CliffordNumbers.bitindex_shuffle(B::BitIndices{Q}, a::BitIndex{Q})
+    CliffordNumbers.bitindex_shuffle(B::NTuple{L,BladeIndex{Q}}, a::BladeIndex{Q})
+    CliffordNumbers.bitindex_shuffle(B::BitIndices{Q}, a::BladeIndex{Q})
 
 Performs the multiplication `-a * b` for each element of `B` for the above ordering, or `-b * a` for
-the below ordering, generating a reordered `NTuple` of `BitIndex{Q}` objects suitable for
+the below ordering, generating a reordered `NTuple` of `BladeIndex{Q}` objects suitable for
 implementing a geometric product.
 """
-@inline function bitindex_shuffle(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+@inline function bitindex_shuffle(a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q}
     return map(b -> _inv(a) * b, B)
 end
 
-@inline function bitindex_shuffle(B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q}
+@inline function bitindex_shuffle(B::NTuple{L,BladeIndex{Q}}, a::BladeIndex{Q}) where {L,Q}
     return map(b -> b * _inv(a), B)
 end
 
-bitindex_shuffle(a::BitIndex{Q}, B::BitIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))
-bitindex_shuffle(B::BitIndices{Q}, a::BitIndex{Q}) where Q = bitindex_shuffle(Tuple(B), a)
+bitindex_shuffle(a::BladeIndex{Q}, B::BitIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))
+bitindex_shuffle(B::BitIndices{Q}, a::BladeIndex{Q}) where Q = bitindex_shuffle(Tuple(B), a)
 
 """
-    CliffordNumbers.nondegenerate_mask(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}})
+    CliffordNumbers.nondegenerate_mask(a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}})
 
 Constructs a Boolean mask which is `false` for any multiplication that squares a degenerate blade;
 `true` otherwise.
 """
-function nondegenerate_mask(a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+function nondegenerate_mask(a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q}
     return map(b -> nondegenerate_mult(a, b), B)
 end
 
@@ -56,13 +55,13 @@ end
 
 A type that can be used to filter certain products of blades in a geometric product multiplication.
 The type parameter `S` must be a `Symbol`. The single instance of `GradeFilter{S}` is a callable
-object which implements a function that takes two or more `BitIndex{Q}` objects `a` and `b` and
+object which implements a function that takes two or more `BladeIndex{Q}` objects `a` and `b` and
 returns `false` if the product of the blades indexed is zero.
 
 To implement a grade filter for a product function `f`, define the following method:
-    (::GradeFilter{:f})(::BitIndex{Q}, ::BitIndex{Q})
+    (::GradeFilter{:f})(::BladeIndex{Q}, ::BladeIndex{Q})
     # Or if the definition allows for more arguments
-    (::GradeFilter{:f})(::BitIndex{Q}...) where Q
+    (::GradeFilter{:f})(::BladeIndex{Q}...) where Q
 """
 struct GradeFilter{S}
     GradeFilter{S}() where S = (@assert S isa Symbol "Type parameter must be a Symbol."; new())
@@ -70,66 +69,66 @@ end
 
 (::GradeFilter{S})(args...) where S = error("This filter has not been implemented.")
 
-(::GradeFilter{:*})(args::BitIndex{Q}...) where Q = true
+(::GradeFilter{:*})(args::BladeIndex{Q}...) where Q = true
 
-(::GradeFilter{:∧})(args::BitIndex{Q}...) where Q = has_wedge(args...)
+(::GradeFilter{:∧})(args::BladeIndex{Q}...) where Q = has_wedge(args...)
 
-(::GradeFilter{:⨼})(a::BitIndex{Q}, b::BitIndex{Q}) where Q = (grade(b) - grade(a)) == grade(a*b)
-(::GradeFilter{:⨽})(a::BitIndex{Q}, b::BitIndex{Q}) where Q = (grade(a) - grade(b)) == grade(a*b)
+(::GradeFilter{:⨼})(a::T, b::T) where {Q,T<:BladeIndex{Q}} = (grade(b) - grade(a)) == grade(a*b)
+(::GradeFilter{:⨽})(a::T, b::T) where {Q,T<:BladeIndex{Q}} = (grade(a) - grade(b)) == grade(a*b)
 
-function (::GradeFilter{:dot})(a::BitIndex{Q}, b::BitIndex{Q}) where Q
+function (::GradeFilter{:dot})(a::T, b::T) where {Q,T<:BladeIndex{Q}}
     return abs(grade(a) - grade(b)) == grade(a*b)
 end
 
 const ContractionGradeFilters = Union{GradeFilter{:⨼},GradeFilter{:⨽},GradeFilter{:dot}}
 
 """
-    CliffordNumbers.mul_mask(F::GradeFilter, a::BitIndex{Q}, B::NTuple{L,BitIndices{Q}})
-    CliffordNumbers.mul_mask(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BitIndex{Q})
+    CliffordNumbers.mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BitIndices{Q}})
+    CliffordNumbers.mul_mask(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BladeIndex{Q})
 
-    CliffordNumbers.mul_mask(F::GradeFilter, a::BitIndex{Q}, B::BitIndices{Q})
-    CliffordNumbers.mul_mask(F::GradeFilter, B::BitIndices{Q}, a::BitIndex{Q})
+    CliffordNumbers.mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q})
+    CliffordNumbers.mul_mask(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q})
 
 Generates a `NTuple{L,Bool}` which is `true` whenever the multiplication of the blade indexed by `a`
 and blades indexed by `B` is nonzero. `false` is returned if the grades multiply to zero due to the
 squaring of a degenerate component, or if they are filtered by `F`.
 """
-function mul_mask(F::GradeFilter, a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+function mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q}
     return map(b -> F(a,b) & nondegenerate_mult(a,b), B)
 end
 
-function mul_mask(F::GradeFilter, B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q}
+function mul_mask(F::GradeFilter, B::NTuple{L,BladeIndex{Q}}, a::BladeIndex{Q}) where {L,Q}
     return map(b -> F(b,a) & nondegenerate_mult(b,a), B)
 end
 
-mul_mask(F::GradeFilter, a::BitIndex{Q}, B::BitIndices{Q}) where Q = mul_mask(F, a, Tuple(B))
-mul_mask(F::GradeFilter, B::BitIndices{Q}, a::BitIndex{Q}) where Q = mul_mask(F, Tuple(B), a)
+mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q}) where Q = mul_mask(F, a, Tuple(B))
+mul_mask(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q}) where Q = mul_mask(F, Tuple(B), a)
 
 """
-    CliffordNumbers.mul_signs(F::GradeFilter, a::BitIndex{Q}, B::NTuple{L,BitIndices{Q}})
-    CliffordNumbers.mul_signs(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BitIndex{Q})
+    CliffordNumbers.mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BitIndices{Q}})
+    CliffordNumbers.mul_signs(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BladeIndex{Q})
 
-    CliffordNumbers.mul_signs(F::GradeFilter, a::BitIndex{Q}, B::BitIndices{Q})
-    CliffordNumbers.mul_signs(F::GradeFilter, B::BitIndices{Q}, a::BitIndex{Q})
+    CliffordNumbers.mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q})
+    CliffordNumbers.mul_signs(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q})
 
 Generates an `NTuple{L,Int8}` which represents the sign associated with the multiplication needed to
 calculate components of a multiplication result.
 
 This is equivalent to `sign.(B)` unless `F === CliffordNumbers.GradeFilter{:dot}()`.
 """
-mul_signs(::GradeFilter, ::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q} = sign.(B)
-mul_signs(::GradeFilter, B::NTuple{L,BitIndex{Q}}, ::BitIndex{Q}) where {L,Q} = sign.(B)
+mul_signs(::GradeFilter, ::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q} = sign.(B)
+mul_signs(::GradeFilter, B::NTuple{L,BladeIndex{Q}}, ::BladeIndex{Q}) where {L,Q} = sign.(B)
 
-function mul_signs(::GradeFilter{:dot}, a::BitIndex{Q}, B::NTuple{L,BitIndex{Q}}) where {L,Q}
+function mul_signs(::GradeFilter{:dot}, a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q}
     return sign.(B) .* Int8(-1).^(grade.(B) .* (grade(a) .- grade.(B)))
 end
 
-function mul_signs(::GradeFilter{:dot}, B::NTuple{L,BitIndex{Q}}, a::BitIndex{Q}) where {L,Q}
+function mul_signs(::GradeFilter{:dot}, B::NTuple{L,BladeIndex{Q}}, a::BladeIndex{Q}) where {L,Q}
     return sign.(B) .* Int8(-1).^(grade(a) .* (grade.(B) .- grade(a)))
 end
 
-mul_signs(F::GradeFilter, a::BitIndex{Q}, B::BitIndices{Q}) where Q = mul_signs(F, a, Tuple(B))
-mul_signs(F::GradeFilter, B::BitIndices{Q}, a::BitIndex{Q}) where Q = mul_signs(F, Tuple(B), a)
+mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q}) where Q = mul_signs(F, a, Tuple(B))
+mul_signs(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q}) where Q = mul_signs(F, Tuple(B), a)
 
 #---Product return types---------------------------------------------------------------------------#
 """
@@ -250,7 +249,7 @@ kernel just returns the geometric product.
             y_mask = mul_mask(F(), inds, b)
             mask = x_mask .& y_mask
             if any(mask)
-                # Resolve BitIndex to an integer here to avoid calling Base.to_index at runtime
+                # Resolve BladeIndex to an integer here to avoid calling Base.to_index at runtime
                 # This function cannot be inlined or unrolled for KVector arguments
                 # But all values are known at compile time, so interpolate them into expressions
                 ib = to_index(y, b)
@@ -275,7 +274,7 @@ kernel just returns the geometric product.
             mask = x_mask .& y_mask
             # Don't append operations that won't actually do anything
             if any(mask)
-                # Resolve BitIndex to an integer here to avoid calling Base.to_index at runtime
+                # Resolve BladeIndex to an integer here to avoid calling Base.to_index at runtime
                 # This function cannot be inlined or unrolled for KVector arguments
                 # But all values are known at compile time, so interpolate them into expressions
                 ia = to_index(x, a)
@@ -294,7 +293,7 @@ end
 
 #= Update (2024-05-07)
     The performance bottlenecks for KVector arguments have been (mostly) resolved.
-    This was done by resolving all BitIndex objects to tuple indices at compile time, avoiding
+    This was done by resolving all BladeIndex objects to tuple indices at compile time, avoiding
     all calls to Base.to_index(::KVector, ::Int) at runtime (since this function cannot be unrolled
     or inlined at compile time).
 

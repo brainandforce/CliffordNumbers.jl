@@ -3,12 +3,12 @@
 ## Involutions and duals
 
 ```@docs; canonical=false
-Base.reverse(::BitIndex)
-Base.adjoint(::BitIndex)
-CliffordNumbers.grade_involution(::BitIndex)
-Base.conj(::BitIndex)
-CliffordNumbers.left_complement(::BitIndex)
-CliffordNumbers.right_complement(::BitIndex)
+Base.reverse(::BladeIndex)
+Base.adjoint(::BladeIndex)
+CliffordNumbers.grade_involution(::BladeIndex)
+Base.conj(::BladeIndex)
+CliffordNumbers.left_complement(::BladeIndex)
+CliffordNumbers.right_complement(::BladeIndex)
 ```
 
 ## Inverses
