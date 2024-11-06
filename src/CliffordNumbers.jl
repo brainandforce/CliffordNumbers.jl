@@ -69,7 +69,7 @@ include("math/arithmetic.jl")
 include("math/duals.jl")
 # Scalar products, absolute values, scalar multiplication
 include("math/scalar.jl")
-export isscalar, scalar, ispseudoscalar, scalar_product, normalize
+export isscalar, scalar, ispseudoscalar, scalar_product
 # Definitions of operators for products
 include("math/products.jl")
 export left_contraction, right_contraction, wedge, regressive, commutator, anticommutator
