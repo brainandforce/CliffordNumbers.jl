@@ -37,11 +37,23 @@ nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
 #---Default BitIndices construction should include all possible BladeIndex objects-----------------#
 
 bitindices_type(::Type{<:CliffordNumber{Q}}) where Q = CliffordNumber{Q}
+blade_indices_type(::Type{<:CliffordNumber{Q}}) where Q = CliffordNumber{Q}
 
 BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
 BitIndices(Q::Metrics.AbstractSignature) = BitIndices{Q}()
 
+BladeIndices{Q}() where Q = BladeIndices{Q,CliffordNumber{Q}}()
+BladeIndices(Q::Metrics.AbstractSignature) = BladeIndices{Q}()
+
 #---Clifford number indexing-----------------------------------------------------------------------#
+
+@propagate_inbounds @inline function getindex(
+    B::BladeIndices{Q,C},
+    i::Int
+) where {Q,C<:CliffordNumber{Q}}
+    @boundscheck checkbounds(B, i)
+    return BladeIndex{Q}(UInt(i-1))
+end
 
 @inline function to_index(::Type{<:CliffordNumber{Q}}, i::BladeIndex{Q}) where Q
     return Int(i) % blade_count(Q) + 1

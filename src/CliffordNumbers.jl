@@ -1,6 +1,6 @@
 module CliffordNumbers
 
-import Base: length, size, axes, getindex, to_index
+import Base: @propagate_inbounds, length, size, axes, getindex, to_index
 import Base: zero, one, oneunit
 import Base: signbit, sign, copysign, flipsign
 import Base: reverse, adjoint, conj, ~
@@ -45,6 +45,8 @@ export grade, scalar_index, pseudoscalar_index, grade_involution, dual, undual, 
 include("bitindices.jl")
 export AbstractBitIndices, BitIndices, TransformedBitIndices, ReversedBitIndices,
     GradeInvolutedBitIndices, ConjugatedBitIndices
+include("bladeindices.jl")
+export BladeIndices
 # Dense representation of a Clifford number
 include("cliffordnumber.jl")
 export CliffordNumber
