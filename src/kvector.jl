@@ -35,6 +35,7 @@ nblades(::Type{<:KVector{K,Q}}) where {K,Q} = binomial(dimension(Q), K)
 #---Indexing---------------------------------------------------------------------------------------#
 
 bitindices_type(::Type{<:KVector{K,Q}}) where {K,Q} = KVector{K,Q}
+blade_indices_type(::Type{<:KVector{K,Q}}) where {K,Q} = KVector{K,Q}
 
 """
     grade(::Type{<:KVector{K}}) = K
@@ -48,6 +49,11 @@ grade(x::KVector) = grade(typeof(x))
 nonzero_grades(::Type{<:KVector{K}}) where K = K:K
 
 @inline function getindex(b::BitIndices{Q,<:KVector{K}}, i::Integer) where {Q,K}
+    @boundscheck checkbounds(b, i)
+    return BladeIndex{Q}(UInt(hamming_number(K, i)))
+end
+
+@propagate_inbounds @inline function getindex(b::BladeIndices{Q,<:KVector{K}}, i::Int) where {Q,K}
     @boundscheck checkbounds(b, i)
     return BladeIndex{Q}(UInt(hamming_number(K, i)))
 end
