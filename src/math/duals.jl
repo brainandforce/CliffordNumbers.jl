@@ -1,10 +1,8 @@
 #---Sign changing operations-----------------------------------------------------------------------#
 
-for f in (:adjoint, :grade_involution, :conj)
-    @eval $f(x::T) where T<:AbstractCliffordNumber = x[$f.(BitIndices(T))]
+for f in (:adjoint, :conj, :grade_involution, :reverse)
+    @eval $f(x::T) where T<:AbstractCliffordNumber = T(x[$f.(BladeIndices(T))])
 end
-
-reverse(x::AbstractCliffordNumber) = adjoint(x)
 
 # Faster implementations for KVector that don't require indexing
 adjoint(x::KVector{K}) where K = ifelse(iszero(K & 2), x, -x)
@@ -18,5 +16,12 @@ function (::CyclicGradeNegation{N,I,R})(x::AbstractCliffordNumber) where {N,I,R}
     return x
 end
 
-left_complement(x::AbstractCliffordNumber) = x[right_complement.(BitIndices(complement_type(x)))]
-right_complement(x::AbstractCliffordNumber) = x[left_complement.(BitIndices(complement_type(x)))]
+function left_complement(x::T) where T<:AbstractCliffordNumber
+    C = complement_type(T)
+    return C(x[right_complement.(BladeIndices(C))])
+end
+
+function right_complement(x::T) where T<:AbstractCliffordNumber
+    C = complement_type(T)
+    return C(x[left_complement.(BladeIndices(C))])
+end

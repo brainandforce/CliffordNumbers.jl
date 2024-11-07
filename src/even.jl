@@ -75,14 +75,7 @@ nonzero_grades(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = P:2:dimension(Q)
 
 #---Indexing---------------------------------------------------------------------------------------#
 
-bitindices_type(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = Z2CliffordNumber{P,Q}
 blade_indices_type(::Type{<:Z2CliffordNumber{P,Q}}) where {P,Q} = Z2CliffordNumber{P,Q}
-
-@inline function getindex(b::BitIndices{Q,<:Z2CliffordNumber{P,Q}}, i::Integer) where {P,Q}
-    @boundscheck checkbounds(b, i)
-    n = number_of_parity(i, P)
-    return BladeIndex{Q}(UInt(n))
-end
 
 @propagate_inbounds @inline function getindex(
     b::BladeIndices{Q,<:Z2CliffordNumber{P,Q}},

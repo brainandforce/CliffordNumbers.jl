@@ -1,10 +1,10 @@
 #---Efficient multiplication kernels---------------------------------------------------------------#
 """
     CliffordNumbers.bitindex_shuffle(a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}})
-    CliffordNumbers.bitindex_shuffle(a::BladeIndex{Q}, B::BitIndices{Q})
+    CliffordNumbers.bitindex_shuffle(a::BladeIndex{Q}, B::BladeIndices{Q})
     
     CliffordNumbers.bitindex_shuffle(B::NTuple{L,BladeIndex{Q}}, a::BladeIndex{Q})
-    CliffordNumbers.bitindex_shuffle(B::BitIndices{Q}, a::BladeIndex{Q})
+    CliffordNumbers.bitindex_shuffle(B::BladeIndices{Q}, a::BladeIndex{Q})
 
 Performs the multiplication `-a * b` for each element of `B` for the above ordering, or `-b * a` for
 the below ordering, generating a reordered `NTuple` of `BladeIndex{Q}` objects suitable for
@@ -18,8 +18,8 @@ end
     return map(b -> b * _inv(a), B)
 end
 
-bitindex_shuffle(a::BladeIndex{Q}, B::BitIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))
-bitindex_shuffle(B::BitIndices{Q}, a::BladeIndex{Q}) where Q = bitindex_shuffle(Tuple(B), a)
+bitindex_shuffle(a::BladeIndex{Q}, B::BladeIndices{Q}) where Q = bitindex_shuffle(a, Tuple(B))
+bitindex_shuffle(B::BladeIndices{Q}, a::BladeIndex{Q}) where Q = bitindex_shuffle(Tuple(B), a)
 
 """
     CliffordNumbers.nondegenerate_mask(a::BladeIndex{Q}, B::NTuple{L,BladeIndex{Q}})
@@ -83,11 +83,11 @@ end
 const ContractionGradeFilters = Union{GradeFilter{:⨼},GradeFilter{:⨽},GradeFilter{:dot}}
 
 """
-    CliffordNumbers.mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BitIndices{Q}})
-    CliffordNumbers.mul_mask(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BladeIndex{Q})
+    CliffordNumbers.mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BladeIndices{Q}})
+    CliffordNumbers.mul_mask(F::GradeFilter, B::NTuple{L,BladeIndices{Q}}, a::BladeIndex{Q})
 
-    CliffordNumbers.mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q})
-    CliffordNumbers.mul_mask(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q})
+    CliffordNumbers.mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::BladeIndices{Q})
+    CliffordNumbers.mul_mask(F::GradeFilter, B::BladeIndices{Q}, a::BladeIndex{Q})
 
 Generates a `NTuple{L,Bool}` which is `true` whenever the multiplication of the blade indexed by `a`
 and blades indexed by `B` is nonzero. `false` is returned if the grades multiply to zero due to the
@@ -101,15 +101,15 @@ function mul_mask(F::GradeFilter, B::NTuple{L,BladeIndex{Q}}, a::BladeIndex{Q}) 
     return map(b -> F(b,a) & nondegenerate_mult(b,a), B)
 end
 
-mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q}) where Q = mul_mask(F, a, Tuple(B))
-mul_mask(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q}) where Q = mul_mask(F, Tuple(B), a)
+mul_mask(F::GradeFilter, a::BladeIndex{Q}, B::BladeIndices{Q}) where Q = mul_mask(F, a, Tuple(B))
+mul_mask(F::GradeFilter, B::BladeIndices{Q}, a::BladeIndex{Q}) where Q = mul_mask(F, Tuple(B), a)
 
 """
-    CliffordNumbers.mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BitIndices{Q}})
-    CliffordNumbers.mul_signs(F::GradeFilter, B::NTuple{L,BitIndices{Q}}, a::BladeIndex{Q})
+    CliffordNumbers.mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::NTuple{L,BladeIndices{Q}})
+    CliffordNumbers.mul_signs(F::GradeFilter, B::NTuple{L,BladeIndices{Q}}, a::BladeIndex{Q})
 
-    CliffordNumbers.mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q})
-    CliffordNumbers.mul_signs(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q})
+    CliffordNumbers.mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::BladeIndices{Q})
+    CliffordNumbers.mul_signs(F::GradeFilter, B::BladeIndices{Q}, a::BladeIndex{Q})
 
 Generates an `NTuple{L,Int8}` which represents the sign associated with the multiplication needed to
 calculate components of a multiplication result.
@@ -127,8 +127,8 @@ function mul_signs(::GradeFilter{:dot}, B::NTuple{L,BladeIndex{Q}}, a::BladeInde
     return sign.(B) .* Int8(-1).^(grade(a) .* (grade.(B) .- grade(a)))
 end
 
-mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::BitIndices{Q}) where Q = mul_signs(F, a, Tuple(B))
-mul_signs(F::GradeFilter, B::BitIndices{Q}, a::BladeIndex{Q}) where Q = mul_signs(F, Tuple(B), a)
+mul_signs(F::GradeFilter, a::BladeIndex{Q}, B::BladeIndices{Q}) where Q = mul_signs(F, a, Tuple(B))
+mul_signs(F::GradeFilter, B::BladeIndices{Q}, a::BladeIndex{Q}) where Q = mul_signs(F, Tuple(B), a)
 
 #---Product return types---------------------------------------------------------------------------#
 """
@@ -239,9 +239,9 @@ kernel just returns the geometric product.
     # However, it seems that a smaller first argument is still *slightly* slower, why?
     # TODO: can we unify the cases and not have to repeat so much code?
     if nblades(x) > nblades(y) 
-        for b in BitIndices(y)
+        for b in BladeIndices(y)
             # Permute the indices of x so that the result coefficients are correctly ordered
-            inds = bitindex_shuffle(BitIndices(C), b)
+            inds = bitindex_shuffle(BladeIndices(C), b)
             # Filter out indexing operations that automatically go to zero
             # This must be done manually since we want to work directly with tuples
             x_mask = map(in, grade.(inds), ntuple(Returns(nonzero_grades(x)), Val(nblades(C))))
@@ -263,9 +263,9 @@ kernel just returns the geometric product.
             end
         end
     else
-        for a in BitIndices(x)
+        for a in BladeIndices(x)
             # Permute the indices of y so that the result coefficients are correctly ordered
-            inds = bitindex_shuffle(a, BitIndices(C))
+            inds = bitindex_shuffle(a, BladeIndices(C))
             # Filter out multiplications which necessarily go to zero
             x_mask = mul_mask(F(), a, inds)
             # Filter out indexing operations that automatically go to zero

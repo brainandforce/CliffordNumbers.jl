@@ -6,7 +6,7 @@ Determines whether the Clifford number `x` is a scalar, meaning that all of its 
 grade are zero.
 """
 function isscalar(x::AbstractCliffordNumber)
-    inds = Iterators.filter(!isequal(scalar_index(x)), BitIndices(x))
+    inds = Iterators.filter(!isequal(scalar_index(x)), BladeIndices(x))
     return all(iszero, x[i] for i in inds)
 end
 
@@ -38,7 +38,7 @@ Determines whether the Clifford number `x` is a pseudoscalar, meaning that all o
 grades below the dimension of the space are zero.
 """
 function ispseudoscalar(x::AbstractCliffordNumber)
-    inds = Iterators.filter(!isequal(pseudoscalar_index(x)), BitIndices(x))
+    inds = Iterators.filter(!isequal(pseudoscalar_index(x)), BladeIndices(x))
     return all(iszero, x[i] for i in inds)
 end
 
@@ -55,7 +55,7 @@ The result is equal to `scalar(x * y)`, but does not calculate the coefficients 
 other basis blades.
 """
 @inline @generated function scalar_product(x::T, y::T) where T<:AbstractCliffordNumber
-    ind_signs = map(sign_of_square, BitIndices(T))
+    ind_signs = map(sign_of_square, BladeIndices(T))
     return :(mapreduce(*, +, Tuple(x), Tuple(y), $ind_signs))
 end
 

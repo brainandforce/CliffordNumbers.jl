@@ -2,7 +2,7 @@
     CliffordNumbers.blade_indices_type(C::Type{<:AbstractCliffordNumber{Q,T}})
 
 Removes extraneous type parameters from `C`, converting it to the least parameterized type that
-can be used to parameterize an `AbstractBitIndices{Q,C}` object. This is to avoid issues with the
+can be used to parameterize an `AbstractBladeIndices{Q,C}` object. This is to avoid issues with the
 proliferation of type parameters that would construct identical `BladeIndices` objects otherwise:
 for instance, `BladeIndices{VGA(3),EvenCliffordNumber{VGA(3),Float32,4}}()` and
 `BladeIndices{VGA(3),EvenCliffordNumber{VGA(3),Int}}()` have identical elements, and are equal when
@@ -16,15 +16,15 @@ parameter present, but leaves the algebra type parameter `Q`.
 
 # Examples
 ```julia-repl
-julia> CliffordNumbers.bitindices_type(CliffordNumber{VGA(3),Float32,8})
+julia> CliffordNumbers.blade_indices_type(CliffordNumber{VGA(3),Float32,8})
 CliffordNumber{VGA(3)}
 
-julia> CliffordNumbers.bitindices_type(KVector{2,STA,Bool})
+julia> CliffordNumbers.blade_indices_type(KVector{2,STA,Bool})
 KVector{2,STA}
 ```
 """
 blade_indices_type(::Type{AbstractCliffordNumber{Q,<:Any}}) where Q = AbstractCliffordNumber{Q}
-blade_indices_type(x::AbstractCliffordNumber) = bitindices_type(typeof(x))
+blade_indices_type(x::AbstractCliffordNumber) = blade_indices_type(typeof(x))
 
 #---Type and aliases-------------------------------------------------------------------------------#
 """
@@ -72,7 +72,7 @@ For performance, this definition should be annotated with the macros `@inline` a
 type. This will automatically strip some type parameters so that identical `BladeIndices` objects
 are constructed regardless of the scalar type.
 
-For this reason, you should not use `BitIndices{Q,C}()`; instead use `BitIndices(C)`.
+For this reason, you should not use `BladeIndices{Q,C}()`; instead use `BladeIndices(C)`.
 
 # Implementation
 
@@ -115,6 +115,14 @@ function getindex(::BladeIndices{Q,C}, i::Int) where {Q,C<:AbstractCliffordNumbe
     )
 end
 
+#---Fast equality checks---------------------------------------------------------------------------#
+
+==(::B, ::B) where B<:CGNBladeIndices = true
+
+function ==(::CGNBladeIndices{Q,S,N,I,R}, ::CGNBladeIndices{Q,T,N,I,R}) where {Q,S,T,N,I,R}
+    return blade_indices_type(S) === blade_indices_type(T)
+end
+
 #---Conversion to a Tuple--------------------------------------------------------------------------#
 
 @generated function _Tuple(
@@ -129,6 +137,11 @@ function Base.Tuple(::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R}
 end
 
 Base.map(f, inds::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R} = map(f, Tuple(inds))
+
+#---Range of valid indices for CliffordNumber------------------------------------------------------#
+
+Base.keys(::Type{T}) where T<:AbstractCliffordNumber = BladeIndices(T)
+Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
 
 #---Custom broadcasting behavior-------------------------------------------------------------------#
 
@@ -157,23 +170,42 @@ function Broadcast.broadcasted(::typeof(conj), ::CGNBladeIndices{Q,C,N,I,R}) whe
 end
 
 #---Indexing AbstractCliffordNumber instances------------------------------------------------------#
+
+# Indexing with an NTuple returns an NTuple of the coefficients at the BladeIndex members
+@inline function getindex(x::AbstractCliffordNumber{Q}, B::NTuple{L,BladeIndex{Q}}) where {L,Q}
+    return map((@inline b -> x[b]), B)
+end
+
 """
     CliffordNumbers.getindex_as_tuple(x::AbstractCliffordNumber{Q}, B::BladeIndices{Q,C})
 
 An efficient method for indexing the elements of `x` into a tuple that can be used to construct a
 Clifford number of type `C`, or a similar type from `CliffordNumbers.similar_type`.
 """
-@generated function getindex_as_tuple(x::AbstractCliffordNumber{Q}, ::BladeIndices{Q,C}) where {Q,C}
-    inds = to_index.(x, BladeIndices(C))
-    # The mask is needed for the KVector case.
-    # BladeIndex objects that don't map to a tuple index just get to turned to index 1
-    mask = in.(BladeIndices(C), tuple(BladeIndices(x)))
-    return :(map(*, getindex.(tuple(Tuple(x)), $inds), $mask))
+@generated function getindex_as_tuple(
+    x::AbstractCliffordNumber{Q},
+    ::B
+) where {Q,C,B<:CGNBladeIndices{Q,C}}
+    return :(getindex.(tuple(x), B()))
 end
 
-@inline function getindex(x::AbstractCliffordNumber{Q}, B::BladeIndices{Q,C}) where {Q,C}
+@inline function getindex(x::AbstractCliffordNumber{Q}, B::CGNBladeIndices{Q,C}) where {Q,C}
     T = similar_type(C, scalar_type(x))
     return T(getindex_as_tuple(x, B))
+end
+
+# Constructors can follow similar logic
+# The type bound is required here to get the expected dispatch behavior
+function (C::Type{<:AbstractCliffordNumber{Q1}})(x::AbstractCliffordNumber{Q2}) where {Q1,Q2}
+    @assert Q1 === Q2 string(
+        "Cannot construct a Clifford number from another Clifford number of a different algebra."
+    )
+    return C(getindex_as_tuple(x, BladeIndices(C)))
+end
+
+function (C::Type{<:AbstractCliffordNumber})(x::AbstractCliffordNumber)
+    T = similar_type(C, scalar_type(x), Val(signature(x)))
+    return T(getindex_as_tuple(x, BladeIndices(T)))
 end
 
 #---Show methods to avoid printing too much type detail--------------------------------------------#
