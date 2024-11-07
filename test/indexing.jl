@@ -113,6 +113,12 @@ end
     Tk = CliffordNumbers.blade_indices_type(k)
     Te = CliffordNumbers.blade_indices_type(e)
     Tx = CliffordNumbers.blade_indices_type(x)
+    @test all(identity.(BladeIndices(x)) .== Iterators.map(identity, BladeIndices(x)))
+    @test identity.(BladeIndices(x)) isa BladeIndices{VGA(3),Tx}
+    @test all(identity.(BladeIndices(e)) .== Iterators.map(identity, BladeIndices(e)))
+    @test identity.(BladeIndices(e)) isa BladeIndices{VGA(3),Te}
+    @test all(identity.(BladeIndices(k)) .== Iterators.map(identity, BladeIndices(k)))
+    @test identity.(BladeIndices(k)) isa BladeIndices{VGA(3),Tk}
     @test all(reverse.(BladeIndices(x)) .== Iterators.map(reverse, BladeIndices(x)))
     @test reverse.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,false,false,true}
     @test all(reverse.(BladeIndices(e)) .== Iterators.map(reverse, BladeIndices(e)))

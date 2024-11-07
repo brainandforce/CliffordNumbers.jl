@@ -148,6 +148,8 @@ Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on
 Broadcast.BroadcastStyle(::Type{<:CGNBladeIndices}) = Broadcast.Style{Tuple}()
 Broadcast.BroadcastStyle(::Type{<:BladeIndices}) = Broadcast.Style{Tuple}()
 
+Broadcast.broadcasted(::Union{typeof(+),typeof(identity)}, inds::CGNBladeIndices) = inds
+
 -(::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R} = CGNBladeIndices{Q,C,!N,I,R}()
 Broadcast.broadcasted(::typeof(-), inds::CGNBladeIndices) = -inds
 
