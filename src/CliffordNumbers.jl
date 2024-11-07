@@ -38,11 +38,11 @@ export nblades, signature, scalar_type
 include("grades.jl")
 export nonzero_grades, has_grades_of
 # Indexing each graded element of an AbstractCliffordNumber
-include("bladeindex.jl")
+include("indexing/bladeindex.jl")
 export BladeIndex
 export grade, scalar_index, pseudoscalar_index, grade_involution, dual, undual, left_complement,
     right_complement
-include("bladeindices.jl")
+include("indexing/bladeindices.jl")
 export BladeIndices
 # Dense representation of a Clifford number
 include("cliffordnumber.jl")
