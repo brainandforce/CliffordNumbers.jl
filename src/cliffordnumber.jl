@@ -34,13 +34,9 @@ CliffordNumber{Q}(x::Tuple{Vararg{BaseNumber}}) where Q = CliffordNumber{Q}(prom
 nblades(::Type{<:CliffordNumber{Q}}) where Q = blade_count(Q)
 nonzero_grades(::Type{<:CliffordNumber{Q}}) where Q = 0:dimension(Q)
 
-#---Default BitIndices construction should include all possible BladeIndex objects-----------------#
+#---Default BladeIndices construction should include all possible BladeIndex objects---------------#
 
-bitindices_type(::Type{<:CliffordNumber{Q}}) where Q = CliffordNumber{Q}
 blade_indices_type(::Type{<:CliffordNumber{Q}}) where Q = CliffordNumber{Q}
-
-BitIndices{Q}() where Q = BitIndices{Q,CliffordNumber{Q}}()
-BitIndices(Q::Metrics.AbstractSignature) = BitIndices{Q}()
 
 BladeIndices{Q}() where Q = BladeIndices{Q,CliffordNumber{Q}}()
 BladeIndices(Q::Metrics.AbstractSignature) = BladeIndices{Q}()

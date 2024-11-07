@@ -61,7 +61,7 @@ function print(io::IO, x::AbstractCliffordNumber{Q}) where Q
     # Loop through all the nonzero grades
     for n in 1:dimension(Q)
         # Group together all indices corresponding to the given grade
-        for i in Iterators.filter(i -> grade(i) == n, BitIndices(x))
+        for i in Iterators.filter(i -> grade(i) == n, BladeIndices(x))
             if !iszero(x[i])
                 print_clifford_coefficient(io, x[i], ffn)
                 print(io, to_basis_str(i))

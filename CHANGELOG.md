@@ -16,11 +16,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
   - **[BREAKING]** `BitIndex` has been renamed to `BladeIndex`.
+  - **[BREAKING]** `BitIndices` has replaced with `BladeIndices`.
 
 ### Removed
   - **[BREAKING]** `CliffordNumbers.normalize` is no longer exported to avoid a name conflict with
     `LinearAlgebra.normalize`.
   - **[BREAKING]** Support for Julia 1.8 due to the use of package extensions.
+  - **[BREAKING]** `TransformedBitIndices` and its aliases.
 
 ## [0.1.10] - 2024-11-06
 
