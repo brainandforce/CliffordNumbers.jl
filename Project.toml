@@ -1,7 +1,7 @@
 name = "CliffordNumbers"
 uuid = "3998ac73-6bd4-4031-8035-f167dd3ed523"
 authors = ["Brandon Flores"]
-version = "0.1.10-dev"
+version = "0.1.10"
 
 [weakdeps]
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
