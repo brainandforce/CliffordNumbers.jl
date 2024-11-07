@@ -13,8 +13,7 @@ and `y`, `x * y` is identical to `x .* y`, both of which calculate the geometric
 On top of this, the grade representation of multivectors makes it difficult to relate the indices of
 the backing `Tuple` for each type to the blades represented by the multivector for anything other
 than the dense `CliffordNumber`. To solve this issue, this package provides types specifically
-intended for indexing `AbstractCliffordNumber` subtypes: `BladeIndex{Q}` and the subtypes of
-`AbstractBitIndices{Q,C}`, `BitIndices{Q,C}` and `TransformedBitIndices{Q,C}`.
+intended for indexing `AbstractCliffordNumber` subtypes: `BladeIndex{Q}` and `BladeIndices{Q,C}`.
 
 ## `BladeIndex{Q}`
 
@@ -26,7 +25,7 @@ products used to construct the blade.
 
 Regardless of what position in the underlying `Tuple` a coefficient may be, if `x == y`, then the
 same `BladeIndex` `b` will index `x` and `y` identically:
-```
+```julia-repl
 julia> k = KVector{1,VGA(3)}(4,2,0)
 3-element KVector{1, VGA(3), Int64}:
 4e₁ + 2e₂
@@ -42,10 +41,12 @@ true
 ```
 It should also be noted that indexing an `AbstractCliffordNumber` at an index which is not
 explicitly represented by the type returns zero:
-```
+```julia-repl
 julia> k[BladeIndex(k, 1, 2)]
 0
 ```
+The only way of throwing an error with a `BladeIndex` object is by having a mismatch of algebra type
+parameters between the Clifford number and the index.
 
 ### Construction
 
@@ -80,13 +81,18 @@ julia> l[BladeIndex(l, 3, 1)]
 
 Julia `AbstractArray` instances can be indexed not just with integers, but with arrays of integers
 or special objects representing iterable ranges, such as `:`. Perhaps surprisingly, tuples 
-containing integers (or any other valid index object) are not valid indices of `AbstractArray`:
-```
+containing integers (or any other valid index object) are not valid indices of `AbstractArray`, even
+though vectors of integers are:
+```julia-repl
+julia> (1:10)[[2,3,4]]
+3-element Vector{Int64}:
+ 2
+ 3
+ 4
+
 julia> (1:10)[(2, 3, 4)]
 ERROR: ArgumentError: invalid index: (2, 3, 4) of type Tuple{Int64, Int64, Int64}
-
 ```
-
 In the case of `AbstractCliffordNumber`, we have a compelling reason to use tuples of
 `BladeIndex{Q}` objects for indexing: since the length of a `Tuple` is known statically, we can use
 that information to construct a new `Tuple` of coefficients with statically known length, which may
@@ -101,76 +107,135 @@ perform conversion.
 for tasks like calculating geometric products. Many of these operations are also supported for
 `AbstractCliffordNumber{Q}` instances, such as negation (`-`) and the geometric product (`*`).
 
-## `AbstractBitIndices{Q,C}`
+## `BladeIndices{Q,C}` and related types
 
 Considering that the indices of an `AbstractCliffordNumber` provided by this package are known from
 the type, it makes sense to define a type which represents all indices of a subtype or instance of
-`AbstractCliffordNumber`. This package defines the supertype `AbstractBitIndices{Q,C}` and concrete
-types `BitIndices{Q,C}` and `TransformedBitIndices{Q,C,F}` that allow for easy operation across all
-valid indices of a type `C`.
+`AbstractCliffordNumber`. This package defines the singleton type `BladeIndices{Q,C}`, a subtype of
+`AbstractArray{BladeIndex{Q}}`, which compactly represents the unique, explicitly present indices of
+a Clifford number of type `C`.
 
-### `BitIndices{Q,C}`
-
-The `BitIndices` object for an `AbstractCliffordNumber` subtype `C` or instance `x` can be 
-constructed with `BitIndices(C)` or `BitIndices(x)`. This is a singleton type which is also returned
-by `eachindex(x)`.
-
-The type information of the `BitIndices` object is used to determine the type of the result of 
-indexing. Conveniently, you can index one Clifford number `x` with the indices of another Clifford 
-number `y`, and this converts `x` to the a type similar to that of `y`, but retaining the element
-type of `x`:
-```
-julia> k = KVector{1,VGA(3)}(4,2,0)             # eltype Int64
+`BladeIndices` objects can be constructed using `BladeIndices`, `eachindex`, or `keys`:
+```julia-repl
+julia> k = KVector{1,VGA(3)}(4, 2, 0)
 3-element KVector{1, VGA(3), Int64}:
 4e₁ + 2e₂
 
-julia> z = zero(CliffordNumber{VGA(3),Float64}) # eltype Float64
-8-element CliffordNumber{VGA(3), Float64}:
-0.0
+julia> BladeIndices(k)
+3-element BladeIndices{VGA(3), KVector{1, VGA(3)}}:
+ BladeIndex(Val(VGA(3)), 1)
+ BladeIndex(Val(VGA(3)), 2)
+ BladeIndex(Val(VGA(3)), 3)
 
-julia> k[BitIndices(ans)]
-8-element CliffordNumber{VGA(3), Int64}:
+julia> eachindex(k)
+3-element BladeIndices{VGA(3), KVector{1, VGA(3)}}:
+ BladeIndex(Val(VGA(3)), 1)
+ BladeIndex(Val(VGA(3)), 2)
+ BladeIndex(Val(VGA(3)), 3)
+
+julia> keys(k)
+3-element BladeIndices{VGA(3), KVector{1, VGA(3)}}:
+ BladeIndex(Val(VGA(3)), 1)
+ BladeIndex(Val(VGA(3)), 2)
+ BladeIndex(Val(VGA(3)), 3)
+```
+Notice how the output type lacks the scalar type parameter or length parameter of the type of the
+`AbstractCliffordNumber`. Stripping the scalar type prevents excessive proliferation of indexing
+types (which is useful for generated functions), and ensures that the indexing types of two Clifford
+numbers with different scalar types are equal in the `===` sense:
+```julia-repl
+julia> kk = float(k)
+3-element KVector{1, VGA(3), Float64}:
+4.0e₁ + 2.0e₂
+
+julia> BladeIndices(kk) === BladeIndices(k)
+true
+```
+For this reason (and others), we recommend using `BladeIndices(k)`, `eachindex(k)`, or `keys(k)` as
+appropriate in generic code instead of `BladeIndices{signature(k),typeof(k)}()`.
+
+### Conversion
+
+One of the greatest uses for `BladeIndices` objects is that they can be used to perform tasks such
+as conversion or grade projection:
+``` julia-repl
+julia> inds = BladeIndices(OddCliffordNumber{VGA(3)})
+4-element BladeIndices{VGA(3), OddCliffordNumber{VGA(3)}}:
+ BladeIndex(Val(VGA(3)), 1)
+ BladeIndex(Val(VGA(3)), 2)
+ BladeIndex(Val(VGA(3)), 3)
+ BladeIndex(Val(VGA(3)), 1, 2, 3)
+
+julia> k[inds]
+4-element OddCliffordNumber{VGA(3), Int64}:
 4e₁ + 2e₂
+```
+This reindexing operation converted `k` from a `KVector{1,VGA(3)}` to an `OddCliffordNumber{VGA(3)}`
+automatically. All construction and conversion operations between Clifford numbers of the same 
+algebra have a simple implementation in terms of indexing.
 
+### Applying involutions
+
+`BladeIndices{Q,C}` is actually not an independent type: it is an alias of an internal type,
+`CliffordNumbers.CGNBladeIndices{Q,C,N,I,R}`. The final three type parameters lazily represent three
+common operations: negation (`N`), grade involution (`I`), and reversion (`R`). Their composition is
+efficiently represented in these type parameters.
+
+Rather than deal directly with the possible types and their instances, custom broadcasting
+implementations are used (though the return type is visible):
+```julia-repl
+julia> grade_involution.(inds)
+4-element CliffordNumbers.CGNBladeIndices{VGA(3), OddCliffordNumber{VGA(3)}, false, true, false}:
+ -BladeIndex(Val(VGA(3)), 1)
+ -BladeIndex(Val(VGA(3)), 2)
+ -BladeIndex(Val(VGA(3)), 3)
+ -BladeIndex(Val(VGA(3)), 1, 2, 3)
+
+julia> reverse.(inds) # equivalent to adjoint.(inds)
+4-element CliffordNumbers.CGNBladeIndices{VGA(3), OddCliffordNumber{VGA(3)}, false, false, true}:
+ BladeIndex(Val(VGA(3)), 1)
+ BladeIndex(Val(VGA(3)), 2)
+ BladeIndex(Val(VGA(3)), 3)
+ -BladeIndex(Val(VGA(3)), 1, 2, 3)
+```
+The Clifford conjugate is equivalent to combining grade involution with reversion:
+```
+julia> conj.(inds)
+4-element CliffordNumbers.CGNBladeIndices{VGA(3), OddCliffordNumber{VGA(3)}, false, true, true}:
+ -BladeIndex(Val(VGA(3)), 1)
+ -BladeIndex(Val(VGA(3)), 2)
+ -BladeIndex(Val(VGA(3)), 3)
+ BladeIndex(Val(VGA(3)), 1, 2, 3)
+```
+And as with all involutions, applying them twice undoes them, leaving behind an ordinary
+`BladeIndices` object:
+```
+julia> conj.(conj.(inds))
+4-element BladeIndices{VGA(3), OddCliffordNumber{VGA(3)}}:
+ BladeIndex(Val(VGA(3)), 1)
+ BladeIndex(Val(VGA(3)), 2)
+ BladeIndex(Val(VGA(3)), 3)
+ BladeIndex(Val(VGA(3)), 1, 2, 3)
 ```
 
-`BitIndices{Q,C}` subtypes `AbstractBitIndices{Q,C}`, which subtypes
-`AbstractVector{BladeIndex{Q}}`, meaning that the objects can be indexed with integers. This 
-indexing is one-based to match the indices of the `Tuple` backing a `CliffordNumber`, but this is
-subject to change in the future.
-
-!!! warning "Avoiding type proliferation with `BitIndices`"
-    One fundamental issue with `BitIndices{Q,C}` is that `C` is only constrained to be a subtype of
-    `AbstractCliffordNumber{Q}`. However, `C` may have other type parameters that vary, but produce
-    objects that index equivalently and are identical elementwise:
+!!! warn
+    `reverse(::BladeIndices)` actually reverses the elements of a `BladeIndices` object, just as it
+    would with any other `AbstractVector`! The dot syntax for broadcasting is necessary:
+    ```julia-repl
+    julia> reverse(inds)
+    4-element Vector{BladeIndex{VGA(3)}}:
+     BladeIndex(Val(VGA(3)), 1, 2, 3)
+     BladeIndex(Val(VGA(3)), 3)
+     BladeIndex(Val(VGA(3)), 2)
+     BladeIndex(Val(VGA(3)), 1)
     ```
-    julia> BitIndices{STA,CliffordNumber{STA}}() == BitIndices{STA,CliffordNumber{STA,Float32}}()
-    true
-
-    julia> BitIndices{STA,CliffordNumber{STA}}() == BitIndices{STA,CliffordNumber{STA,Float32,8}}()
-    true 
+    `adjoint(::BladeIndices)` does broadcast the reverse operation (it is equivalent to `'`), but
+    also changes the array type to a `LinearAlgebra.Adjoint` wrapper:
+    ```julia-repl
+    julia> adjoint(inds)
+    1×4 adjoint(::BladeIndices{VGA(3), OddCliffordNumber{VGA(3)}}) with eltype BladeIndex{VGA(3)}:
+     BladeIndex(Val(VGA(3)), 1)  BladeIndex(Val(VGA(3)), 2)  BladeIndex(Val(VGA(3)), 3)  -BladeIndex(Val(VGA(3)), 1, 2, 3)
     ```
-    For this reason, you should call `BitIndices(x)` or `BitIndices(C)` instead of directly
-    constructing `BitIndices{Q,C}()`.
-
-### `TransformedBitIndices{Q,C,F}`
-
-If we want to perform a transformation on all elements of a `BitIndices` instance, we may use dot 
-syntax and broadcast an operation: for instance, `reverse.(BitIndices(x))` to obtain the reverse of
-all indices. Without any explicit specification of behavior, this will return a `Vector`, and for 
-the sake of performance we'd like to avoid returning types without statically known lengths.
-
-We could solve this by converting `BitIndices` to a `Tuple` internally as part of the broadcasting
-implementation, but doing this will cause its own set of problems: indexing an
-`AbstractCliffordNumber` with a `Tuple` returns a `Tuple`. This may be fine internally, if we know
-to call the constructor, but this is potentially confusing for new users. For this reason, we 
-provide `TransformedBitIndices{Q,C,F}`, which is a lazy representation of a function applied to
-every element of `BitIndices(C)`.
-
-For convenience, we provide a few aliases for operations which are commonly used with `BitIndices`:
-- `ReversedBitIndices{Q,C}` is the type of `reverse.(::BitIndices{Q,C})`.
-- `GradeInvolutedBitIndices{Q,C}` is the type of `grade_involution.(::BitIndices{Q,C})`.
-- `ConjugatedBitIndices{Q,C}` is the type of `conj.(::BitIndices{Q,C})`.
-
-In the future, we may override some `broadcast` implementations to ensure that all of these types
-are interconvertible with each other and with `BitIndices{Q,C}`.
+    
+As with conversion and construction, efficient implementations of the common involutions are all
+done in terms of indexing with `CGNBladeIndex` objects.
