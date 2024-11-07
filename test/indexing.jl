@@ -161,6 +161,13 @@ end
     @test -conj.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,true,true,true}
     @test all(-conj.(BladeIndices(k)) .== Iterators.map(conj, -BladeIndices(k)))
     @test -conj.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,true,true,true}
+    # Map definitions that don't generate Tuple
+    @test map(+, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,false,false}()
+    @test map(identity, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,false,false}()
+    @test map(-, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,true,false,false}()
+    @test map(grade_involution, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,true,false}()
+    @test map(reverse, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,false,true}()
+    @test map(conj, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,true,true}()
 end
 
 @testset "Indexing" begin

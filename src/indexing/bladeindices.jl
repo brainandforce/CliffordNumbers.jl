@@ -143,7 +143,7 @@ Base.map(f, inds::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R} = map(f, Tuple(i
 Base.keys(::Type{T}) where T<:AbstractCliffordNumber = BladeIndices(T)
 Base.keys(x::AbstractCliffordNumber) = keys(typeof(x))  # only need to define on types
 
-#---Custom broadcasting behavior-------------------------------------------------------------------#
+#---Custom broadcast and map implementations-------------------------------------------------------#
 
 Broadcast.BroadcastStyle(::Type{<:CGNBladeIndices}) = Broadcast.Style{Tuple}()
 Broadcast.BroadcastStyle(::Type{<:BladeIndices}) = Broadcast.Style{Tuple}()
@@ -170,6 +170,12 @@ end
 function Broadcast.broadcasted(::typeof(conj), ::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R}
     return CGNBladeIndices{Q,C,N,!I,!R}()
 end
+
+Base.map(::Union{typeof(+),typeof(identity)}, inds::CGNBladeIndices) = inds
+Base.map(::typeof(-), inds::CGNBladeIndices) = -inds
+Base.map(::typeof(grade_involution), inds::CGNBladeIndices) = grade_involution.(inds)
+Base.map(::Union{typeof(adjoint), typeof(reverse)}, inds::CGNBladeIndices) = reverse.(inds)
+Base.map(::typeof(conj), inds::CGNBladeIndices) = conj.(inds)
 
 #---Indexing AbstractCliffordNumber instances------------------------------------------------------#
 
