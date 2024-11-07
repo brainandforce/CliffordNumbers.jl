@@ -3,6 +3,8 @@ module CliffordNumbersQuaternionsExt
 using CliffordNumbers
 using Quaternions
 
+CliffordNumbers.scalar_type(::Type{Quaternion{T}}) where T = T
+
 #---Conversion methods-----------------------------------------------------------------------------#
 
 # To AbstractCliffordNumber
@@ -22,8 +24,8 @@ end
     Quaternion(c::AbstractCliffordNumber{VGA(3)})
     Quaternion{T}(c::AbstractCliffordNumber{VGA(3)})
 
-Constructs a quaternion from an element of the algebra of physical space, a 3D vanilla geometric
-algebra.
+Constructs a quaternion from an element of the algebra of physical space, the 3D geometric algebra
+with a positive-definite signature whose even subalgebra is isomorphic to the quaternion algebra ℍ.
 """
 (::Type{H})(c::EvenCliffordNumber{VGA(3)}) where H<:Quaternion = H(Tuple(c)...)
 
@@ -34,5 +36,15 @@ end
 function Base.convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
     return H(Tuple(convert(EvenCliffordNumber{VGA(3)}, c))...)
 end
+
+# Type promotion
+function Base.promote_rule(
+    ::Type{C}, 
+    ::Type{Quaternion{T}}
+) where {S,C<:AbstractCliffordNumber{VGA(3),S},T}
+    return promote_type(C, EvenCliffordNumber{VGA(3),T})
+end
+
+#---Arithmetic operations--------------------------------------------------------------------------#
 
 end
