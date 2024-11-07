@@ -45,6 +45,8 @@ rules to follow for the time being:
   * All operators (such as `∧`) should be defined with their operator symbol and use aliases for
     verbose names (in this case, `wedge`). Any operators defined in this package must have a verbose
     name that uses ASCII characters.
+  * Unless a method is used purely for its side effects and returns `nothing` (such as `show`), all
+    method definitions must contain explicit `return` statements.
 
 ## Interoperability
 
