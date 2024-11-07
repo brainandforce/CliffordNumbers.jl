@@ -79,30 +79,82 @@
     @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 2, 1)))) === BladeIndex(Val(VGA(3)), 2, 1)
 end
 
-@testset "BitIndices" begin
+@testset "BladeIndices" begin
     # Tests to check that types don't proliferate like crazy
-    @test BitIndices(CliffordNumber{VGA(3)}) === BitIndices{VGA(3),CliffordNumber{VGA(3)}}()
-    @test BitIndices(CliffordNumber{VGA(3),Float32}) === BitIndices(CliffordNumber{VGA(3)})
-    @test BitIndices(CliffordNumber{VGA(3),Complex{Int}}) === BitIndices(CliffordNumber{VGA(3)})
-    @test BitIndices(CliffordNumber{VGA(3),Bool,8}) === BitIndices(CliffordNumber{VGA(3)})
+    @test BladeIndices(CliffordNumber{VGA(3)}) === BladeIndices{VGA(3),CliffordNumber{VGA(3)}}()
+    @test BladeIndices(CliffordNumber{VGA(3),Float32}) === BladeIndices(CliffordNumber{VGA(3)})
+    @test BladeIndices(CliffordNumber{VGA(3),Complex{Int}}) === BladeIndices(CliffordNumber{VGA(3)})
+    @test BladeIndices(CliffordNumber{VGA(3),Bool,8}) === BladeIndices(CliffordNumber{VGA(3)})
     APS_bivector_indices = [
         BladeIndex(Val{VGA(3)}(), 1, 2),
         BladeIndex(Val{VGA(3)}(), 1, 3),
         BladeIndex(Val{VGA(3)}(), 2, 3)
     ]
-    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == APS_bivector_indices
-    @test BitIndices(KVector{2,VGA(3)}(4,2,0)) == APS_bivector_indices
-    @test BitIndices{VGA(3),KVector{2,VGA(3)}}() == BitIndices(KVector{2,VGA(3)}(4,2,0))
-    @test grade.(BitIndices(VGA(3))) == count_ones.(0:7)
+    @test BladeIndices{VGA(3),KVector{2,VGA(3)}}() == APS_bivector_indices
+    @test BladeIndices(KVector{2,VGA(3)}(4,2,0)) == APS_bivector_indices
+    @test BladeIndices{VGA(3),KVector{2,VGA(3)}}() == BladeIndices(KVector{2,VGA(3)}(4,2,0))
+    @test grade.(BladeIndices(VGA(3))) === count_ones.(NTuple{8,Int}(0:7))
     @test scalar_index(zero(CliffordNumber{VGA(3)})) === BladeIndex(Val{VGA(3)}())
     @test pseudoscalar_index(zero(CliffordNumber{VGA(3)})) === BladeIndex(Val{VGA(3)}(), 1, 2, 3)
-    @test all(map(-, BitIndices{VGA(3)}()) .== (-).(BitIndices{VGA(3)}()))
-    @test Broadcast.BroadcastStyle(BitIndices) === Broadcast.Style{Tuple}()
-    @test Broadcast.BroadcastStyle(TransformedBitIndices) === Broadcast.Style{Tuple}()
+    @test all(map(-, BladeIndices{VGA(3)}()) .== (-).(BladeIndices{VGA(3)}()))
+    @test Broadcast.BroadcastStyle(BladeIndices) === Broadcast.Style{Tuple}()
+    @test Broadcast.BroadcastStyle(CliffordNumbers.CGNBladeIndices) === Broadcast.Style{Tuple}()
     # Efficient == methods
-    @test BitIndices(KVector{1,VGA(3)}) == BitIndices{VGA(3), KVector{1,VGA(3)}}()
-    @test BitIndices(KVector{1,VGA(3)}) == BitIndices{VGA(3), KVector{1,VGA(3),Int}}()
-    @test BitIndices(KVector{1,VGA(3)}) == BitIndices{VGA(3), KVector{1,VGA(3),Int,3}}()
+    @test BladeIndices(KVector{1,VGA(3)}) == BladeIndices{VGA(3), KVector{1,VGA(3)}}()
+    @test BladeIndices(KVector{1,VGA(3)}) == BladeIndices{VGA(3), KVector{1,VGA(3),Int}}()
+    @test BladeIndices(KVector{1,VGA(3)}) == BladeIndices{VGA(3), KVector{1,VGA(3),Int,3}}()
+end
+
+@testset "CGNBladeIndices" begin
+    import CliffordNumbers.CGNBladeIndices
+    k = KVector{2,VGA(3)}(4, 2, 0)
+    e = EvenCliffordNumber(k)
+    x = CliffordNumber(k)
+    Tk = CliffordNumbers.blade_indices_type(k)
+    Te = CliffordNumbers.blade_indices_type(e)
+    Tx = CliffordNumbers.blade_indices_type(x)
+    @test all(reverse.(BladeIndices(x)) .== Iterators.map(reverse, BladeIndices(x)))
+    @test reverse.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,false,false,true}
+    @test all(reverse.(BladeIndices(e)) .== Iterators.map(reverse, BladeIndices(e)))
+    @test reverse.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,false,false,true}
+    @test all(reverse.(BladeIndices(k)) .== Iterators.map(reverse, BladeIndices(k)))
+    @test reverse.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,false,false,true}
+    @test all(grade_involution.(BladeIndices(x)) .== Iterators.map(grade_involution, BladeIndices(x)))
+    @test grade_involution.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,false,true,false}
+    @test all(grade_involution.(BladeIndices(e)) .== Iterators.map(grade_involution, BladeIndices(e)))
+    @test grade_involution.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,false,true,false}
+    @test all(grade_involution.(BladeIndices(k)) .== Iterators.map(grade_involution, BladeIndices(k)))
+    @test grade_involution.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,false,true,false}
+    @test all(conj.(BladeIndices(x)) .== Iterators.map(conj, BladeIndices(x)))
+    @test conj.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,false,true,true}
+    @test all(conj.(BladeIndices(e)) .== Iterators.map(conj, BladeIndices(e)))
+    @test conj.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,false,true,true}
+    @test all(conj.(BladeIndices(k)) .== Iterators.map(conj, BladeIndices(k)))
+    @test conj.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,false,true,true}
+    @test all((-).(BladeIndices(x)) .== Iterators.map(-, BladeIndices(x)))
+    @test (-).(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,true,false,false}
+    @test all((-).(BladeIndices(e)) .== Iterators.map(-, BladeIndices(e)))
+    @test (-).(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,true,false,false}
+    @test all((-).(BladeIndices(k)) .== Iterators.map(-, BladeIndices(k)))
+    @test (-).(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,true,false,false}
+    @test all(-reverse.(BladeIndices(x)) .== Iterators.map(reverse, -BladeIndices(x)))
+    @test -reverse.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,true,false,true}
+    @test all(-reverse.(BladeIndices(e)) .== Iterators.map(reverse, -BladeIndices(e)))
+    @test -reverse.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,true,false,true}
+    @test all(-reverse.(BladeIndices(k)) .== Iterators.map(reverse, -BladeIndices(k)))
+    @test -reverse.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,true,false,true}
+    @test all(-grade_involution.(BladeIndices(x)) .== Iterators.map(grade_involution, -BladeIndices(x)))
+    @test -grade_involution.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,true,true,false}
+    @test all(-grade_involution.(BladeIndices(e)) .== Iterators.map(grade_involution, -BladeIndices(e)))
+    @test -grade_involution.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,true,true,false}
+    @test all(-grade_involution.(BladeIndices(k)) .== Iterators.map(grade_involution, -BladeIndices(k)))
+    @test -grade_involution.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,true,true,false}
+    @test all(-conj.(BladeIndices(x)) .== Iterators.map(conj, -BladeIndices(x)))
+    @test -conj.(BladeIndices(x)) isa CGNBladeIndices{VGA(3),Tx,true,true,true}
+    @test all(-conj.(BladeIndices(e)) .== Iterators.map(conj, -BladeIndices(e)))
+    @test -conj.(BladeIndices(e)) isa CGNBladeIndices{VGA(3),Te,true,true,true}
+    @test all(-conj.(BladeIndices(k)) .== Iterators.map(conj, -BladeIndices(k)))
+    @test -conj.(BladeIndices(k)) isa CGNBladeIndices{VGA(3),Tk,true,true,true}
 end
 
 @testset "Transformed BitIndices" begin
@@ -138,10 +190,10 @@ end
     @test iszero(k[BladeIndex(Val{VGA(3)}(), 2)])
     @test iszero(k[BladeIndex(Val{VGA(3)}(), 3)])
     @test iszero(k[BladeIndex(Val{VGA(3)}(), 1, 2, 3)])
-    @test k[BitIndices(k)] === k
-    @test k[BitIndices(VGA(3))] === x
-    @test x[BitIndices(k)] === k
-    @test x[BitIndices(KVector{2,VGA(3)})] === k
+    @test k[BladeIndices(k)] === k
+    @test k[BladeIndices(VGA(3))] === x
+    @test x[BladeIndices(k)] === k
+    @test x[BladeIndices(KVector{2,VGA(3)})] === k
     # Testing for cases where the first element is 1//0
     # This caused problems before commit 528636f4496785253be9807b17df1f028ef7a5f0
     @test k_inf[BladeIndex(Val(STA))] === 0//1
