@@ -74,9 +74,6 @@
     @test nondegenerate_square(BladeIndex(Val{QF}(), 1, 5)) === false
     @test nondegenerate_square(BladeIndex(Val{QF}(), 5, 6)) === false
     @test Base.Broadcast.broadcastable(BladeIndex(Val(VGA(3)))) === tuple(BladeIndex(Val(VGA(3))))
-    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}())))) === BladeIndex(Val(VGA(3)))
-    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 1, 2)))) === BladeIndex(Val(VGA(3)), 1, 2)
-    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 2, 1)))) === BladeIndex(Val(VGA(3)), 2, 1)
 end
 
 @testset "BladeIndices" begin
@@ -168,6 +165,7 @@ end
     @test map(grade_involution, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,true,false}()
     @test map(reverse, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,false,true}()
     @test map(conj, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,true,true}()
+    @test +BladeIndices(e) === BladeIndices(e)
 end
 
 @testset "Indexing" begin
@@ -199,4 +197,19 @@ end
     @test nblades(zero(CliffordNumber{STA})) === nblades(CliffordNumber{STA,Int,16})
     @test nblades(EvenCliffordNumber{STA}) === nblades(EvenCliffordNumber{STA,Int,8})
     @test nblades(zero(EvenCliffordNumber{STA})) === nblades(EvenCliffordNumber{STA,Int,8})
+end
+
+@testset "Custom printing" begin
+    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}())))) === BladeIndex(Val(VGA(3)))
+    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 1, 2)))) === BladeIndex(Val(VGA(3)), 1, 2)
+    @test eval(Meta.parse(repr(BladeIndex(Val{VGA(3)}(), 2, 1)))) === BladeIndex(Val(VGA(3)), 2, 1)
+    inds = BladeIndices(CliffordNumber{STA})
+    @test eval(Meta.parse(repr(inds))) === inds
+    @test eval(Meta.parse(repr(grade_involution.(inds)))) === grade_involution.(inds)
+    @test eval(Meta.parse(repr(reverse.(inds)))) === reverse.(inds)
+    @test eval(Meta.parse(repr(conj.(inds)))) === conj.(inds)
+    @test eval(Meta.parse(repr(-inds))) === -inds
+    @test eval(Meta.parse(repr(-grade_involution.(inds)))) === -grade_involution.(inds)
+    @test eval(Meta.parse(repr(-adjoint.(inds)))) === -adjoint.(inds)
+    @test eval(Meta.parse(repr(-conj.(inds)))) === -conj.(inds)
 end
