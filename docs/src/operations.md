@@ -11,7 +11,7 @@ Grade automorphisms are operations which preserves the grades of each basis blad
 sign depending on the grade. All of these operations are their own inverse.
 
 All grade automorphisms are applicable to `BladeIndex` objects, and the way they are implemented is
-through constructors that use `TransformedBitIndices` objects to alter each grade.
+through constructors that use `BladeIndices` objects to alter each grade.
 
 #### Reverse
 

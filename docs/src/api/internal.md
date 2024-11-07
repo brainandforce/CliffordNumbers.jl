@@ -18,7 +18,8 @@ CliffordNumbers.Hamming.hamming_number
 ```@docs
 CliffordNumbers.signmask
 CliffordNumbers._sort_with_parity!
-CliffordNumbers.bitindices_type
+CliffordNumbers.blade_indices_type
+CliffordNumbers.CGNBladeIndices
 ```
 
 ## Construction

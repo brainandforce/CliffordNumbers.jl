@@ -7,11 +7,12 @@ CliffordNumbers.nonzero_grades
 CliffordNumbers.has_grades_of
 ```
 
-## `BladeIndex`
+## `BladeIndex` and `BladeIndices`
 
 ```@docs
 CliffordNumbers.BladeIndex
 CliffordNumbers.is_same_blade
+CliffordNumbers.BladeIndices
 ```
 
 ### Special indices
@@ -41,12 +42,4 @@ CliffordNumbers.signbit_of_mult
 CliffordNumbers.nondegenerate_mult
 Base.:*(::T, ::T) where T<:BladeIndex
 CliffordNumbers.has_wedge
-```
-
-## `BitIndices` and related types
-
-```@docs
-CliffordNumbers.AbstractBitIndices
-CliffordNumbers.BitIndices
-CliffordNumbers.TransformedBitIndices
 ```
