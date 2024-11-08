@@ -6,7 +6,7 @@ using Quaternions
 import Base: convert, promote_rule
 import Base: *
 
-import CliffordNumbers: ∧, ∨, ⨼, ⨽, ×, ⨰, dot
+import CliffordNumbers: ∧, ∨, ⨼, ⨽, ×, ⨰, dot, scalar_product
 
 CliffordNumbers.scalar_type(::Type{Quaternion{T}}) where T = T
 
@@ -52,5 +52,16 @@ function promote_rule(
 end
 
 #---Arithmetic operations--------------------------------------------------------------------------#
+
+for op in (:*, :∧, :∨, :⨼, :⨽, :×, :⨰, :dot, :scalar_product)
+    @eval begin
+        function $op(q::Quaternion, x::AbstractCliffordNumber{Q}) where Q
+            return $op(convert(AbstractCliffordNumber{Q}, q), x)
+        end
+        function $op(x::AbstractCliffordNumber{Q}, q::Quaternion) where Q
+            return $op(x, convert(AbstractCliffordNumber{Q}, q))
+        end
+    end
+end
 
 end
