@@ -1,0 +1,26 @@
+@testset "Quaternions.jl extension" begin
+    q = Quaternion(0, 1, 2, 3)
+    k = KVector{1,VGA(3)}(4, 2, 0)
+    l = KVector{2,VGA(3)}(0, 6, 9)
+    @test Quaternion(l) === Quaternion(0, 0, 6, 9)
+    @test Quaternion(float(l)) === Quaternion(0.0, 0.0, 6.0, 9.0)
+    @test Quaternion{Float64}(l) === Quaternion(0.0, 0.0, 6.0, 9.0)
+    @test convert(Quaternion, l) === Quaternion(0, 0, 6, 9)
+    @test convert(Quaternion{Float64}, l) === Quaternion{Float64}(0, 0, 6, 9)
+    @test Quaternion(k) === zero(Quaternion{scalar_type(k)})
+    @test Quaternion(float(k)) === zero(Quaternion{Float64})
+    @test Quaternion{Float64}(k) === zero(Quaternion{Float64})
+    @test_throws InexactError convert(Quaternion, k)
+    @test_throws InexactError convert(Quaternion{Float64}, k)
+    @test q + k === CliffordNumber{VGA(3)}(0, 4, 2, 1, 0, 2, 3, 0)
+    @test q + l === EvenCliffordNumber{VGA(3)}(0, 1, 8, 12)
+    @test float(q) + k === CliffordNumber{VGA(3),Float64}(0, 4, 2, 1, 0, 2, 3, 0)
+    @test float(q) + l === EvenCliffordNumber{VGA(3),Float64}(0, 1, 8, 12)
+    @test q + float(k) === CliffordNumber{VGA(3),Float64}(0, 4, 2, 1, 0, 2, 3, 0)
+    @test q + float(l) === EvenCliffordNumber{VGA(3),Float64}(0, 1, 8, 12)
+    # Products
+    @test q * k === convert(EvenCliffordNumber{VGA(3)}, q) * k
+    @test q * l === convert(EvenCliffordNumber{VGA(3)}, q) * l
+    @test k * q === k * convert(EvenCliffordNumber{VGA(3)}, q)
+    @test l * q === l * convert(EvenCliffordNumber{VGA(3)}, q)
+end
