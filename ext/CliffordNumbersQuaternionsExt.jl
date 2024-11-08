@@ -3,6 +3,11 @@ module CliffordNumbersQuaternionsExt
 using CliffordNumbers
 using Quaternions
 
+import Base: convert, promote_rule
+import Base: *
+
+import CliffordNumbers: ∧, ∨, ⨼, ⨽, ×, ⨰, dot
+
 CliffordNumbers.scalar_type(::Type{Quaternion{T}}) where T = T
 
 #---Conversion methods-----------------------------------------------------------------------------#
@@ -15,7 +20,7 @@ function (::Type{C})(q::Quaternion) where C<:AbstractCliffordNumber{VGA(3)}
     return C(EvenCliffordNumber{VGA(3)}(q))
 end
 
-function Base.convert(::Type{C}, q::Quaternion) where C<:AbstractCliffordNumber{VGA(3)} 
+function convert(::Type{C}, q::Quaternion) where C<:AbstractCliffordNumber{VGA(3)} 
     return convert(C, EvenCliffordNumber{VGA(3)}(q))
 end
 
@@ -33,12 +38,13 @@ function (::Type{H})(c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
     return H(Tuple(EvenCliffordNumber{VGA(3)}(c))...)
 end
 
-function Base.convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
+function convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
+    # This fails if Quaternion would drop represented grades of c
     return H(Tuple(convert(EvenCliffordNumber{VGA(3)}, c))...)
 end
 
 # Type promotion
-function Base.promote_rule(
+function promote_rule(
     ::Type{C}, 
     ::Type{Quaternion{T}}
 ) where {S,C<:AbstractCliffordNumber{VGA(3),S},T}
