@@ -25,6 +25,32 @@ All subtypes `C` of `AbstractCliffordNumber{Q}` must implement the following fun
 abstract type AbstractCliffordNumber{Q,T<:BaseNumber} <: Number
 end
 
+#---AbstractCliffordNumber passthrough constructors------------------------------------------------#
+
+AbstractCliffordNumber(x::AbstractCliffordNumber) = x
+
+function AbstractCliffordNumber(::BaseNumber)
+    throw(
+        ArgumentError(
+            "When constructing a CliffordNumber from a Real or Complex instance, " *
+            "the algebra type parameter must be specified."
+        )
+    )
+end
+
+function (::Type{<:AbstractCliffordNumber})(::Number)
+    throw(
+        ArgumentError(
+            "Clifford numbers can only be constructed from Real or Complex arguments.\n" *
+            "Support for other types may be provided by a package extension."
+        )
+    )
+end
+
+AbstractCliffordNumber{Q}(x::AbstractCliffordNumber{Q}) where Q = x
+# UNDERSTAND: The type constraint on T is required. Why?
+AbstractCliffordNumber{Q,T}(x::AbstractCliffordNumber{Q,T}) where {Q,T<:BaseNumber} = x
+
 #---Default varargs constructors for types---------------------------------------------------------#
 
 (::Type{T})(x::Vararg{BaseNumber}) where {Q,T<:AbstractCliffordNumber{Q}} = T(x)
