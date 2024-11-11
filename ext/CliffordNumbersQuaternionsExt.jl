@@ -11,9 +11,9 @@ import CliffordNumbers: ∧, ∨, ⨼, ⨽, ×, ⨰, dot, scalar_product
 
 CliffordNumbers.scalar_type(::Type{Quaternion{T}}) where T = T
 
-#---Conversion methods-----------------------------------------------------------------------------#
+#---Conversion to Clifford numbers-----------------------------------------------------------------#
 
-# To AbstractCliffordNumber
+# By default, treat a Quaternion{T} like it is an EvenCliffordNumber{VGA(3),T}
 (::Type{C})(q::Quaternion) where C<:EvenCliffordNumber{VGA(3)} = C(q.s, q.v1, q.v2, q.v3)
 AbstractCliffordNumber(q::Quaternion) = EvenCliffordNumber{VGA(3)}(q)
 
@@ -25,7 +25,7 @@ function convert(::Type{C}, q::Quaternion) where C<:AbstractCliffordNumber{VGA(3
     return convert(C, EvenCliffordNumber{VGA(3)}(q))
 end
 
-# To Quaternion
+#---Conversion to quaternions----------------------------------------------------------------------#
 """
     Quaternion(c::AbstractCliffordNumber{VGA(3)})
     Quaternion{T}(c::AbstractCliffordNumber{VGA(3)})
@@ -48,7 +48,8 @@ function convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaterni
     return H(convert(EvenCliffordNumber{VGA(3)}, c))
 end
 
-# Type promotion
+#---Promotion rules--------------------------------------------------------------------------------#
+
 function promote_rule(
     ::Type{C}, 
     ::Type{Quaternion{T}}
