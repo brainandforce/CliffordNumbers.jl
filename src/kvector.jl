@@ -23,6 +23,11 @@ KVector{K,Q}(x::Tuple{Vararg{T}}) where {K,Q,T<:BaseNumber} = KVector{K,Q,T}(x)
 # Automatically convert arguments to a common type
 KVector{K,Q}(x::Tuple{Vararg{BaseNumber}}) where {K,Q} = KVector{K,Q}(promote(x...))
 
+# AbstractCliffordNumber{Q} constructor converts to a `KVector{0,Q}`
+AbstractCliffordNumber{Q}(x::BaseNumber) where Q = KVector{0,Q}(x)
+# UNDERSTAND: The type constraint on T is required. Why?
+AbstractCliffordNumber{Q,T}(x::BaseNumber) where {Q,T<:BaseNumber} = KVector{0,Q,T}(x)
+
 #---Number of elements-----------------------------------------------------------------------------#
 
 nblades(::Type{<:KVector{K,Q}}) where {K,Q} = binomial(dimension(Q), K)
