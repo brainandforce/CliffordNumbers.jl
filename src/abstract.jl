@@ -164,6 +164,12 @@ similar_type(x, Q::Val) = similar_type(x, scalar_type(x), Q)
 similar(C::Type{<:AbstractCliffordNumber}, args...) = zero(similar_type(C, args...))
 similar(x::AbstractCliffordNumber, args...) = zero(similar_type(x, args...))
 
+# Perform conversion of the scalar type
+# UNDERSTAND: The type constraint on T is required. Why?
+function AbstractCliffordNumber{Q,T}(x::AbstractCliffordNumber{Q}) where {Q,T<:BaseNumber}
+    return similar_type(x, T)(x)
+end
+
 """
     CliffordNumbers.complement_type(C::Type{<:AbstractCliffordNumber})
     CliffordNumbers.complement_type(x::AbstractCliffordNumber)
