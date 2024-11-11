@@ -24,6 +24,21 @@
     @test scalar_convert(Float32, 2) === Float32(2)
 end
 
+@testset "Abstract conversion" begin
+    k = KVector{1,VGA(3)}(4, 2, 0)
+    # Things that should work
+    @test convert(AbstractCliffordNumber, k) === k
+    @test convert(AbstractCliffordNumber{VGA(3)}, k) === k
+    @test convert(AbstractCliffordNumber{VGA(3),scalar_type(k)}, k) === k
+    @test convert(AbstractCliffordNumber{VGA(3),Float64}, k) === float(k)
+    @test convert(AbstractCliffordNumber{VGA(3)}, 1) === one(KVector{0,VGA(3),Int})
+    @test convert(AbstractCliffordNumber{VGA(3),Float64}, 1) === one(KVector{0,VGA(3),Float64})
+    # Things that shouldn't
+    @test_throws ArgumentError convert(AbstractCliffordNumber, 1)
+    @test_throws ArgumentError convert(AbstractCliffordNumber, MockNumber())
+    @test_throws ArgumentError convert(AbstractCliffordNumber{VGA(3)}, MockNumber())
+end
+
 @testset "Promotion" begin
     @test promote_type(Int, CliffordNumber{VGA(3)}) === CliffordNumber{VGA(3)}
     @test promote_type(Int, CliffordNumber{VGA(3),Float64}) === CliffordNumber{VGA(3),Float64,8}
