@@ -6,6 +6,7 @@ using Quaternions
 import Base: convert, promote_rule
 import Base: *
 
+import CliffordNumbers: AbstractCliffordNumber, EvenCliffordNumber
 import CliffordNumbers: ∧, ∨, ⨼, ⨽, ×, ⨰, dot, scalar_product
 
 CliffordNumbers.scalar_type(::Type{Quaternion{T}}) where T = T

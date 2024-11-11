@@ -2,6 +2,19 @@
     q = Quaternion(0, 1, 2, 3)
     k = KVector{1,VGA(3)}(4, 2, 0)
     l = KVector{2,VGA(3)}(0, 6, 9)
+    # Conversion to AbstractCliffordNumber
+    eq = EvenCliffordNumber{VGA(3)}(0, 1, 2, 3)
+    @test AbstractCliffordNumber(q) === eq
+    @test EvenCliffordNumber{VGA(3)}(q) === eq
+    @test EvenCliffordNumber{VGA(3),Float64}(q) === scalar_convert(Float64, eq)
+    @test KVector{1,VGA(3)}(q) === zero(KVector{1,VGA(3),Int})
+    @test OddCliffordNumber{VGA(3)}(q) === zero(OddCliffordNumber{VGA(3),Int})
+    @test convert(AbstractCliffordNumber, q) === eq
+    @test convert(EvenCliffordNumber{VGA(3)}, q) === eq
+    @test convert(EvenCliffordNumber{VGA(3),Float64}, q) === scalar_convert(Float64, eq)
+    @test_throws InexactError convert(KVector{1,VGA(3)}, q)
+    @test_throws InexactError convert(OddCliffordNumber{VGA(3)}, q)
+    # Conversion to Quaternion
     @test Quaternion(l) === Quaternion(0, 0, 6, 9)
     @test Quaternion(float(l)) === Quaternion(0.0, 0.0, 6.0, 9.0)
     @test Quaternion{Float64}(l) === Quaternion(0.0, 0.0, 6.0, 9.0)
