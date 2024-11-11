@@ -1,5 +1,6 @@
 # Default conversion should check for exact representability
-function convert(T::Type{<:AbstractCliffordNumber}, x::AbstractCliffordNumber)
+function convert(::Type{T}, x::AbstractCliffordNumber) where T<:AbstractCliffordNumber
+    x isa T && return x
     result = T(x)::T
     return (has_grades_of(x, result) ? result : throw(InexactError(:convert, T, x)))
 end
