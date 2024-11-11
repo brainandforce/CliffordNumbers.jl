@@ -9,6 +9,10 @@ Aqua.test_all(CliffordNumbers; unbound_args = false)
 @basis_vars(PGA(3), Int)
 @basis_vars(STA)
 
+# A subtype of Number that does not subtype Real or Complex
+struct MockNumber <: Number
+end
+
 @testset "CliffordNumbers.jl" begin
     include("internals.jl")
     include("metrics.jl")

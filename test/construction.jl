@@ -79,6 +79,21 @@ end
     @test CliffordNumbers.Z2CliffordNumber(k2) === EvenCliffordNumber{VGA(3)}(0, 1, 2, 3)
 end
 
+@testset "Abstract constructors" begin
+    k = KVector{1,VGA(3)}(4, 2, 0)
+    # Things that should work
+    @test AbstractCliffordNumber(k) === k
+    @test AbstractCliffordNumber{VGA(3)}(k) === k
+    @test AbstractCliffordNumber{VGA(3),scalar_type(k)}(k) === k
+    @test AbstractCliffordNumber{VGA(3),Float64}(k) === float(k)
+    @test AbstractCliffordNumber{VGA(3)}(1) === one(KVector{0,VGA(3),Int})
+    @test AbstractCliffordNumber{VGA(3),Float64}(1) === one(KVector{0,VGA(3),Float64})
+    # Things that shouldn't work
+    @test_throws ArgumentError AbstractCliffordNumber(1)
+    @test_throws ArgumentError AbstractCliffordNumber(MockNumber())
+    @test_throws ArgumentError AbstractCliffordNumber{VGA(3)}(MockNumber())
+end
+
 @testset "Similar types" begin
     import CliffordNumbers.similar_type
     @test similar_type(EvenCliffordNumber{VGA(3),Int}, Val(STA)) === EvenCliffordNumber{STA,Int,8}
