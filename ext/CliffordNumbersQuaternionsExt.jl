@@ -31,16 +31,20 @@ end
 
 Constructs a quaternion from an element of the algebra of physical space, the 3D geometric algebra
 with a positive-definite signature whose even subalgebra is isomorphic to the quaternion algebra ℍ.
+Any odd-grade coefficients of `c` are lost.
+
+If loss of odd-grade coefficients should throw an error, use `convert(Quaternion, c)` or
+`convert(Quaternion{T}, c)` instead of the constructor.
 """
 (::Type{H})(c::EvenCliffordNumber{VGA(3)}) where H<:Quaternion = H(Tuple(c)...)
 
 function (::Type{H})(c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
-    return H(Tuple(EvenCliffordNumber{VGA(3)}(c))...)
+    return H(EvenCliffordNumber{VGA(3)}(c))
 end
 
 function convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
     # This fails if Quaternion would drop represented grades of c
-    return H(Tuple(convert(EvenCliffordNumber{VGA(3)}, c))...)
+    return H(convert(EvenCliffordNumber{VGA(3)}, c))
 end
 
 # Type promotion
