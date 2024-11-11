@@ -9,6 +9,8 @@ import Base: *
 import CliffordNumbers: AbstractCliffordNumber, EvenCliffordNumber
 import CliffordNumbers: ∧, ∨, ⨼, ⨽, ×, ⨰, dot, scalar_product
 
+import Quaternions: slerp
+
 CliffordNumbers.scalar_type(::Type{Quaternion{T}}) where T = T
 
 #---Conversion to Clifford numbers-----------------------------------------------------------------#
@@ -69,5 +71,41 @@ for op in (:*, :∧, :∨, :⨼, :⨽, :×, :⨰, :dot, :scalar_product)
         end
     end
 end
+
+#---Extend slerp to some AbstractCliffordNumber types----------------------------------------------#
+"""
+    slerp(x::AbstractCliffordNumber{VGA(3)}, y::AbstractCliffordNumber{VGA(3)}, t::Real)
+        -> EvenCliffordNumber{VGA(3)}
+
+Performs spherical linear interpolation for rotors in the 3D vanilla geometric algebra, treating
+them as if they were `Quaternion` instances.
+"""
+function slerp(a::AbstractCliffordNumber{VGA(3)}, b::AbstractCliffordNumber{VGA(3)}, t::Real)
+    S = promote_type(scalar_type(a), scalar_type(b), typeof(t))
+    (qa, qb) =  convert.(Quaternion{S}, (a, b))
+    return EvenCliffordNumber{VGA(3)}(slerp(qa, qb, convert(S, t)))
+end
+
+"""
+    slerp(x::Quaternion, y::AbstractCliffordNumber{VGA(3)}, t::Real) -> EvenCliffordNumber{VGA(3)}
+    slerp(x::AbstractCliffordNumber{VGA(3)}, y::Quaternion, t::Real) -> EvenCliffordNumber{VGA(3)}
+
+Performs spherical linear interpolation for rotors in the 3D vanilla geometric algebra, treating
+them as if they were `Quaternion` instances. The resulting output gains Clifford number semantics,
+so it is of type `EvenCliffordNumber{VGA(3)}` instead of `Quaternion`.
+"""
+function slerp(a::AbstractCliffordNumber{VGA(3)}, q::Quaternion, t::Real)
+    S = promote_type(scalar_type(a), scalar_type(q), typeof(t))
+    (qa, qb) = convert.(Quaternion{S}, (a, q))
+    return EvenCliffordNumber{VGA(3)}(slerp(qa, qb, convert(S, t)))
+end
+
+function slerp(q::Quaternion, b::AbstractCliffordNumber{VGA(3)}, t::Real)
+    S = promote_type(scalar_type(q), scalar_type(b), typeof(t))
+    (qa, qb) = convert.(Quaternion{S}, (q, b))
+    return EvenCliffordNumber{VGA(3)}(slerp(qa, qb, convert(S, t)))
+end
+
+# TODO: spherical linear interpolation for arbitrary dimensions
 
 end

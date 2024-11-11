@@ -36,4 +36,12 @@
     @test q * l === convert(EvenCliffordNumber{VGA(3)}, q) * l
     @test k * q === k * convert(EvenCliffordNumber{VGA(3)}, q)
     @test l * q === l * convert(EvenCliffordNumber{VGA(3)}, q)
+    # Spherical linear interpolation
+    a = exp(1.09 * KVector{2,VGA(3)}(1, 2, 3))
+    b = exp(1.11 * KVector{2,VGA(3)}(1, 2, 3))
+    qa = Quaternion(a)
+    qb = Quaternion(b)
+    @test Quaternion(slerp(a, b, 0.5)) === slerp(qa, qb, 0.5)
+    @test Quaternion(slerp(qa, b, 0.5)) === slerp(qa, qb, 0.5)
+    @test Quaternion(slerp(a, qb, 0.5)) === slerp(qa, qb, 0.5)
 end
