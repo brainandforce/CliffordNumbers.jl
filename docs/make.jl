@@ -1,16 +1,18 @@
 using CliffordNumbers
+using Quaternions
 using Documenter
 
 import CliffordNumbers.BaseNumber
 
-DocMeta.setdocmeta!(CliffordNumbers, :DocTestSetup, :(using CliffordNumbers); recursive=true)
+using_directives = :(using CliffordNumbers; using Quaternions)
+DocMeta.setdocmeta!(CliffordNumbers, :DocTestSetup, using_directives; recursive=true)
 
 is_ci_env = (get(ENV, "CI", nothing) == true)
 @info "is_ci_env == $is_ci_env"
 
 makedocs(;
     sitename="CliffordNumbers.jl",
-    modules=[CliffordNumbers],
+    modules=[CliffordNumbers, Base.get_extension(CliffordNumbers, :CliffordNumbersQuaternionsExt)],
     doctest=false,
     checkdocs = :exports,
     format=Documenter.HTML(;

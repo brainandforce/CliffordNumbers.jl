@@ -28,6 +28,9 @@ function convert(::Type{C}, q::Quaternion) where C<:AbstractCliffordNumber{VGA(3
 end
 
 #---Conversion to quaternions----------------------------------------------------------------------#
+
+(::Type{H})(c::EvenCliffordNumber{VGA(3)}) where H<:Quaternion = H(Tuple(c)...)
+
 """
     Quaternion(c::AbstractCliffordNumber{VGA(3)})
     Quaternion{T}(c::AbstractCliffordNumber{VGA(3)})
@@ -39,8 +42,6 @@ Any odd-grade coefficients of `c` are lost.
 If loss of odd-grade coefficients should throw an error, use `convert(Quaternion, c)` or
 `convert(Quaternion{T}, c)` instead of the constructor.
 """
-(::Type{H})(c::EvenCliffordNumber{VGA(3)}) where H<:Quaternion = H(Tuple(c)...)
-
 function (::Type{H})(c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
     return H(EvenCliffordNumber{VGA(3)}(c))
 end
