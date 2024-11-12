@@ -31,17 +31,21 @@ end
 
 (::Type{H})(c::EvenCliffordNumber{VGA(3)}) where H<:Quaternion = H(Tuple(c)...)
 
+# TODO: simplify this with functor syntax. Documenter.jl issues prevent this at the moment
 """
     Quaternion(c::AbstractCliffordNumber{VGA(3)})
     Quaternion{T}(c::AbstractCliffordNumber{VGA(3)})
 
 Constructs a quaternion from an element of the algebra of physical space, the 3D geometric algebra
 with a positive-definite signature whose even subalgebra is isomorphic to the quaternion algebra ℍ.
-Any odd-grade coefficients of `c` are lost.
+Any odd-grade coefficients of `c` are lost. If the type parameter `T` is supplied, the scalars of
+the input are converted to type T.
 
 If loss of odd-grade coefficients should throw an error, use `convert(Quaternion, c)` or
 `convert(Quaternion{T}, c)` instead of the constructor.
 """
+Quaternion(c::AbstractCliffordNumber{VGA(3)}) = Quaternion(EvenCliffordNumber{VGA(3)}(c))
+
 function (::Type{H})(c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
     return H(EvenCliffordNumber{VGA(3)}(c))
 end
