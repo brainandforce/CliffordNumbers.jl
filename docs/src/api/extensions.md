@@ -3,7 +3,7 @@
 ## [Quaternions.jl]
 
 ```@docs
-Quaternion(::AbstractCliffordNumber{VGA(3)})
+Quaternions.Quaternion(::AbstractCliffordNumber{VGA(3)})
 Quaternions.slerp(::AbstractCliffordNumber{VGA(3)}, ::AbstractCliffordNumber{VGA(3)}, ::Real)
 Quaternions.slerp(::AbstractCliffordNumber{VGA(3)}, ::Quaternion, ::Real)
 ```
