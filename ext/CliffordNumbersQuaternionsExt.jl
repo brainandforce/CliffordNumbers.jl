@@ -29,9 +29,10 @@ end
 
 #---Conversion to quaternions----------------------------------------------------------------------#
 
-(::Type{H})(c::EvenCliffordNumber{VGA(3)}) where H<:Quaternion = H(Tuple(c)...)
-
 # TODO: simplify this with functor syntax. Documenter.jl issues prevent this at the moment
+Quaternion(c::EvenCliffordNumber{VGA(3)}) = Quaternion(Tuple(c)...)
+Quaternion{T}(c::EvenCliffordNumber{VGA(3)}) where T = Quaternion{T}(Tuple(c)...)
+
 """
     Quaternion(c::AbstractCliffordNumber{VGA(3)})
     Quaternion{T}(c::AbstractCliffordNumber{VGA(3)})
@@ -44,11 +45,8 @@ the input are converted to type T.
 If loss of odd-grade coefficients should throw an error, use `convert(Quaternion, c)` or
 `convert(Quaternion{T}, c)` instead of the constructor.
 """
-Quaternion(c::AbstractCliffordNumber{VGA(3)}) = Quaternion(EvenCliffordNumber{VGA(3)}(c))
-
-function Quaternion{T}(c::AbstractCliffordNumber{VGA(3)}) where T
-    return Quaternion{T}(EvenCliffordNumber{VGA(3)}(c))
-end
+Quaternion(c::AbstractCliffordNumber{VGA(3)}) = Quaternion(EvenCliffordNumber(c))
+Quaternion{T}(c::AbstractCliffordNumber{VGA(3)}) where T = Quaternion{T}(EvenCliffordNumber(c))
 
 function convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
     # This fails if Quaternion would drop represented grades of c
