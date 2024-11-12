@@ -46,8 +46,8 @@ If loss of odd-grade coefficients should throw an error, use `convert(Quaternion
 """
 Quaternion(c::AbstractCliffordNumber{VGA(3)}) = Quaternion(EvenCliffordNumber{VGA(3)}(c))
 
-function (::Type{H})(c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
-    return H(EvenCliffordNumber{VGA(3)}(c))
+function Quaternion{T}(c::AbstractCliffordNumber{VGA(3)}) where T
+    return Quaternion{T}(EvenCliffordNumber{VGA(3)}(c))
 end
 
 function convert(::Type{H}, c::AbstractCliffordNumber{VGA(3)}) where H<:Quaternion
