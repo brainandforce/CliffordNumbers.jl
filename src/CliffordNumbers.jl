@@ -13,6 +13,9 @@ import Base: print, show, summary
 
 import Base.Broadcast
 
+import Random: Sampler, SamplerType
+import Random: rand, randexp, randn
+
 """
     CliffordNumbers.BaseNumber
 
@@ -82,6 +85,8 @@ export versor_inverse
 # Exponentiation
 include("math/exponential.jl")
 export exppi, exptau
+# Random Clifford number generation
+include("random.jl")
 # Pretty printing
 include("show.jl")
 # Generate basis variables with a macro
