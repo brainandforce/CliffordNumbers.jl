@@ -1,5 +1,7 @@
 module CliffordNumbers
 
+using Random
+
 import Base: length, size, axes, getindex, to_index
 import Base: zero, one, oneunit
 import Base: signbit, sign, copysign, flipsign

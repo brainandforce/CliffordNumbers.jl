@@ -65,17 +65,12 @@ current LTS.
 
 ### Dependencies
 
-At the time of writing, this package does not have any dependencies. Zero dependencies is not a
-goal of the package: part of the reason for this is that I may spin some of the functionality of
-this package off into separate subpackages (such as the `CliffordNumbers.Hamming` module for working
-with Hamming weights of integers or other binary data).
-
-However, this package is intended to be a relatively low-level component of the Julia ecosystem.
-No dependencies on packages providing high-level functionality (such as GUIs) should ever be
-included. In addition, this package has not needed to depend on packages that would ordinarily be
-considered for a library like this, such as [LinearAlgebra], [StaticArrays], or [StaticArraysCore].
-Inclusion of these libraries as dependencies will only be done if a pressing need for them can be
-demonstrated.
+At the time of writing, this package only depends on the Random standard library. This package is
+intended to be a relatively low-level component of the Julia ecosystem. No dependencies on packages
+providing high-level functionality (such as GUIs) should ever be included. In addition, this package
+has not needed to depend on packages that would ordinarily be considered for a library like this, 
+such as [LinearAlgebra], [StaticArrays], or [StaticArraysCore]. Inclusion of these libraries as
+dependencies will only be done if a pressing need for them can be demonstrated.
 
 ### Extensions
 

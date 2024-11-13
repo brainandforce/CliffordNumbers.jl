@@ -3,6 +3,9 @@ uuid = "3998ac73-6bd4-4031-8035-f167dd3ed523"
 authors = ["Brandon Flores"]
 version = "0.2.0-dev"
 
+[deps]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
 [weakdeps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Quaternions = "94ee1d12-ae83-5a48-8b1c-48b8ff168ae0"
@@ -18,6 +21,7 @@ CliffordNumbersUnitfulExt = "Unitful"
 [compat]
 LinearAlgebra = "1"
 Quaternions = "0.7"
+Random = "1.11.0"
 StaticArraysCore = "1"
 Unitful = "1"
 julia = "1.9"
