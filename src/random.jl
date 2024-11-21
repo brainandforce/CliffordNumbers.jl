@@ -16,8 +16,8 @@ randexp(rng::AbstractRNG, ::SamplerType{KVector{0,Q}}) where Q = KVector{0,Q}(ra
 """
     randn([rng=default_rng()], ::Type{KVector{1,Q,T}})
 
-Generates a random 1-blade whose coefficients are sampled from an `n`-spherically symmetric
-multivariate normal distribution, where `n = dimension(Q)`.
+Generates a random 1-blade whose coefficients are sampled from a radially symmetric multivariate
+normal distribution.
 
 In a positive-definite metric, the resulting 1-blades have their norms distributed according to
 the [chi distribution], and their moduli distributed according to the [chi-squared distribution].
