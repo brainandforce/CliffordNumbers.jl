@@ -405,6 +405,9 @@ end
     @test Base.literal_pow(^, m, Val(1/3)) === Base.literal_pow(^, scalar(m), Val(1/3))
     @test Base.literal_pow(^, m, Val(2*im)) === Base.literal_pow(^, scalar(m), Val(2*im))
     =#
+    @test sqrt(KVector{0,VGA(3)}(1)) === KVector{0,VGA(3)}(sqrt(1))
+    @test sqrt(KVector{0,VGA(3)}(2.0)) === KVector{0,VGA(3)}(sqrt(2.0))
+    @test_throws DomainError sqrt(KVector{0,VGA(3)}(-1))
 end
 
 @testset "Miscellaneous properties" begin

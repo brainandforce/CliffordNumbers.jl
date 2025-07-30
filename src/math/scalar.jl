@@ -163,3 +163,7 @@ function muladd(x::AbstractCliffordNumber{Q}, y::BaseNumber, z::AbstractClifford
     (xx, zz) = promote(x, z)
     return muladd(xx, y, zz)
 end
+
+#---Scalar square roots----------------------------------------------------------------------------#
+
+sqrt(x::KVector{0,Q}) where Q = KVector{0,Q}(sqrt(only(Tuple(x))))
