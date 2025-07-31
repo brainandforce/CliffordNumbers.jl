@@ -33,7 +33,7 @@ the n∞ component is chosen so that the result squares to 0.
 rand(rng::AbstractRNG, K::Type{<:KVector{1,Q,T}}) where {Q,T} = rand_by_algebra(rng, Q, K)
 
 # Default to Float64 scalars
-rand(rng::AbstractRNG, ::Type{<:KVector{1,Q}}) where Q = rand(rng, KVector{1,Q,Float64})
+rand(rng::AbstractRNG, ::Type{KVector{1,Q}}) where Q = rand(rng, KVector{1,Q,Float64})
 
 """
     randn([rng=default_rng()], ::Type{KVector{1,Q,[T = Float64]}})
@@ -54,7 +54,7 @@ squares to 0.
 [chi distribution]:         https://en.wikipedia.org/wiki/Chi_distribution
 [chi-squared distribution]: https://en.wikipedia.org/wiki/Chi-squared_distribution
 """
-randn(rng::AbstractRNG, K::Type{KVector{1,Q,T}}) where {Q,T} =  randn_by_algebra(rng, Q, K)
+randn(rng::AbstractRNG, K::Type{<:KVector{1,Q,T}}) where {Q,T} =  randn_by_algebra(rng, Q, K)
 
 # Default to Float64 scalars
 randn(rng::AbstractRNG, ::Type{KVector{1,Q}}) where Q = randn(rng, KVector{1,Q,Float64})
@@ -111,19 +111,19 @@ This internal function is needed because we cannot directly specialize on the ty
 parameter.
 """
 function rand_by_algebra(rng::AbstractRNG, ::VGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
-    return normalize(rand(rng, K))
+    return normalize(randn(rng, K))
 end
 
 function rand_by_algebra(rng::AbstractRNG, ::PGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa PGA || error(LazyString("Algebra ", Q, " is not a PGA."))
     data = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 1))
-    return KVector{1,Q,T}(one(T), (data ./ sum(abs2, data))...)
+    return KVector{1,Q,T}(one(T), (data ./ hypot(data...))...)
 end
 
 function rand_by_algebra(rng::AbstractRNG, ::CGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa CGA || error(LazyString("Algebra ", Q, " is not a CGA."))
     data = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 2))
-    return KVector{1,Q,T}(1//2 * (sq + 1), 1//2 * (sq - 1), (data ./ sum(abs2, data))...)
+    return KVector{1,Q,T}(one(T), zero(T), (data ./ hypot(data...))...)
 end
 
 function rand_by_algebra(::AbstractRNG, ::Any, ::Type{<:KVector{1,Q,T}}) where {Q,T}
