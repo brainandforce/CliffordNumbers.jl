@@ -14,6 +14,28 @@ randexp(rng::AbstractRNG, ::SamplerType{KVector{0,Q}}) where Q = KVector{0,Q}(ra
 
 #---Random sampling of unit 1-blades---------------------------------------------------------------#
 """
+    rand(rng::AbstractRNG, K::Type{<:KVector{0,Q,[T = Float64]}}
+
+Generates a uniformly distributed random 1-blade sampled from a uniform distribution on the unit
+sphere centered at the origin of the modeled space.
+
+In a positive-definite metric (VGA), the 1-blade coefficients are drawn from a standard normal
+distribution and the resulting vector is normalized so that it squares to 1.
+
+In a projective geometric algebra (PGA), the e₀ component is set equal to 1 and the remaining
+coefficients are drawn from a standard normal distribution, then normalized so that the result
+squares to 1.
+
+In a conformal geometric algebra (CGA), the n₀ component is set equal to 1, the coordinate
+coefficients are drawn from a standard normal distribution and normalized so they square to 1, and
+the n∞ component is chosen so that the result squares to 0.
+"""
+rand(rng::AbstractRNG, K::Type{<:KVector{1,Q,T}}) where {Q,T} = rand_by_algebra(rng, Q, K)
+
+# Default to Float64 scalars
+rand(rng::AbstractRNG, ::Type{<:KVector{1,Q}}) where Q = rand(rng, KVector{1,Q,Float64})
+
+"""
     randn([rng=default_rng()], ::Type{KVector{1,Q,[T = Float64]}})
 
 Generates a random 1-blade sampled from a radially symmetric multivariate normal distribution.
@@ -33,6 +55,10 @@ randn(rng::AbstractRNG, K::Type{KVector{1,Q,T}}) where {Q,T} =  randn_by_algebra
 # Default to Float64 scalars
 randn(rng::AbstractRNG, ::Type{KVector{1,Q}}) where Q = randn(rng, KVector{1,Q,Float64})
 
+#---Defining random number generation by algebra---------------------------------------------------#
+
+# NOTE: this is one of the reasons why I think the algebra module needs to be reimplemented.
+# Managing dispatch is way too complicated here.
 """
     CliffordNumbers.randn_by_algebra(
         ::Metrics.Signature,
@@ -67,11 +93,35 @@ function randn_by_algebra(::AbstractRNG, ::Any, ::Type{<:KVector{1,Q,T}}) where 
     error("Custom algebras require their own implementation of CliffordNumbers.randn_by_algebra.")
 end
 
-#---Functions for other distributions not in Base.Random-------------------------------------------#
+"""
+    CliffordNumbers.rand_by_algebra(
+        ::Metrics.Signature,
+        rng::AbstractRNG,
+        ::Type{<:KVector{1,Q,T}}
+    ) -> KVector{1,Q,T}
 
-#=
-function rand_by_algebra(
-    rand_f,
-    algebra::Metrics.Signature
-)
-=#
+Generates a random 1-blade with unit distance from the origin. For more information about the
+public-facing implementation, see [`rand`](@ref).
+
+This internal function is needed because we cannot directly specialize on the type of the algebra
+parameter.
+"""
+function rand_by_algebra(rng::AbstractRNG, ::VGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
+    return normalize(rand(rng, K))
+end
+
+function rand_by_algebra(rng::AbstractRNG, ::PGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
+    Q isa PGA || error(LazyString("Algebra ", Q, " is not a PGA."))
+    data = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 1))
+    return KVector{1,Q,T}(one(T), (data ./ sum(abs2, data))...)
+end
+
+function rand_by_algebra(rng::AbstractRNG, ::CGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
+    Q isa CGA || error(LazyString("Algebra ", Q, " is not a CGA."))
+    data = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 2))
+    return KVector{1,Q,T}(1//2 * (sq + 1), 1//2 * (sq - 1), (data ./ sum(abs2, data))...)
+end
+
+function rand_by_algebra(::AbstractRNG, ::Any, ::Type{<:KVector{1,Q,T}}) where {Q,T}
+    error("Custom algebras require their own implementation of CliffordNumbers.rand_by_algebra.")
+end
