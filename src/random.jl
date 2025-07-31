@@ -60,6 +60,18 @@ randn(rng::AbstractRNG, K::Type{<:KVector{1,Q,T}}) where {Q,T} =  randn_by_algeb
 randn(rng::AbstractRNG, ::Type{KVector{1,Q}}) where Q = randn(rng, KVector{1,Q,Float64})
 
 #---Defining random number generation by algebra---------------------------------------------------#
+"""
+    CliffordNumbers.randn_coordinate(rng::AbstractRNG, ::Type{NTuple{N,T}}; normalize = false)
+
+Generates a coordinate in `N` dimensions by drawing each of its coefficients from a standard
+multivariate normal distribution.
+"""
+function randn_coordinate(
+    rng::AbstractRNG,
+    ::Type{NTuple{N,T}}
+) where {N,T<:AbstractFloat}
+    return ntuple(_ -> randn(rng, T), Val(N))
+end
 
 # NOTE: this is one of the reasons why I think the algebra module needs to be reimplemented.
 # Managing dispatch is way too complicated here.
@@ -78,23 +90,31 @@ parameter.
 """
 function randn_by_algebra(rng::AbstractRNG, ::VGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa VGA || error(LazyString("Algebra ", Q, " is not a VGA."))
-    return KVector{1,Q,T}(ntuple(_ -> randn(rng, T), Val(dimension(Q))))
+    return KVector{1,Q,T}(randn_coordinate(rng, NTuple{dimension(Q), T})...)
 end
 
 function randn_by_algebra(rng::AbstractRNG, ::PGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa PGA || error(LazyString("Algebra ", Q, " is not a PGA."))
-    return KVector{1,Q,T}(one(T), ntuple(_ -> randn(rng, T), Val(dimension(Q) - 1))...)
+    return KVector{1,Q,T}(one(T), randn_coordinate(rng, NTuple{dimension(Q) - 1, T})...)
 end
 
 function randn_by_algebra(rng::AbstractRNG, ::CGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa CGA || error(LazyString("Algebra ", Q, " is not a CGA."))
-    coords = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 2))
-    sq = sum(abs2, coords)
-    return KVector{1,Q,T}(1//2 * (sq + 1), 1//2 * (sq - 1), coords...)
+    data = randn_coordinate(rng, NTuple{dimension(Q) - 2, T})
+    sq = sum(abs2, data)
+    return KVector{1,Q,T}(1//2 * (sq + 1), 1//2 * (sq - 1), data...)
 end
 
 function randn_by_algebra(::AbstractRNG, ::Any, ::Type{<:KVector{1,Q,T}}) where {Q,T}
     error("Custom algebras require their own implementation of CliffordNumbers.randn_by_algebra.")
+end
+
+function rand_coordinate(
+    rng::AbstractRNG,
+    ::Type{NTuple{N,T}}
+) where {N,T<:AbstractFloat}
+    result = randn_coordinate(rng, NTuple{N,T})
+    return result ./ hypot(result...)
 end
 
 """
@@ -116,14 +136,12 @@ end
 
 function rand_by_algebra(rng::AbstractRNG, ::PGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa PGA || error(LazyString("Algebra ", Q, " is not a PGA."))
-    data = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 1))
-    return KVector{1,Q,T}(one(T), (data ./ hypot(data...))...)
+    return KVector{1,Q,T}(one(T), rand_coordinate(rng, NTuple{dimension(Q) - 1, T})...)
 end
 
 function rand_by_algebra(rng::AbstractRNG, ::CGA, K::Type{<:KVector{1,Q,T}}) where {Q,T}
     Q isa CGA || error(LazyString("Algebra ", Q, " is not a CGA."))
-    data = ntuple(_ -> randn(rng, T), Val(dimension(Q) - 2))
-    return KVector{1,Q,T}(one(T), zero(T), (data ./ hypot(data...))...)
+    return KVector{1,Q,T}(one(T), zero(T), rand_coordinate(rng, NTuple{dimension(Q) - 2, T})...)
 end
 
 function rand_by_algebra(::AbstractRNG, ::Any, ::Type{<:KVector{1,Q,T}}) where {Q,T}
