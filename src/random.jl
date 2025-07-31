@@ -47,6 +47,10 @@ their moduli distributed according to the [chi-squared distribution].
 In a projective geometric algebra (PGA), the resulting 1-blades have their projective component
 fixed to `one(T)`, and the remaining components are drawn from a standard normal distribution.
 
+In a conformal geometric algebra (CGA), the n₀ coeffient is `one(T)`, the coordinate coefficients
+are drawn from a standard normal distribution, and the n∞ component is chosen so that the result
+squares to 0.
+
 [chi distribution]:         https://en.wikipedia.org/wiki/Chi_distribution
 [chi-squared distribution]: https://en.wikipedia.org/wiki/Chi-squared_distribution
 """
