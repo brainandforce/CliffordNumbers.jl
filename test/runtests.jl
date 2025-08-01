@@ -1,5 +1,6 @@
 using CliffordNumbers
 using Aqua, Test
+using Random, Statistics
 using LinearAlgebra, Quaternions, StaticArrays, Unitful
 
 Aqua.test_all(CliffordNumbers; unbound_args = false)
