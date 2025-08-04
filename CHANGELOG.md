@@ -12,6 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     `LinearAlgebra.dot`, `LinearAlgebra.normalize`, `StaticArraysCore.similar_type`.
   - Package extension for [Quaternions.jl](https://github.com/JuliaGeometry/Quaternions.jl) to allow
     for interoperability of the `Quaternion` type with `AbstractCliffordNumber`.
+  - `sqrt` is now defined for `KVector{0}`.
 
 ### Removed
   - **[BREAKING]** `CliffordNumbers.normalize` is no longer exported to avoid a name conflict with
