@@ -39,10 +39,10 @@ reversion (`R`) to the indices.
 Custom broadcast implementations are used to change the values of the type parameters `N`, `I`, and
 `R`, so that the types do not need to be managed directly with their constructors.
 
-Printing of each variant type is done using broadcasted functions:
+Printing of each variant type is done using `map` syntax:
 ```julia_repl
 julia> show(CliffordNumbers.CGNBladeIndices{VGA(3),KVector{2,VGA(3)},true,true,true}())
--grade_involution.(reverse.(BladeIndices(KVector{2, VGA(3)})))
+-map(conj, BladeIndices(KVector{2, VGA(3)}))
 ```
 # Aliases
 
@@ -230,6 +230,22 @@ function Base.summary(io::IO, i::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R}
     )
 end
 
+function Base.show(io::IO, ::CGNBladeIndices{Q,C,N,false,false}) where {Q,C,N}
+    if C === blade_indices_type(C)
+        print(io, '-'^N, BladeIndices, '(', C, ')')
+    else
+        print(io, '-'^N, BladeIndices{Q,C}, "()")
+    end
+end
+
+function Base.show(io::IO, ::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R}
+    f = ifelse(I, ifelse(R, conj, grade_involution), reverse)
+    # If we make a tuple, (f, BladeIndices{Q,C}), grade_involution is fully qualified
+    # So manually print the parentheses and comma
+    print(io, '-'^N, map, '(', f, ", ", BladeIndices{Q,C}(), ')')
+end
+
+#= This displays the result using broadcast syntax
 function Base.show(io::IO, ::BladeIndices{Q,C}) where {Q,C}
     if C === blade_indices_type(C)
         print(io, BladeIndices, '(', C, ')')
@@ -247,3 +263,4 @@ function Base.show(io::IO, ::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R}
     show(io, BladeIndices{Q,C}())
     print(io, ')'^(I || R))
 end
+=#
