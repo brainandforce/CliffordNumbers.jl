@@ -378,8 +378,8 @@ therefore resolved at compile time.
 
 Objects of this type can be composed arbitrarily as functors:
 ```julia-repl
-julia> Involution{true, true, false}()(Involution{true, false, false}())
-Involution{false, true, false}()
+julia> CyclicGradeNegation{true, true, false}()(CyclicGradeNegation{true, false, false}())
+CyclicGradeNegation{false, true, false}()
 ```
 They can also be applied to `AbstractCliffordNumber` or `BladeIndex` instances.
 """
