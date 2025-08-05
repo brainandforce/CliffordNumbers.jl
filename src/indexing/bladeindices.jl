@@ -219,6 +219,17 @@ end
 
 #---Show methods to avoid printing too much type detail--------------------------------------------#
 
+Base.summary(io::IO, i::BladeIndices) = print(io, length(i), "-element ", typeof(i))
+
+function Base.summary(io::IO, i::CGNBladeIndices{Q,C,N,I,R}) where {Q,C,N,I,R}
+    automorphism = ifelse(I, ifelse(R, "Clifford conjugated","grade involuted"), "reversed"^R)
+    opstring = "negated"^N * ", "^(N && !isempty(automorphism)) * automorphism
+    print(
+        io,
+        length(i), "-element ", BladeIndices{Q,C}, " (", opstring, ')'
+    )
+end
+
 function Base.show(io::IO, ::BladeIndices{Q,C}) where {Q,C}
     if C === blade_indices_type(C)
         print(io, BladeIndices, '(', C, ')')
