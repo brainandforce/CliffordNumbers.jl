@@ -7,8 +7,10 @@
     @test BladeIndex(Val{VGA(3)}(), 1, 2) === BladeIndex{VGA(3)}(false, UInt(3))
     @test BladeIndex(Val{VGA(3)}(), 2, 1) === BladeIndex{VGA(3)}(true, UInt(3))
     @test BladeIndex(Val{VGA(3)}(), 1, 2) === -BladeIndex(Val{VGA(3)}(), 2, 1)
+    @test BladeIndex(Val{VGA(2)}(), 1, 2) != BladeIndex(Val{VGA(3)}(), 1, 2)
     @test abs(BladeIndex(Val{VGA(3)}(), 1, 2)) === BladeIndex(Val{VGA(3)}(), 1, 2)
     @test abs(BladeIndex(Val{VGA(3)}(), 2, 1)) === BladeIndex(Val{VGA(3)}(), 1, 2)
+    @test signature(a) === VGA(3)
     # Sign manipulation
     @test copysign(+a, +1) === +a
     @test copysign(+a, -1) === -a
@@ -26,6 +28,15 @@
     @test flipsign(+c, -b) === -c
     @test flipsign(-c, +b) === -c
     @test flipsign(-c, -b) === +c
+    # With other numeric types
+    @test flipsign(1, a) === 1
+    @test flipsign(1, -a) === -1
+    @test flipsign(-1, a) === -1
+    @test flipsign(-1, -a) === 1
+    @test copysign(2.0, b) === 2.0
+    @test copysign(-2.0, b) === 2.0
+    @test copysign(2.0, -b) === -2.0
+    @test copysign(-2.0, b) === -2.0
     # Euclidean multiplications
     @test signbit_of_mult(a, b) === false
     @test signbit_of_mult(b, a) === true
@@ -43,6 +54,8 @@
     @test a * b === BladeIndex(Val{VGA(3)}(), 1, 2)
     @test b * a === BladeIndex(Val{VGA(3)}(), 2, 1)
     @test b * a === -BladeIndex(Val{VGA(3)}(), 1, 2)
+    @test adjoint(a) === reverse(a)
+    @test (a * b)' === b * a
     @test CliffordNumbers.has_wedge(a, BladeIndex(Val{VGA(3)}())) === true
     @test CliffordNumbers.has_wedge(a, b) === true
     @test CliffordNumbers.has_wedge(b, a) === true
@@ -88,6 +101,7 @@ end
         BladeIndex(Val{VGA(3)}(), 2, 3)
     ]
     @test BladeIndices{VGA(3),KVector{2,VGA(3)}}() == APS_bivector_indices
+    @test BladeIndices{VGA(3)}(KVector{2,VGA(3)}(4,2,0)) == APS_bivector_indices
     @test BladeIndices(KVector{2,VGA(3)}(4,2,0)) == APS_bivector_indices
     @test BladeIndices{VGA(3),KVector{2,VGA(3)}}() == BladeIndices(KVector{2,VGA(3)}(4,2,0))
     @test grade.(BladeIndices(VGA(3))) === count_ones.(NTuple{8,Int}(0:7))
@@ -103,7 +117,7 @@ end
 end
 
 @testset "CGNBladeIndices" begin
-    import CliffordNumbers.CGNBladeIndices
+    import CliffordNumbers: CGNBladeIndices, CyclicGradeNegation
     k = KVector{2,VGA(3)}(4, 2, 0)
     e = EvenCliffordNumber(k)
     x = CliffordNumber(k)
@@ -166,6 +180,10 @@ end
     @test map(reverse, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,false,true}()
     @test map(conj, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,true,true}()
     @test +BladeIndices(e) === BladeIndices(e)
+    # Not sure if we'll use this type on its own, honestly
+    @test CyclicGradeNegation{true,false,false}()(k) === -k
+    @test CyclicGradeNegation{false,true,false}()(k) === k
+    @test CyclicGradeNegation{false,false,true}()(k) === -k
 end
 
 @testset "Indexing" begin
