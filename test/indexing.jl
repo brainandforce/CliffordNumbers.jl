@@ -184,6 +184,16 @@ end
     @test CyclicGradeNegation{true,false,false}()(k) === -k
     @test CyclicGradeNegation{false,true,false}()(k) === k
     @test CyclicGradeNegation{false,false,true}()(k) === -k
+    # Summary when printing
+    base_summary = "3-element BladeIndices{VGA(3), KVector{2, VGA(3)}}"
+    @test summary(BladeIndices(k)) == base_summary
+    @test summary(map(grade_involution, BladeIndices(k))) == base_summary * " (grade involuted)"
+    @test summary(map(reverse, BladeIndices(k))) == base_summary * " (reversed)"
+    @test summary(map(adjoint, BladeIndices(k))) == base_summary * " (reversed)"
+    @test summary(map(var"'", BladeIndices(k))) == base_summary * " (reversed)"
+    @test summary(map(conj, BladeIndices(k))) == base_summary * " (Clifford conjugated)"
+    @test summary(-BladeIndices(k)) == base_summary * " (negated)"
+    @test summary(-map(reverse, BladeIndices(k))) == base_summary * " (negated, reversed)"
 end
 
 @testset "Indexing" begin
