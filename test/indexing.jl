@@ -181,9 +181,17 @@ end
     @test map(conj, BladeIndices(k)) === CGNBladeIndices{VGA(3),Tk,false,true,true}()
     @test +BladeIndices(e) === BladeIndices(e)
     # Not sure if we'll use this type on its own, honestly
+    identityCGN = CyclicGradeNegation{false,false,false}()
     @test CyclicGradeNegation{true,false,false}()(k) === -k
     @test CyclicGradeNegation{false,true,false}()(k) === k
     @test CyclicGradeNegation{false,false,true}()(k) === -k
+    @test -identityCGN === CyclicGradeNegation{true,false,false}()
+    @test grade_involution(identityCGN) === CyclicGradeNegation{false,true,false}()
+    @test reverse(identityCGN) === CyclicGradeNegation{false,false,true}()
+    @test adjoint(identityCGN) === CyclicGradeNegation{false,false,true}()
+    @test identityCGN' === CyclicGradeNegation{false,false,true}()
+    @test conj(identityCGN) === CyclicGradeNegation{false,true,true}()
+    @test adjoint(identityCGN)(-grade_involution(identityCGN)) === -conj(identityCGN)
     # Summary when printing
     base_summary = "3-element BladeIndices{VGA(3), KVector{2, VGA(3)}}"
     @test summary(BladeIndices(k)) == base_summary
