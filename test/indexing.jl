@@ -36,7 +36,7 @@
     @test copysign(2.0, b) === 2.0
     @test copysign(-2.0, b) === 2.0
     @test copysign(2.0, -b) === -2.0
-    @test copysign(-2.0, b) === -2.0
+    @test copysign(-2.0, -b) === -2.0
     # Euclidean multiplications
     @test signbit_of_mult(a, b) === false
     @test signbit_of_mult(b, a) === true
