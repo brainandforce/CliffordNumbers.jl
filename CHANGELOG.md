@@ -11,7 +11,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Package extensions for `LinearAlgebra` and `StaticArraysCore` to add methods to
     `LinearAlgebra.dot`, `LinearAlgebra.normalize`, `StaticArraysCore.similar_type`.
   - Package extension for [Quaternions.jl](https://github.com/JuliaGeometry/Quaternions.jl) to allow
-    for interoperability of the `Quaternion` type with `AbstractCliffordNumber`.
+    for interoperability of the `Quaternion` type with `AbstractCliffordNumber`. This includes 
+    limited support for `Quaternions.slerp` (only applies to `EvenCliffordNumber{VGA(3)}`).
   - `sqrt` is now defined for `KVector{0}`.
 
 ### Changed
