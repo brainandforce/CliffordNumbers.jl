@@ -42,7 +42,9 @@ end
 @inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{2}) = x*x
 
 @inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{-1}) = inv(x)
-@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{-2}) = (i = inv(x); i*i)
+# This was previously defined as (i = inv(x); i*i), which can cause unexpected exceptions
+# I can't remember why I defined it like that before, but I wanted to point it out for later
+@inline Base.literal_pow(::typeof(^), x::AbstractCliffordNumber, ::Val{-2}) = inv(x*x)
 
 # It appears that exponentiation with `Bool` does not get converted to Base.literal_pow
 # But they're defined here anyway
