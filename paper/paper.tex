@@ -1,0 +1,654 @@
+
+% JuliaCon proceedings template
+\documentclass{juliacon}
+
+\usepackage{amsmath}
+
+% Defining some useful symbols
+\DeclareMathOperator{\Cl}{Cl}
+
+\newcommand{\ClR}[1]{\Cl_{#1}\left(\mathbb{R}\right)}
+\newcommand{\ClC}[1]{\Cl_{#1}\left(\mathbb{C}\right)}
+
+\setcounter{page}{1}
+
+\begin{document}
+
+\input{header}
+
+\maketitle
+
+\begin{abstract}
+
+This is a guide for authors who are preparing papers for JuliaCon using the \LaTeX{} document
+preparation system and the \verb|juliacon|  class file.
+
+\end{abstract}
+
+\section{Introduction}
+
+One of the great challenges of modeling physical systems is the treatement of dimensions.
+Historically, two major conventions have been used to model 3D space.
+In 1843, William Rowan Hamilton famously inscribed the formula $i^2 = j^2 = k^2 = ijk = -1$  into the stone of Brougham Bridge with a pocket knife, defining the quaternions.
+Quaternions can encode both scalar quantities and three-dimensional vectors in a single object, and they permit addition, multiplication, and their inverses.
+Although the quaternions immediately found use in the physical sciences, notably in Maxwell's first publication of his famous equations, they were also considered unwieldy: Maxwell originally published 20 equations instead of the four we know today.
+Part of this unwieldiness stems from the noncommutativity of quaternion multiplication, but this property is necessary to describe rotations in three dimensions.
+More troubling was that 3D vectors would always have negative squares, which requires careful manipulation of signs to ensure that quantities are correctly computed.
+
+The deficiencies of quaternions led Josiah Willard Gibbs to develop a new formalism, vector algebra, which is the dominant formalism in all but a few niche applications today.
+Rather than a single quaternion product, vector algebra uses two products, the dot and cross product, splitting the commutative and anticommutative components of the quaternion product into two different operations.
+However, vector algebra is not free of unwieldiness, either, particularly with the cross product.
+The cross product of two vectors does not transform like the input vectors under a reflection or other transformation that reverses the orientation of the space.
+For clarity, the output of the cross product is often called a \textit{pseudovector}, and the dot product of a pseudovector with a vector (as in the triple product) is called a \textit{pseudoscalar}.
+The vector algebra formalism requires these distinctions to correctly describe how multidimensional quantities transform.
+
+Today, most physics literature is written in the language of vector calculus, a combination of calculus and vector algebra.
+By contrast, quaternions see relatively little practical use, with the most notable exception being the description of 3D rotations.
+However, both quaternions and vector algebra also share one glaring deficiency: they are limited to describing 3D space.
+This is obvious from the limited size of quaternions, but even vector algebra is deficient in this regard without combining it with matrix algebra.
+It is possible to generalize the cross product to an $n-1$-ary operator on $n$-dimensional vectors, but this means that the binary nature of the cross product is dependent on three dimensions.
+(A seven-dimensional generalization exists, but does not satisfy the Jacobi identity.)
+
+While Hamilton's quaternions and Gibbs' vector algebra battled for dominance in the scientific community, a third formalism developed in the shadows.
+In 1844, Hermann Grassmann introduced \textit{Ausdehnungslehre} (\textit{Theory of Extension}), which we call \textit{exterior algebra} today.
+This algebra combines $k$ $d$-dimensional vectors into new objects called \textit{$k$-vectors} (with the \textit{grade}, $k$, ranging from 0 to $d$), with $\binom{d}{k}$ components, using a new operation, the \textit{wedge product} ($\wedge$).
+With the wedge product, objects of any dimension from 0 to $d$ residing in a $d$-dimensional space can be rigorously described.
+In three dimensions, the wedge product of two vectors is calculated exactly as the cross product is, but the result is a not an ordinary vector, but a $2$-vector (or bivector).
+This distinction explains why axial vectors and pseudovectors transform differently in the vector calculus formalism: axial vectors are $1$-vectors, and pseudovectors are $2$-vectors (or more generally $\left(d-1\right)$-vectors in $d$ dimensions).
+
+In 1878, William Kingdon Clifford, familiar with the work of Hamilton and Grassmann realized that the "vector" components of quaternions actually transformed like the bivectors of a three-dimensional exterior algebra.
+He then constructed a new family of algebras, which he called \textit{$n$-way geometric algebras}, which extended the exterior algebra to include quaternion-like constructions which worked in any number of dimensions.
+Today, these algebras are called \textit{Clifford algebras} in his honor.
+
+Clifford's geometric algebra, as he formulated it, faded into obscurity.
+Notably, Paul Dirac used the geometric algebra of spacetime in his derivation of his eponymous equation, but phrased it in the language of matrices.
+Most literature on Clifford algebras uses matrix-based formalisms
+The work of David Hestenes, 
+
+\subsection*{Statement of need}
+
+The first computational tool we turn to when solving multidimensional problems is usually numerical linear algebra.
+Numerous libraries exist to efficiently implement fundamental matrix and vector operations efficiently and with high numerical stability.
+However, linear algebra may not be the best mathematical tool for phrasing a solution to a problem in low-dimensional geometry, and in some cases it may be an inferior approach for reasons that are not immediately obvious.
+While 3D rotations and reflections can be composed and performed with matrix-vector multiplication, it has suboptimal efficiency, is not numerically stable, and can introduce shearing that does not respect the orthonormality of the space.
+
+CliffordNumbers.jl aims to provide an implementation of geometric algebras that is fast and easy to use, with a well-documented implementation that can be used as a reference for others who wish to implement the fundamental operations of geometric algebra.
+While it supports algebras of arbitrary dimension, the most common anticipated use cases are small 
+
+\section{Mathematical background}
+
+Formally, a \textit{Clifford algebra} $\Cl\left(V, \operatorname{Q}\right)$ is a unital associative algebra over the vector space $V$ and field $K$ and quadratic form $\operatorname{Q}: V \to K$.
+Specifically, it is the quotient of the tensor algebra over $V$, $T(V) = \bigoplus_{x = 0}^{\infty} T^x V$, with respect to the two-sided ideal $v \otimes v - \operatorname{Q}\left(v\right) 1$ for all $v \in V$.
+For most readers, this definition will likely not be informative without further context.
+
+We start with an $n$-dimensional vector space $V$, and define the quadratic form as the dot product of vectors with themselves: $\operatorname{Q}\left(v\right) = v \cdot v$.
+The tensor algebra $T(V)$ is the set of all tensor products of elements of $V$.
+Each vector in $V$ is a $1$-tensor, and the tensor product of $k$ elements is a $k$-tensor, with the empty product ($0$-tensors) being scalars $K$.
+The space of tensors of grade $k$ over $V$, $T^k V$, has dimension $n^k$.
+
+With this, we construct the exterior algebra over $V$, $\bigwedge\left(V\right)$, by taking the quotient of $T(V)$ with respect to the two-sided ideal $v \otimes v$.
+All tensors of the form $v \otimes v$ are symmetric tensors, and the two-sided ideal eliminates that contribution from the tensor product.
+This tell us that the product of the exterior algebra, the \textit{wedge product} ($u \wedge v$), is the antisymmetric component of the tensor product $u \otimes v$.
+It also tells us that the wedge product of linearly dependent of vectors is zero.
+This limits the grades of $\bigwedge\left(V\right)$ to values between $0$ and $n$.
+
+The subspaces of $\bigwedge\left(V\right)$ with grade $k$ are denoted $\bigwedge^{k}\left(V\right)$, and their elements are called $k$-vectors, which have $\binom{n}{k}$ components.
+A general $k$-vector is a linear combination of \textit{$k$-blades}, which are generated by the wedge products of $k$ $1$-vectors.
+$k$-blades correspond to oriented regions spanned by the $1$-vectors which generated them, and represent primitive geometric objects.
+For all exterior algebras, scalars, vectors, $n-1$-vectors, and $n$-vectors are always blades.
+Therefore, all $k$-vectors are blades in spaces of dimension 3 and below.
+We can also sum of $k$-vectors of different grades, producing \textit{multivectors}.
+
+We can now construct the Clifford algebra as a modification of the exterior algebra.
+The quadratic form $\operatorname{Q}$ is simply the dot product of vectors with themselves: $\operatorname{Q}\left(v\right) = v \cdot v$.
+With this, we modify the ideal we used to generate the exterior product from $T(V)$ to $v \otimes v - \operatorname{Q}\left(v\right) 1$.
+Instead of eliminating the symmetric component of $u \times v$, we replace it a scalar, $u \cdot v$.
+The \textit{Clifford product} or \textit{geometric product} of two $1$-vectors (denoted without an operator, $u v$) can now be described succinctly:
+\begin{flalign}
+    u v & = u \cdot v + u \wedge v
+\end{flalign}
+While this formula only holds for a very specific case, it may be used to derive the geometric product formula for arbitrary multivectors.
+
+Like $k$-blades in the exterior algebra, we use the term $k$-versor to refer to geometric products of $1$-vectors.
+Each versor corresponds to an isometry of space, with $1$-versors corresponding to reflections, $2$-versors to rotations, and $n$-versors to inversions.
+In general, $k$-versors are the sum of blades with grades of the same parity as $k$, allowing us to classify versors as \textit{even} and \textit{odd}.
+The preservation of grade parity by the Clifford product indicates that Clifford algebras are $\mathbb{Z}_2$-graded algebras.
+
+\subsection{Direct and mirror interpretations}
+
+The standard description of 
+
+\subsection{Families of geometric algebras}
+
+For the sake of simplicity, we started by defining our quadratic form as the dot product of a vector with itself.
+But in practice, we can make use of non-positive definite or degenerate quadratic forms to produce useful algebras.
+
+A geometric algebra generated with a positive-definite quadratic form is commonly referred to as a \textit{vanilla geometric algebra} (VGA).
+The term "vector space geometric algebra" was previously used, but 
+The most commonly used example is the \textit{algebra of physical space} (APS), $\ClR{3,0,0}$.
+Vanilla geometric algebras form the basis of more complicated modeling algebras.
+
+The algebra of physical space can be extended to the \textit{spacetime algebra} (STA), $\ClR{1,3,0}$ or $\ClR{3,1,0}$ depending on the choice of metric signature.
+These algebras are not isomorphic, but their even subalgebras are APS.
+In this Article and in CliffordNumbers.jl, we use the general term \textit{Lorentzian geometric algebra} for algebras that combine a single timelike dimension with multiple spacelike dimensions.
+
+
+
+\section{Transformations}
+
+The 
+
+In this Article, we preferentially use \textit{geometric algebra} to emphasize the importance of the geometric product and wedge product
+
+\section{Architecture}
+
+\subsection{Optimizations}
+
+\section{Usage examples}
+
+\section{Limitations}
+
+Some discourse around geometric algebra treats it as a total replacement for linear algebra.
+In theory, it is possible to use 
+But in practice, the computation complexity of such an approach will 
+
+\section{The JuliaCon Article Class}
+\label{sec:documentclass}
+%
+The juliacon class file preserves the standard LATEX{} interface such
+that any document that can be produced using the standard LATEX{}
+article class can also be produced with the class file.\vskip 6pt
+It is likely that the make up will change after file submission. For
+this reason, we ask you to ignore details such as slightly long lines,
+page stretching, or figures falling out of synchronization, as these
+details can be dealt with at a later stage.\vskip 6pt
+Use should be made of symbolic references (\verb|\ref| ) in order to
+protect against late changes of order, etc.
+
+\section{USING THE JuliaCon Article CLASS FILE}
+
+If the file \verb|juliacon.cls|  is not already in the appropriate system directory
+for \LaTeX{} files, either arrange for it to be put there or copy
+it to your working directory. The \verb|juliacon|  document class is implemented
+as a complete class, not a document style option. In order to
+use the \verb|juliacon  document class, replace \verb|article|  by \verb|juliacon|  in the
+\verb|\documentclass|  command at the beginning of your document:
+\vskip 6pt
+\begin{centering}
+    \verb|\documentclass{article}|  \end{centering}
+\vskip 6pt
+replace by
+\vskip 6pt
+ \verb|\documentclass{juliacon}|  \vskip 6pt
+In general, the following standard document \verb|style|  options should
+{ \itshape not} be used with the {\footnotesize \itshape article} class file:
+\begin{enumerate}
+\item[(1)] \verb|10pt|,  \verb|11pt|,  \verb|12pt|   ? unavailable;
+\item[(2)] \verb|twoside|  (no associated style file) ? \verb|twoside|  is the default;
+\item[(3)] \verb|fleqn|, \verb|leqno|, \verb|titlepage| ? should not be used;
+\end{enumerate}
+
+\section{Additional Document Style Options}
+\label{sec:additional_doc}
+%
+The following additional style option is available with the \verb|juliacon|  class file:
+\vskip 6pt
+Please place any additional command definitions at the very start of
+the \LaTeX{} file, before the \verb|\begin{document}|. For example, user-defined
+\verb|\def|  and \verb|\newcommand|   commands that define macros for
+technical expressions should be placed here. Other author-defined
+macros should be kept to a minimum.
+\vskip 6pt
+Commands that differ from the standard \LaTeX{} interface, or that
+are provided in addition to the standard interface, are explained in
+this guide. This guide is not a substitute for the \LaTeX{} manual itself.
+Authors planning to submit their papers in \LaTeX{} are advised to use
+\verb|juliacon.cls|  as early as possible in the creation of their files.
+
+%
+%
+%
+%
+\begin{table*}[t]
+\tabcolsep22pt
+\tbl{If necessary, the tables can be extended both columns.}{
+\begin{tabular}{|l|l|c|c|}\hline
+Label & \multicolumn{1}{c|}{Description}
+& Number of Users &
+Number of Queries\\\hline
+Test 1 & Training Data &
+\smash{\raise-7pt\hbox{70}} & 104\\
+\cline{1-2}\cline{4-4}
+Test 2 & Testing Data I & & 105\\\hline
+Test 3 & Testing Data II & 30 & 119\\\hline
+& Total & 100 & 328\\\hline
+\end{tabular}}
+\label{tab:symbols}
+\begin{tabnote}
+This is an example of table footnote.
+\end{tabnote}
+\end{table*}
+% \begin{figure*}[t]
+% \centerline{\includegraphics[width=11cm]{juliagraphs.png}}
+% \caption{If necessary, the images can be extended both columns.}
+%   \label{fig:sample_image}
+% \end{figure*}
+
+\section{Additional features}
+\label{sec:additional_faci}
+In addition to all the standard \LaTeX{} design elements, the \verb|juliacon|  class file includes the following features:
+In general, once you have used the additional \verb|juliacon.cls| facilities
+in your document, do not process it with a standard \LaTeX{} class
+file.
+
+\subsection{Titles, Author's Name, and Affiliation}
+\label{subsub:title_auth}
+The title of the article, author's name, and affiliation are used at the
+beginning of the article (for the main title). These can be produced
+using the following code:
+
+\begin{verbatim}
+\title{ This is an example of article title} }
+\author{
+   \large 1st Author \\[-3pt]
+   \normalsize 1st author's affiliation  \\[-3pt]
+    \normalsize 1st line of address \\[-3pt]
+    \normalsize 2nd line of address \\[-3pt]
+    \normalsize	1st author's email address \\[-3pt]
+  \and
+   \large 2nd Author \\[-3pt]
+   \normalsize 2nd author's affiliation  \\[-3pt]
+    \normalsize 1st line of address \\[-3pt]
+    \normalsize 2nd line of address \\[-3pt]
+    \normalsize	2nd author's email address \\[-3pt]
+\and
+   \large 3rd Author \\[-3pt]
+   \normalsize 3rd author's affiliation  \\[-3pt]
+    \normalsize 1st line of address \\[-3pt]
+    \normalsize 2nd line of address \\[-3pt]
+    \normalsize	3rd author's email address \\[-3pt]
+}
+\maketitle
+\end{verbatim}
+
+\subsection{Writing Julia code}
+
+A special environment is already defined for Julia code,
+built on top of \textit{listings} and \textit{jlcode}.
+
+\begin{verbatim}
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={lst:exmplg}, 
+    caption={Example Code Block.}
+]
+using Plots
+
+x = -3.0:0.01:3.0
+y = rand(length(x))
+plot(x, y)
+\end{lstlisting}
+\end{verbatim}
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={lst:exmplg}, 
+    caption={Example Code Block.}
+]
+using Plots
+
+x = -3.0:0.01:3.0
+y = rand(length(x))
+plot(x, y)
+\end{lstlisting}
+
+
+\subsection{Abstracts, Key words, term etc...}
+\label{subsub:abs_key_etc}
+
+At the beginning of your article, the title should be generated
+in the usual way using the \verb|\maketitle|  command. For genaral tem and keywords use
+\verb|\terms|,
+\verb|\keywords|  commands respectively. The abstract should be enclosed
+within an abstract environment, All these environment
+can be produced using the following code:
+\begin{verbatim}
+\terms{Experimentation, Human Factors}
+
+\keywords{Face animation, image-based modelling...}
+
+\begin{abstract}
+In this paper, we propose a new method for the
+systematic determination of the model's base of
+time varying delay system. This method based on
+the construction of the classification data related
+to the considered system. The number, the orders,
+the time delay and the parameters of the local
+models are generated automatically without any
+knowledge about the full operating range of the
+process. The parametric identification of the local
+models is realized by a new recursive algorithm for
+on line identification of systems with unknown time
+delay. The proposed algorithm allows simultaneous
+estimation of time delay and parameters of
+discrete-time systems. The effectiveness of
+the new method has been illustrated through
+simulation.
+\end{abstract}
+
+\end{verbatim}
+
+\section{Some guidelines}
+\label{sec:some_guide}
+The following notes may help you achieve the best effects with the
+\verb|juliacon|  class file.
+
+\subsection{Sections}
+\label{subsub:sections}
+\LaTeXe{}  provides four levels of section headings and they are all
+defined in the \verb|juliacon|  class file:
+\begin{itemize}
+\item \verb|\section|
+\item \verb|\subsection|
+\item \verb|\subsubsection|
+\item \verb|\paragraph|
+\end{itemize}
+Section headings are automatically converted to allcaps style.
+\subsection{Lists}
+\label{sec:lists}
+%
+The \verb|juliacon|   class file provides unnumbered lists using the
+\verb|unnumlist|  environment for example,
+
+\begin{unnumlist}
+\item First unnumbered item which has no label and is indented from the
+left margin.
+\item Second unnumbered item.
+\item Third unnumbered item.
+\end{unnumlist}
+The unnumbered list which has no label and is indented from the
+left margin. was produced by:
+\begin{verbatim}
+\begin{unnumlist}
+\item First unnumbered item...
+\item Second unnumbered item...
+\item Third unnumbered item...
+\end{unnumlist}
+\end{verbatim}
+
+The \verb|juliacon|  class file also provides hyphen list using the
+\verb|itemize|  environment for example,
+\begin{itemize}
+\item First unnumbered bulleted item which has no label and is indented
+from the left margin.
+\item Second unnumbered bulleted item.
+\item Third unnumbered bulleted item which has no label and is indented
+from the left margin.
+\end{itemize}
+was produced by:
+\begin{verbatim}
+\begin{itemize}
+\item First item...
+\item Second item...
+\item Third item...
+\end{itemize}
+\end{verbatim}
+
+Numbered list is also provided in acmtog class file using the
+enumerate environment for example,
+\begin{enumerate}
+\item The attenuated and diluted stellar radiation.
+\item Scattered radiation, and
+\item Reradiation from other grains.
+\end{enumerate}
+
+was produced by:
+\begin{verbatim}
+\begin{enumerate}
+\item The attenuated...
+\item Scattered radiation, and...
+\item Reradiation from other grains...
+\end{enumerate}
+\end{verbatim}
+\subsection{Illustrations (or figures)}
+\label{subsub:sec_Illus}
+The \verb|juliacon|  class file will cope with most of the positioning of
+your illustrations and you should not normally use the optional positional
+qualifiers on the \verb|figure|  environment that would override
+these decisions.
+\vskip 6pt
+
+%
+\begin{figure}[t]
+\centerline{\includegraphics[width=4cm]{juliagraphs.png}}
+\caption{This is example of the image in a column.}
+	\label{fig:sample_figure}
+\end{figure}
+
+The figure \ref{fig:sample_figure} is taken from the JuliaGraphs
+organization \footnote{https://github.com/JuliaGraphs}.
+
+Figure captions should be \emph{below} the figure itself, therefore the
+\verb|\caption|  command should appear after the figure or space left for
+an illustration. For example, Figure 1 is produced using the following
+commands:
+
+\begin{verbatim}
+\begin{figure}
+\centerline{\includegraphics[width=20pc]{Graphics.eps}}
+\caption{An example of the testing process for a
+binary tree. The globa null hypothesis is tested
+first at level $\alpha$ (a), and the level of
+individual variables is reached last (d). Note
+that individual hypotheses can be tested at
+level $\alpha/4$ and not $\alpha/8$ as one might
+expect at first.}
+\label{sample-figure_2}
+\end{figure}
+\end{verbatim}
+Figures can be resized using first and second argument of
+\verb|\includegraphics|   command. First argument is used for modifying
+figure height and the second argument is used for modifying
+figure width respectively.
+\vskip 6pt
+Cross-referencing of figures, tables, and numbered, displayed
+equations using the \verb|\label|  and \verb|\ref|   commands is encouraged.
+For example, in referencing Figure 1 above, we used
+\verb|Figure~\ref{sample-figure}|
+
+ \subsection{Tables}
+\label{subsub:sec_Tab}
+The \verb|juliacon|   class file will cope with most of the positioning of
+your tables and you should not normally use the optional positional qualifiers on the table environment which would override these
+decisions. Table captions should be at the top.
+\begin{verbatim}
+\begin{table}
+\tbl{Tuning Set and Testing Set}{
+\begin{tabular}{|l|l|c|c|}\hline
+Label & \multicolumn{1}{c|}{Description}
+& Number of Users &
+Number of Queries\\\hline
+Train70 & Training Data &
+\smash{\raise-7pt\hbox{70}} & 104\\
+\cline{1-2}\cline{4-4}
+Test70 & Testing Data I & & 105\\\hline
+Test30 & Testing Data II & 30 & 119\\\hline
+& Total & 100 & 328\\\hline
+\end{tabular}}
+\end{table}
+\end{verbatim}
+
+\begin{table}
+\tbl{Tuning Set and Testing Set}{
+\begin{tabular}{|l|l|c|c|}\hline
+Label & \multicolumn{1}{c|}{Description}
+& Number of Users &
+Number of Queries\\\hline
+Test 1 & Training Data &
+\smash{\raise-7pt\hbox{70}} & 104\\
+\cline{1-2}\cline{4-4}
+Test 2 & Testing Data I & & 105\\\hline
+Test 3 & Testing Data II & 30 & 119\\\hline
+& Total & 100 & 328\\\hline
+\end{tabular}}
+\end{table}
+\subsection{Landscaping Pages}
+\label{subsub:landscaping_pages}
+If a table is too wide to fit the standard measure, it may be turned,
+with its caption, to 90 degrees. Landscape tables cannot be produced
+directly using the \verb|juliacon|   class file because \TeX{} itself cannot
+turn the page, and not all device drivers provide such a facility.
+The following procedure can be used to produce such pages.
+\vskip 6pt
+Use the package \verb|rotating|   in your document and change the coding
+from
+\begin{verbatim}
+\begin{table}...\end{table}
+to
+\begin{sidewaystable}...\end{sidewaystable}
+and for figures
+\begin{figure}...\end{figure}
+to
+\begin{sidewaysfigure}...\end{sidewaysfigure}
+\end{verbatim}
+
+environments in your document to turn your table on the appropriate
+page of your document. For instance, the following code prints
+a page with the running head, a message half way down and the
+table number towards the bottom.
+\begin{verbatim}
+\begin{sidewaystable}
+\tbl{Landscape table caption to go here.}{...}
+\label{landtab}
+\end{sidewaystable}
+\end{verbatim}
+
+\subsection{Double Column Figure and Tables}
+\label{subsub:double_fig_tab}
+For generating the output of figures and tables in double column
+we can use the following coding:
+
+\begin{enumerate}
+\item For Figures:
+\begin{verbatim}
+\begin{figure*}...\end{figure*}
+\end{verbatim}
+\item For landscape figures:
+\begin{verbatim}
+\begin{sidewaysfigure*}...\end{sidewaysfigure*}
+\end{verbatim}
+\item For Tables:
+\begin{verbatim}
+\begin{table*}...\end{table*}
+\end{verbatim}
+\item For landscape tables:
+\begin{verbatim}
+\begin{sidewaystable*}...\end{sidewaystable*}
+\end{verbatim}
+\end{enumerate}
+
+\subsection{Typesetting Mathematics}
+\label{subsub:type_math}
+The \verb|juliacon| class file will set displayed mathematics with center to
+the column width, provided that you use the \LaTeXe{} standard of
+open and closed square brackets as delimiters.
+The equation
+\[
+\sum_{i=1}^p \lambda_i = (S)
+\]
+
+was typeset using the acmtog class file with the commands
+
+\begin{verbatim}
+\[
+\sum_{i=1}^p \lambda_i = (S)
+\]
+\end{verbatim}
+
+For display equations, cross-referencing is encouraged. For example,
+\begin{verbatim}
+\begin{equation}
+(n-1)^{-1} \sum^n_{i=1} (X_i - \overline{X})^2.
+\label{eq:samplevar}
+\end{equation}
+Equation~(\ref{eq:samplevar}) gives the formula for
+sample variance.
+\end{verbatim}
+The following output is generated with the above coding:
+\begin{equation}
+(n-1)^{-1} \sum^n_{i=1} (X_i - \overline{X})^2.
+\label{eq:samplevar}
+\end{equation}
+Equation~(\ref{eq:samplevar}) gives the formula for
+sample variance.
+
+
+\subsection{Enunciations}
+\label{subsub:enunciation}
+The \verb|juliacon|   class file generates the enunciations with the help of
+the following commands:
+\begin{verbatim}
+\begin{theorem}...\end{theorem}
+\begin{strategy}...\end{strategy}
+\begin{property}...\end{property}
+\begin{proposition}...\end{proposition}
+\begin{lemma}...\end{lemma}
+\begin{example}...\end{example}
+\begin{proof}...\end{proof}
+\begin{definition}...\end{definition}
+\begin{algorithm}...\end{algorithm}
+\begin{remark}...\end{remark}
+\end{verbatim}
+The above-mentioned coding can also include optional arguments
+such as
+\begin{verbatim}
+\begin{theorem}[...]. Example for theorem:
+\begin{theorem}[Generalized Poincare Conjecture]
+Four score and seven ... created equal.
+\end{theorem}
+\end{verbatim}
+
+\begin{theorem}[Generalized Poincare Conjecture]
+Four score and seven years ago our fathers brought forth,
+upon this continent, a new nation, conceived in Liberty,
+ and dedicated to the proposition that all men are
+created equal.
+\end{theorem}
+
+
+\subsection{Extract}
+\label{subsub:extract}
+Extract environment should be coded within
+\begin{verbatim}
+\begin{extract}..\end{extract}
+\end{verbatim}
+
+\subsection{Balancing column at last page}
+\label{subsub:Balance}
+For balancing the both column length at last page use :
+\begin{verbatim}
+\vadjust{\vfill\pagebreak}
+\end{verbatim}
+
+%\vadjust{\vfill\pagebreak}
+
+at appropriate place in your \TeX{} file or in bibliography file.
+
+\section{Handling references}
+\label{subsub:references}
+References are most easily (and correctly) generated using the
+BIBTEX, which is easily invoked via
+\begin{verbatim}
+\bibliographystyle{juliacon}
+\bibliography{ref}
+\end{verbatim}
+When submitting the document source (.tex) file to external
+parties, the ref.bib file should be sent with it.
+\cite{bezanson2017julia}
+
+\input{bib.tex}
+
+\end{document}
+
+% Inspired by the International Journal of Computer Applications template
