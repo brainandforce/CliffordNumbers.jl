@@ -62,18 +62,21 @@ Today, these algebras are called \textit{Clifford algebras} in his honor.
 
 Clifford's geometric algebra, as he formulated it, faded into obscurity.
 Notably, Paul Dirac used the geometric algebra of spacetime in his derivation of his eponymous equation, but phrased it in the language of matrices.
-Most literature on Clifford algebras uses matrix-based formalisms
-The work of David Hestenes, 
+Most literature on Clifford algebras uses the matrix-based formalism of representation theory, unlike Clifford's approach which treated Clifford algebras as a hypercomplex number system.
+David Hestenes advocated for a return to Clifford's original geometric approach, and used this framework to develop new approaches to geometric and physical problems.
+Although geometric algebra is still a niche formalism today, there has been a recent resurgence of interest in the topic: in part due to potential increases in computational efficiently, but primarily due to the conceptual and pedagogical clarity of the approach.
 
 \subsection*{Statement of need}
 
 The first computational tool we turn to when solving multidimensional problems is usually numerical linear algebra.
 Numerous libraries exist to efficiently implement fundamental matrix and vector operations efficiently and with high numerical stability.
 However, linear algebra may not be the best mathematical tool for phrasing a solution to a problem in low-dimensional geometry, and in some cases it may be an inferior approach for reasons that are not immediately obvious.
-While 3D rotations and reflections can be composed and performed with matrix-vector multiplication, it has suboptimal efficiency, is not numerically stable, and can introduce shearing that does not respect the orthonormality of the space.
+A prime example is implementing 3D rotations and reflections: while they can be composed and performed with matrix-vector multiplication, it has suboptimal efficiency, is not numerically stable, and can introduce shearing that does not respect the orthonormality of the space.
 
-CliffordNumbers.jl aims to provide an implementation of geometric algebras that is fast and easy to use, with a well-documented implementation that can be used as a reference for others who wish to implement the fundamental operations of geometric algebra.
-While it supports algebras of arbitrary dimension, the most common anticipated use cases are small 
+CliffordNumbers.jl aims to provide an implementation of geometric algebras that is fast and easy to use, with a well-documented implementation that can be used as a reference for others who wish to efficiently implement the fundamental operations of geometric algebra.
+It supports algebras of arbitrary dimension, but the most common anticipated use cases are algebras of low dimensionality, which can take advantage of Julia's compiler infrastructure to produce highly optimized code for common numeric types, including the use of SIMD instructions.
+Although it is possible to use matrix representations to perform all of the operations of a Clifford algebra, it is rare to require an explicit representation of all linearly independent components, so CliffordNumbers.jl provides small types for handling those cases efficiently.
+All types representing elements of a Clifford algebra provided by the package subtype \verb|Number| rather than \verb|Array|, allowing them to interoperate seamlessly with existing Julia \verb|Number| types and operations, including the type promotion mechanism.
 
 \section{Mathematical background}
 
@@ -110,13 +113,95 @@ The \textit{Clifford product} or \textit{geometric product} of two $1$-vectors (
 While this formula only holds for a very specific case, it may be used to derive the geometric product formula for arbitrary multivectors.
 
 Like $k$-blades in the exterior algebra, we use the term $k$-versor to refer to geometric products of $1$-vectors.
-Each versor corresponds to an isometry of space, with $1$-versors corresponding to reflections, $2$-versors to rotations, and $n$-versors to inversions.
+Each versor corresponds to an isometry of space, with $1$-versors corresponding to reflections, $2$-versors to rotations, and $n$-versors to inversions, all combined with a scale factor proportional to the magnitude of the versor.
 In general, $k$-versors are the sum of blades with grades of the same parity as $k$, allowing us to classify versors as \textit{even} and \textit{odd}.
 The preservation of grade parity by the Clifford product indicates that Clifford algebras are $\mathbb{Z}_2$-graded algebras.
 
-\subsection{Direct and mirror interpretations}
+\subsection{Grade operations}
 
-The standard description of 
+Geometric algebras admit a few special operations that manipulate the signs of components of different grades.
+
+The \textit{main involution}, or \textit{grade involution} of $M$, $M^*$, reverses the signs of all components of odd grade.
+This is equivalent to a spatial inversion, and changes the orientation of a blade if both the blade and algebra has odd dimension.
+The \textit{reverse} of $M$, $M^\dagger$, reverses the signs of all components whose grade \textit{modulo} 2 is odd.
+This operation is analogous to complex conjugation or the matrix adjoint in that it reverses the order of multiplication:
+\begin{flalign}
+a^\dagger b^\dagger & = \left(b a\right)^\dagger
+\end{flalign}
+The \textit{Clifford conjugate} of $M$ is the composition of the main involution and the reverse.
+
+In CliffordNumbers.jl, we overload \verb|Base.reverse| and \verb|Base.adjoint| for the reverse, and we overload \verb|Base.conj| for the Clifford conjugate.
+This choice was made to align with the behavior of \verb|Base.adjoint| for matrix multiplication, and to ensure that two possible representations of quaternions in CliffordNumbers.jl (either all elements of $\ClR{0,2,0}$ or the even elements of $\ClR{3,0,0}$) behave identically.
+
+\subsection{Transformations}
+
+As mentioned previously, $k$-versors are the geometric product of $k$ $1$-blades, and these $1$-blades correspond to reflections augmented with a magnitude.
+This is an algebraic manifestation of the Cartan–Dieudonné theorem, which states that every orthogonal transformation in an $n$-dimensional Euclidean space is decomposable into no more than $n$ reflections.
+$1$-blades now come with two interpretations: the usual "arrow" interpretation as objects with magnitude and direction, and a "mirror" interpretation as a plane of reflection, with the arrow corresponding to the direction of reflection.
+
+If we want to reflect the vector $v$ along a mirror plane $r$, we have to break $v$ into its vector projection and rejection along $r$, $v_{\parallel r}$ and $v_{\perp r}$.
+Reflection changes the sign of the projection but preserves the rejection:
+\begin{flalign}
+v = v_{\perp r} + v_{\parallel r}  & \to v_{\perp r} - v_{\parallel r} 
+\end{flalign}
+The linear algebraic definitions of the projection and rejection are:
+\begin{flalign}
+v_{\parallel r}
+    & = r \frac{v \cdot r}{r \cdot r} \\
+v_{\perp r}
+    & = v - r \frac{v \cdot r}{r \cdot r} = v - v_{\parallel r}
+\end{flalign}
+In geometric algebra, these formulas can be simplified by using the fact that every vector $v$ has an inverse:
+\begin{flalign}
+v_{\parallel r}
+    & = r \left(v \cdot r^{-1}\right) \\
+v_{\perp r}
+    & = v - r \left(v \cdot r^{-1}\right)
+\end{flalign}
+However, the rejection formula can also be expressed in terms of the wedge product.
+We do this by expanding the geometric product of $v$ with the null product $r r^{-1}$, which allows us to identify the projection:
+\begin{flalign}
+v = v_{\parallel r} + v_{\perp r}
+    & = \left(r r^{-1}\right) v \\
+    & = r \left(r^{-1} v\right) \\
+    & = r \left(r^{-1} \cdot v + r^{-1} \wedge v\right) \\
+    & = r \left(r^{-1} \cdot v\right) + r \left(r^{-1} \wedge v\right) \\
+v_{\perp r}
+    & = r\left(r^{-1} \wedge v\right)
+\end{flalign}
+We can now construct the reflection of $v$ along $r$ from these components:
+\begin{flalign}
+v_{\perp r} - v_{\parallel r} 
+    & = r \left(r^{-1} \wedge v\right) - r \left(v \cdot r^{-1}\right) \\
+    & = - r \left(v \wedge r^{-1}\right) - r \left(r^{-1} \cdot v\right) \\
+    & = -r \left(v \wedge r^{-1} + r r^{-1} \cdot v\right) \\
+    & = -r v r^{-1}
+\end{flalign}
+This double-sided operation is known as a \textit{sandwich product}, the sandwich of $v$ with $r$.
+
+What if we want to compose two reflections to perform a rotation?
+We can decompose any rotation $R$ into a pair of reflections, so it is simply a nested sandwich:
+\begin{flalign}
+v_{R}
+    & = -q \left( -r v r^{-1} \right) q^{-1} \\
+    & = q r v r^{-1} q^{-1}
+\end{flalign}
+In this case, the two negative signs from the reflection formula cancel out.
+Generally, if an orthogonal transformation $T$ consists of $k$ reflections, the sign depends on whether $k$ is even or odd -- indicating that a grade involution is being performed.
+This means that we can construct a more general transformation formula using the grade involution of the transformation:
+\begin{flalign}
+v_{T}
+    & = T^* v T^{-1} \\
+    & = T v \left(T^*\right)^{-1}
+\end{flalign}
+
+\subsection{Mirror space and homogeneous models}
+
+A standard description of a vector in linear algebra is an object with magnitude and direction.
+This maps nicely onto the visual depiction of vectors as arrows pointing from an origin point, but this depiction can be simplified to the point at the tip of the arrow.
+
+In geometric algebra, it is common to use an alternative convention: $1$-blades are mirror planes, with the arrow corresponding to the direction that is reversed by the reflection.
+This \textit{mirror space} interpretation corresponds to the transformation that is
 
 \subsection{Families of geometric algebras}
 
@@ -129,14 +214,17 @@ The most commonly used example is the \textit{algebra of physical space} (APS), 
 Vanilla geometric algebras form the basis of more complicated modeling algebras.
 
 The algebra of physical space can be extended to the \textit{spacetime algebra} (STA), $\ClR{1,3,0}$ or $\ClR{3,1,0}$ depending on the choice of metric signature.
-These algebras are not isomorphic, but their even subalgebras are APS.
+Although these algebras are not isomorphic, their even subalgebras are both $\ClR{3,0,0}$, the algebra of physical space.
+in general, the even subalgebras of both $\ClR{1,n,0}$ or $\ClR{n,1,0}$ are $\ClR{n,0,0}$.
+$1$-vectors in a spacetime algebra can be projected into the even subalgebra with the use of a \textit{spacetime split}:
+by multiplying any $1$-vector with the timelike vector $\gamma_0$, the result is projected into the even subalgebra, with timelike components becoming scalars and spacelike components becoming vectors.
 In this Article and in CliffordNumbers.jl, we use the general term \textit{Lorentzian geometric algebra} for algebras that combine a single timelike dimension with multiple spacelike dimensions.
 
+If we extend an $n$-dimensional vanilla geometric algebra with a single degenerate dimension, we obtain a projective geometric algebra (PGA), $\ClR{n,0,1}$.
+The original formulation of this model uses $1$-blades to describe points, but the alternative mirror space convention
 
-
-\section{Transformations}
-
-The 
+Conformal geometric algebra (CGA) augments a vanilla geometric algebra with two extra dimensions, one positive-squaring and one negative-squaring, corresponding to the Clifford algebra $\ClR{n+1,1,0}$.
+The two extra modeling dimensions are spanned by a basis of two null vectors, $n_0$ and $n_\infty$, corresponding to the point at the origin and the point at infinity.
 
 In this Article, we preferentially use \textit{geometric algebra} to emphasize the importance of the geometric product and wedge product
 
