@@ -49,7 +49,7 @@ By contrast, quaternions see relatively little practical use, with the most nota
 However, both quaternions and vector algebra also share one glaring deficiency: they are limited to describing 3D space.
 This is obvious from the limited size of quaternions, but even vector algebra is deficient in this regard without combining it with matrix algebra.
 It is possible to generalize the cross product to an $n-1$-ary operator on $n$-dimensional vectors, but this means that the binary nature of the cross product is dependent on three dimensions.
-(A seven-dimensional generalization exists, but does not satisfy the Jacobi identity.)
+(A seven-dimensional generalization exists, but does not satisfy the Jacobi identity.)\cite{lounesto2001clifford}
 
 While Hamilton's quaternions and Gibbs' vector algebra battled for dominance in the scientific community, a third formalism developed in the shadows.
 In 1844, Hermann Grassmann introduced \textit{Ausdehnungslehre} (\textit{Theory of Extension}), which we call \textit{exterior algebra} today.
@@ -78,7 +78,7 @@ A prime example is implementing 3D rotations and reflections: while they can be 
 CliffordNumbers.jl aims to provide an implementation of geometric algebras that is fast and easy to use, with a well-documented implementation that can be used as a reference for others who wish to efficiently implement the fundamental operations of geometric algebra.
 It supports algebras of arbitrary dimension, but the most common anticipated use cases are algebras of low dimensionality, which can take advantage of Julia's compiler infrastructure to produce highly optimized code for common numeric types, including the use of SIMD instructions.
 Although it is possible to use matrix representations to perform all of the operations of a Clifford algebra, it is rare to require an explicit representation of all linearly independent components, so CliffordNumbers.jl provides small types for handling those cases efficiently.
-All types representing elements of a Clifford algebra provided by the package subtype \verb|Number| rather than \verb|Array|, allowing them to interoperate seamlessly with existing Julia \verb|Number| types and operations, including the type promotion mechanism.
+All types representing elements of a Clifford algebra provided by the package subtype \texttt{Number} rather than \texttt{Array}, allowing them to interoperate seamlessly with existing Julia \texttt{Number} types and operations, including the type promotion mechanism.
 
 \section{Mathematical background}
 
@@ -133,7 +133,7 @@ a^\dagger b^\dagger & = \left(b a\right)^\dagger
 The \textit{Clifford conjugate} of $M$ is the composition of the main involution and the reverse.
 
 In CliffordNumbers.jl, we overload \texttt{Base.reverse} and \texttt{Base.adjoint} for the reverse, and we overload \texttt{Base.conj} for the Clifford conjugate.
-This choice was made to align with the behavior of \verb|Base.adjoint| for matrix multiplication, and to ensure that two possible representations of quaternions in CliffordNumbers.jl (either all elements of $\ClR{0,2,0}$ or the even elements of $\ClR{3,0,0}$) behave identically.
+This choice was made to align with the behavior of \texttt{Base.adjoint} for matrix multiplication, and to ensure that two possible representations of quaternions in CliffordNumbers.jl (either all elements of $\ClR{0,2,0}$ or the even elements of $\ClR{3,0,0}$) behave identically.
 
 \subsection{Transformations}
 
@@ -234,13 +234,13 @@ In this Article, we preferentially use \textit{geometric algebra} to emphasize t
 
 The implementation of geometric algebras in this package generally follows that of Geometric Algebra for Computer Science by Dorst, Fontijne, and Mann \cite{dorst_geometric_2010}, as it was started as a simple exercise in the author's spare time before becoming a full-fledged package.
 
-CliffordNumbers.jl provides the abstract type \verb|AbstractCliffordNumber{Q,T}|, a subtype of \verb|Number| which an element of the Clifford algebra \verb*|Q| and the real or complex type \verb*|T|.
-The concrete types provided include \verb|CliffordNumber{Q,T,L}|, which explicitly represents every element of the algebra, \verb|EvenCliffordNumber{Q,T,L}| and \verb|OddCliffordNumber{Q,T,L}| which only explicitly represent the even or odd grade elements, and \verb|KVector{K,Q,T,L}| which only explicitly represents elements of grade \verb*|K|.
-The type parameter \verb*|L| stores the length of the \verb|Tuple| that backs each of these types, and can be omitted in most contexts.
+CliffordNumbers.jl provides the abstract type \texttt{AbstractCliffordNumber\string{Q,T\string}}, a subtype of \texttt{Number} which an element of the Clifford algebra \texttt{Q} and the real or complex type \texttt{T}.
+The concrete types provided include \texttt{CliffordNumber\string{Q,T,L\string}}, which explicitly represents every element of the algebra, \texttt{EvenCliffordNumber\string{Q,T,L\string}} and \texttt{OddCliffordNumber\string{Q,T,L\string}} which only explicitly represent the even or odd grade elements, and \texttt{KVector\string{K,Q,T,L\string}} which only explicitly represents elements of grade \texttt{K}.
+The type parameter \texttt{L} stores the length of the \texttt{Tuple} that backs each of these types, and can be omitted in most contexts.
 
-Unlike subtypes of \verb|Number| provided by Julia, construction and conversion of Clifford numbers have different semantics.
-The construction of a type that explicitly represents fewer grades from one that does explicitly represent those grades (for instance, \verb|EvenCliffordNumber| from \verb|CliffordNumber|) will perform grade projection, implicitly setting all elements not represented by the result type to 0.
-On the other hand, conversion will throw a \verb|InexactError| if any grade not representable by the result type is not zero.
+Unlike subtypes of \texttt{Number} provided by Julia, construction and conversion of Clifford numbers have different semantics.
+The construction of a type that explicitly represents fewer grades from one that does explicitly represent those grades (for instance, \texttt{EvenCliffordNumber} from \texttt{CliffordNumber}) will perform grade projection, implicitly setting all elements not represented by the result type to 0.
+On the other hand, conversion will throw a \texttt{InexactError} if any grade not representable by the result type is not zero.
 
 \subsection{Algebras}
 
@@ -249,8 +249,8 @@ However, we often use algebras with identical metric signature to represent dist
 $\ClR{3,1,0}$ could represent either the spacetime algebra with mostly positive metric signature (East Coast convention), or the 2D conformal geometric algebra.
 Although the mathematical operations defined in these algebras is identical, it may be useful to handle these cases differently: for instance, when pretty printing their elements or plotting blades of these algebras.
 
-Code for handling the specification of an algebra is found in the \verb|Metrics| submodule.
-Aside from the \verb|AbstractSignature| and generic \verb|Signature| types, this submodule provides types for most commonly used algebras.
+Code for handling the specification of an algebra is found in the \texttt{Metrics} submodule.
+Aside from the \texttt{AbstractSignature} and generic \texttt{Signature} types, this submodule provides types for most commonly used algebras.
 \texttt{AbstractSignature} is a subtype of \texttt{AbstractVector\string{Int8\string}} which takes on values of either $+1$, $-1$, or $0$, corresponding to the metric signature.
 The indices of 
 
@@ -276,27 +276,27 @@ The indices of
 \subsection{Indexing}
 
 Because \texttt{AbstractCliffordNumber} subtypes are not arrays, indexing one with integer indices behaves as it does with other subtypes of \texttt{Number}.
-Indexing with any number of ones will return itself, and indexing with any other index returns a \verb|BoundsError|.
-To avoid conflict with the established behavior of number indexing, we provide the \verb|BitIndex{Q}| type which represents all basis blades of the algebra \verb*|Q|.
+Indexing with any number of ones will return itself, and indexing with any other index returns a \texttt{BoundsError}.
+To avoid conflict with the established behavior of number indexing, we provide the \texttt{BitIndex\string{Q\string}} type which represents all basis blades of the algebra \texttt{Q}.
 
-\verb|BitIndex{Q}| is backed by an \verb|Int| whose bits represent the presence or absence of particular basis $1$-blades in the indexed component.
-The sign bit of the \verb|Int| represents the sign of the permutation of the indices.
-When constructing a \verb|BitIndex{Q}| from the integer indices of the basis blades, the parity is used to determine the sign, and it may be flipped with negation.
+\texttt{BitIndex\string{Q\string}} is backed by an \texttt{Int} whose bits represent the presence or absence of particular basis $1$-blades in the indexed component.
+The sign bit of the \texttt{Int} represents the sign of the permutation of the indices.
+When constructing a \texttt{BitIndex\string{Q\string}} from the integer indices of the basis blades, the parity is used to determine the sign, and it may be flipped with negation.
 
-The coefficients of a \verb|CliffordNumber| are stored in the natural binary order imparted by \verb|BitIndex{Q}|.
-For \verb|EvenCliffordNumber| and \verb|OddCliffordNumber|, the natural binary ordering can still be used efficiently:
-the integer indices of either of these types can be mapped to the indices of a \verb|CliffordNumber| by adding an extra bit to the index and setting it to zero or one to make the Hamming weight of the integer even or odd.
-The case of \verb|KVector| is the most complicated, but is implemented in a generated function to avoid executing unrolled loops.
+The coefficients of a \texttt{CliffordNumber} are stored in the natural binary order imparted by \texttt{BitIndex\string{Q\string}}.
+For \texttt{EvenCliffordNumber} and \texttt{OddCliffordNumber}, the natural binary ordering can still be used efficiently:
+the integer indices of either of these types can be mapped to the indices of a \texttt{CliffordNumber} by adding an extra bit to the index and setting it to zero or one to make the Hamming weight of the integer even or odd.
+The case of \texttt{KVector} is the most complicated, but is implemented in a generated function to avoid executing unrolled loops.
 
-The use of \verb|Int| to store the basis blade information limits the maximum algebra size on an $n$-bit system to one generated by $n-1$ elements, but this does not represent a practical limit on the maximum algebra size.
+The use of \texttt{Int} to store the basis blade information limits the maximum algebra size on an $n$-bit system to one generated by $n-1$ elements, but this does not represent a practical limit on the maximum algebra size.
 
 \subsection{Implementation of products}
 
-Internally, CliffordNumbers.jl provides the function \verb|CliffordNumbers.mul|, which takes two multivectors as an argument along with an instance of the singleton type \verb|CliffordNumbers.GradeFilter|.
-The \verb|GradeFilter| object represents how elementwise products are incorporated into the final result.
+Internally, CliffordNumbers.jl provides the function \texttt{CliffordNumbers.mul}, which takes two multivectors as an argument along with an instance of the singleton type \texttt{CliffordNumbers.GradeFilter}.
+The \texttt{GradeFilter} object represents how elementwise products are incorporated into the final result.
 For instance, the wedge product omits any components which are not linearly independent, so a specialization on \texttt{GradeFilter\string{:\\wedge\string}} ensures that the results of those products are set to zero.
 
-Performance is maximized by the use of generated functions, which manually unroll operations on all \verb|AbstractCliffordNumber| subtypes by leveraging their fixed size.
+Performance is maximized by the use of generated functions, which manually unroll operations on all \texttt{AbstractCliffordNumber} subtypes by leveraging their fixed size.
 These generated functions are designed to leverage SIMD and fma instructions present in modern CPUs if they are available.
 
 \section{Usage examples}
@@ -310,7 +310,7 @@ We still recommend the use of tools designed for linear algebra when dealing wit
 
 \subsection{Large algebras}
 
-Operations on the \verb|Tuple| type are subject to inlining limits imposed by Julia.
+Operations on the \texttt{Tuple} type are subject to inlining limits imposed by Julia.
 In practice, this means that the best performance is limited to algebras generated by a six-dimensional vector space.
 In practice, this will be sufficient for almost all work with commonly used algebras, including 2D and 3D VGA, PGA and CGA, as well as the spacetime algebra.
 
