@@ -320,6 +320,17 @@ Not all operations in this package are necessarily numerically stable.
 In particular, this is true of the wedge product: repeated wedge products can accumulate significant error.\cite{de_keninck_hyperwedge_2020}
 We plan to mitigate this in the case of wedging $n$ $1$-blades together by using the techinques from linear algebra suggested by de Keninck et. al., but we also seek to improve the stability when wedging fewer than $n$ blades together.
 
+\section{Future work}
+
+The highest priorities in future releases of CliffordNumbers.jl is ensuring that package methods are numerically stable and providing performant implementations of commonly used sequences of operations, such as the sandwich product.
+While the topic of numerical stability for operations in geometric algebra has not been thoroughly explored, we may use existing techniques from linear algebra or develop analogous modifications to naive algorithms.
+Of interest is the ability to express the Gram-Schmidt process in terms of wedge products,\cite{GA4P} since the naively implemented Gram-Schmidt process is numerically unstable, but admits modifications and alternative algorithms that are stable.
+
+We plan to extend CliffordNumbers.jl to interoperate with more of the Julia ecosystem, particularly Julia's standard libraries.
+Package extensions already exist for the LinearAlgebra standard library,  StaticArrays.jl, and Quaternions.jl to encourage interoperation with existing code.
+Work has begun on integrating \texttt{AbstractCliffordNumber} with Julia's random number generation functionality, including methods for \texttt{randn} and \texttt{rand} for $1$-blades of VGA, PGA, and CGA.
+This work will be extended to the Distributions.jl package\cite{JSSv098i16} to support other useful distributions of blades or rotors over Clifford algebras.
+
 \subsection{Precompilation}
 
 \section{The JuliaCon Article Class}
@@ -822,6 +833,7 @@ parties, the ref.bib file should be sent with it.
 B. S. Flores would like to acknowledge the members of the geometric algebra community at bivector.net.
 Specifically, this includes David Cohoe (sudgylacmoe), Steven de Keninck (enki), Hamish Todd, and Moab Croft (Slackline).
 B. S. Flores would also like to acknowledge Chris Doran and Cédric Belmant (serenity7) for discussing the implementation of Clifford algebras in Julia, as well as Mateusz Baran for discussion of the related StaticArrays.jl package.
+Finally, B. S. Flores would like to acknowledge Dr. Michael Davies for bringing him an appreciation for computing on all levels, from hardware to the human.
 
 \input{bib.tex}
 
