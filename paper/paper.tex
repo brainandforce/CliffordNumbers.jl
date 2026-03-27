@@ -22,7 +22,11 @@
 
 \begin{abstract}
 
-
+Vector algebra, with its familiar cross product and dot product, has long been the \textit{lingua franca} of physics and 3D geometry, mostly replacing the older quaternion formalism.
+While vector algebra managed to clean up some of the clunkier aspects of quaternions, it also introduced its own issues, particularly with the cross product, and remains limited to describing 3D space like the quaternions.
+An alternative formalism, \textit{geometric algebra}, or \textit{Clifford algebra}, generalizes the geometric concepts of vector algebra, quaternions, complex numbers, and dual numbers to any number of dimensions, and offers greater conceptual clarity for learners.
+In service of the goal of making geometric algebra more accessible to the broader community, CliffordNumbers.jl provides a first-class implementation of geometric algebras in Julia.
+Here, we provide an introduction to geometric algebra for those not familiar with the topic, and provide details about the architecture of CliffordNumbers.jl, as well as usage examples.
 
 \end{abstract}
 
@@ -47,7 +51,7 @@ Today, most physics literature is written in the language of vector calculus, a 
 By contrast, quaternions see relatively little practical use, with the most notable exception being the description of 3D rotations.
 However, both quaternions and vector algebra also share one glaring deficiency: they are limited to describing 3D space.
 This is obvious from the limited size of quaternions, but even vector algebra is deficient in this regard without combining it with matrix algebra.
-It is possible to generalize the cross product to an $n-1$-ary operator on $n$-dimensional vectors, but this means that the binary nature of the cross product is dependent on three dimensions.
+It is possible to generalize the cross product to an $(n-1)$-ary operator on $n$-dimensional vectors, but this implies that the binary nature of the cross product is dependent on three dimensions.
 (A seven-dimensional generalization exists, but does not satisfy the Jacobi identity.)\cite{lounesto2001clifford}
 
 While Hamilton's quaternions and Gibbs' vector algebra battled for dominance in the scientific community, a third formalism developed in the shadows.
@@ -108,7 +112,7 @@ We can now construct the Clifford algebra as a modification of the exterior alge
 The quadratic form $\operatorname{Q}$ is simply the dot product of vectors with themselves: $\operatorname{Q}\left(v\right) = v \cdot v$.
 With this, we modify the ideal we used to generate the exterior product from $T(V)$ to $v \otimes v - \operatorname{Q}\left(v\right) 1$.
 Instead of eliminating the symmetric component of $u \times v$, we replace it a scalar, $u \cdot v$.
-The \textit{Clifford product} or \textit{geometric product} of two $1$-vectors (denoted without an operator, $u v$) can now be described succinctly:
+The \textit{geometric product}, or \textit{Clifford product} of two $1$-vectors (denoted without an operator, $u v$) can now be described succinctly:
 \begin{flalign}
     u v & = u \cdot v + u \wedge v
 \end{flalign}
@@ -117,7 +121,7 @@ While this formula only holds for a very specific case, it may be used to derive
 Like $k$-blades in the exterior algebra, we use the term $k$-versor to refer to geometric products of $1$-vectors.
 Each versor corresponds to an isometry of space, with $1$-versors corresponding to reflections, $2$-versors to rotations, and $n$-versors to inversions, all combined with a scale factor proportional to the magnitude of the versor.
 In general, $k$-versors are the sum of blades with grades of the same parity as $k$, allowing us to classify versors as \textit{even} and \textit{odd}.
-The preservation of grade parity by the Clifford product indicates that Clifford algebras are $\mathbb{Z}_2$-graded algebras.
+The preservation of grade parity by the geometric product indicates that Clifford algebras are $\mathbb{Z}_2$-graded algebras.
 
 \subsection{Grade operations}
 
@@ -155,7 +159,7 @@ the wedge product of the $2$-blade $e_1 e_2 + e_3 e_4$ with itself is not zero, 
 Therefore, the square of this blade must have a non-scalar factor, and it is $2\left(-1 + e_1 e_2 e_3 e_4\right)$.
 
 From this, all positive integer powers can be defined in terms of the geometric product.
-CliffordNumbers leverages \texttt{Base.literal_pow} to convert the result of exponentiation to a type of minimum size.
+CliffordNumbers leverages \texttt{Base.literal_pow} to convert the result of exponentiation to a type of minimum size -- a detail that may not be inferrable if a naive geometric product is performed.
 
 Additionally, it is also possible to define a natural exponential of a blade $b$ using Taylor series, analogous to complex and quaternion exponentiation.
 This can be broken down depending on the sign of the square of the blade:
@@ -260,7 +264,7 @@ v_{\parallel r}
 v_{\perp r}
     & = v - r \frac{v \cdot r}{r \cdot r} = v - v_{\parallel r}
 \end{flalign}
-In geometric algebra, these formulas can be simplified by using the fact that every vector $v$ has an inverse:
+In geometric algebra, these formulas can be simplified with vector inverses:
 \begin{flalign}
 v_{\parallel r}
     & = r \left(v \cdot r^{-1}\right) \\
@@ -474,6 +478,67 @@ Because \texttt{AbstractCliffordNumber\string{Q,T\string}} is not an \texttt{Abs
 For this reason, we provide the functions \texttt{scalar_type} and \texttt{nblades} to obtain this information without interfering with the expected behavior of \texttt{eltype} and \texttt{length}.
 
 \section{Usage examples}
+
+\subsection{The Cauchy distribution}
+
+The Cauchy distribution is a probability distribution with probability density function
+\begin{flalign}
+\frac{1}{\pi \gamma \left[1 + \left(\frac{x - x_0}{\gamma}\right)\right]}
+\end{flalign}
+where $x_0$ is a location parameter and $\gamma$ is a scale parameter.
+While the Cauchy distribution is pathological in that it has no mean or variance, it does arise naturally as the ratio distribution of two normally distributed random variables with zero mean.
+
+One of the most common constructions of the Cauchy distribution is from the intersection of uniformly distributed random rays with a plane.
+This process can be illustrated easily with 2D PGA.
+We generate random rays through the origin, then find their meet by taking their wedge product with the line at $y = -1$:
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={cauchy:ray-line}, 
+    caption={Ray-line intersections.}
+]
+using CliffordNumbers
+
+n = 1024    # change this to taste
+rays = [KVector{1,PGA(2)}(0, randn(), randn()) for _ in 1:n]
+line = KVector{1,PGA(2)}(-1, 1, 0)
+intersections = wedge.(line, rays)
+\end{lstlisting}
+\begin{figure}
+\centerline{\includegraphics[width=20pc]{figures/cauchy-rays.png}}
+\caption{
+    a) Points generated by the intersection of random rays with uniformly distributed angles with a line.
+    b) Histogram of the x-value of the points, accompanied by their histogram and expected shape of their distribution.
+}
+\label{fig:cauchy-rays}
+\end{figure}
+
+The multidimensional Cauchy distribution also arises naturally in $n$-dimensional PGA by generating $n-1$-blades with coefficients drawn from a standard normal distribution.
+We recover the coordinates of a point by dividing all other blade coefficients by the $e_0$ coefficient, which generates the Cauchy distribution as a ratio distribution.
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={cauchy:multidimensional}, 
+    caption={The multidimensional Cauchy distribution.}
+]
+using CliffordNumbers
+
+n = 1024    # change this to taste
+points = [KVector{2,PGA(2)}(randn(), randn(), randn()) for _ in 1:n]
+\end{lstlisting}
+\begin{figure}
+\centerline{\includegraphics[width=20pc]{figures/cauchy-2d.png}}
+\caption{
+    a) 1024 points drawn from a multivariate standard normal distribution ($\mu = \left[0, 0\right], \sigma_{ij} = \delta_{ij}$).
+    b) 1024 PGA 2-blades with all coefficients drawn from a standard normal distribution, producing a multivariate Cauchy distribution with fatter tails than the normal distribution.
+}
+\label{fig:cauchy-2d}
+\end{figure}
+This illustrates that the Cauchy distribution is intrinsically linked to the idea of projection, whether we do so by explicitly tracing the intersection of rays onto a plane, or implicitly with the use of a projective geometric algebra.
+
+\subsection{Intersections of circles and spheres}
+
+The intersection of 
 
 \section{Limitations}
 
