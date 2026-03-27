@@ -65,7 +65,7 @@ Today, these algebras are called \textit{Clifford algebras} in his honor.
 Clifford's geometric algebra, as he formulated it, faded into obscurity.
 Notably, Paul Dirac used the geometric algebra of spacetime in his derivation of his eponymous equation, but phrased it in the language of matrices.
 Most literature on Clifford algebras uses the matrix-based formalism of representation theory, unlike Clifford's approach which treated Clifford algebras as a hypercomplex number system.
-David Hestenes advocated for a return to Clifford's original geometric approach, and used this framework to develop new approaches to geometric and physical problems.
+David Hestenes advocated for a return to Clifford's original geometric approach, and used this framework to develop new approaches to geometric and physical problems.\cite{CA2GC}
 Although geometric algebra is still a niche formalism today, there has been a recent resurgence of interest in the topic: in part due to potential increases in computational efficiently, but primarily due to the conceptual and pedagogical clarity of the approach.
 
 \subsection*{Statement of need}
@@ -135,6 +135,112 @@ The \textit{Clifford conjugate} of $M$ is the composition of the main involution
 In CliffordNumbers.jl, we overload \texttt{Base.reverse} and \texttt{Base.adjoint} for the reverse, and we overload \texttt{Base.conj} for the Clifford conjugate.
 This choice was made to align with the behavior of \texttt{Base.adjoint} for matrix multiplication, and to ensure that two possible representations of quaternions in CliffordNumbers.jl (either all elements of $\ClR{0,2,0}$ or the even elements of $\ClR{3,0,0}$) behave identically.
 
+\subsection{Arithmetic operations}
+
+As with ordinary vectors, all elements of a Clifford algebra can be added to each other and scaled by some scalar, so the usual \texttt{+}, \texttt{-}, \texttt{*}, and \texttt{/} operators behave as expected.
+The geometric product also uses the \texttt{*} operator, and the wedge product may performed with either the $\wedge$ operator or the \texttt{wedge} function.
+
+While the quadratic form, geometric product and wedge product are fundamental to geometric algebra, geometric algebras also admit other kinds of operations useful in expressing geometric transformations.
+
+\subsubsection{Exponentiation}
+
+The square of a multivector is defined as the geometric product of a multivector with itself:
+\begin{flalign}
+a^2 & = a a
+\end{flalign}
+Because the wedge product of any blade with itself is zero, the square of a blade is always a scalar.
+In algebras with 3 or fewer dimensions, all $k$-vectors are blades, so they always have scalar squares.
+But this does not hold in any space of higher dimension:
+the wedge product of the $2$-blade $e_1 e_2 + e_3 e_4$ with itself is not zero, but $2 e_1 e_2 e_3 e_4$, since $e_1 e_2$ and $e_3 e_4$ have no factors in commmon.
+Therefore, the square of this blade must have a non-scalar factor, and it is $2\left(-1 + e_1 e_2 e_3 e_4\right)$.
+
+From this, all positive integer powers can be defined in terms of the geometric product.
+CliffordNumbers leverages \texttt{Base.literal_pow} to convert the result of exponentiation to a type of minimum size.
+
+Additionally, it is also possible to define a natural exponential of a blade $b$ using Taylor series, analogous to complex and quaternion exponentiation.
+This can be broken down depending on the sign of the square of the blade:
+\begin{flalign}
+e^b = \sum_{n = 1}^{\infty} \frac{1}{n!} b^n 
+    & = \begin{cases}
+        \cos  \left|b\right| + b \sin  \left|b\right|, & b^2 < 0 \\
+        \cosh \left|b\right| + b \sinh \left|b\right|, & b^2 > 0 \\
+        1 + b,                                         & b^2 = 0 \\
+    \end{cases}
+\end{flalign}
+Due to the noncommutativity of geometric algebras, the natural exponential of arbitrary multivectors cannot be broken down into a simple sum using the defining property of scalar exponentiation, $e^{a+b} = e^a e^b$.
+
+In the vast majority of cases, the objects to be exponentiated are even multivectors, particularly $2$-blades, as these are taken to represent rotations or other types of fundamental transformations, as we will see later.
+
+\subsubsection{Inverses and division}
+
+Every blade and versor with nonzero square has an inverse:
+\begin{flalign}
+a & = \frac{1}{a^2} a^\dagger
+\end{flalign}
+However, arbitrary elements of a geometric algebra do not necessarily have an inverse, and may instead have zero divisors.
+CliffordNumbers.jl overloads \texttt{inv} with a checked inverse function that throws a \texttt{CliffordNumbers.InverseException} if the input does not have a defined inverse.
+
+Because geometric algebras are not commutative, it is also necessary to distinguish between left and right division, and we overload the right division operator \texttt{\textbackslash}, which is already used for matrix operations, to allow these operations to be clearly distinguished.
+
+\subsubsection{Duality}
+
+The grade $n$ element of an $n$-dimensional geometric algebra, or \textit{pseudoscalar} (generically written as $I$), has a special property: multiplying a $k$-vector by the pseudoscalar produces a $n-k$-vector.
+This allows us to define the \textit{dual} of a multivector $a$:
+\begin{flalign}
+\operatorname{dual}\left(a\right)
+    & = a I^{-1}
+\end{flalign}
+The dual can be extended to any multivector through the linearity of the geometric product.
+The reason we use the inverse of the pseudoscalar here is so that we satisfy the following property:
+\begin{flalign}
+a \operatorname{dual}\left(a\right)^{-1} & = I
+\end{flalign}
+The inverse of $I$ depends on the dimension of the algebra $n$ as well as the quadratic form:
+\begin{flalign}
+I^{-1} & = \left(-1\right)^{\lfloor \frac{1}{2} n + q \rfloor}I
+\end{flalign}
+where $q$ is the number of dimensions with negative square.
+
+However, we can extend our idea of duality if we base it on the wedge product.
+For a basis blade $e$, the \textit{right complement} $\overline{e}$ and \textit{left complement} $\underline{e}$ are the basis blades that satisfy the following relations:
+\begin{flalign}
+e \wedge \overline{e}
+    & = I \\
+\underline{e} \wedge e
+    & = I
+\end{flalign}
+As with the pseudoscalar dual, these can be extended by linearity to all multivectors of a geometric algebra.
+
+In CliffordNumbers.jl, the function \texttt{pseudoscalar(x)} generates the pseudoscalar of the algebra \texttt{x} belongs to.
+The left contraction and right contraction are provided with the functions \texttt{left_contraction} and \texttt{right_contraction}, respectively.
+
+\subsubsection{Regressive product}
+The regressive product $a \vee b$ is analogous to the wedge product, but produces objects with complementary grades: if the result of $a \wedge b$ is grade $k$, the result of $a \vee b$ is grade $n - k$.
+The regressive product can be defined in terms of the dual in Clifford algebras with nondegenerate quadratic form, but the complements are better suited for defining it in general.
+\begin{flalign}
+\underline{a \vee b}
+    & = \underline{a} \wedge \underline{b} \\
+\overline{a \vee b}
+    & = \overline{a} \wedge \overline{b}
+\end{flalign}
+We will see later that the similarty of these definitions to De Morgan's laws is not a coincidence.
+
+\subsubsection{Contractions}
+The \textit{left contraction} $a \rfloor B$ and \textit{right contraction} $B \lfloor a$ are generalizations of the dot product which blades of differing grades, returning the portion of $B$ remaining when the component spanned by $a$ is removed from it.
+If $a$ has grade $h$ and $B$ has grade $k$, the result has grade $k - h$, or if $k$ is less than $h$, the result is zero.
+Aside from behaving like a scalar product when one argument is a scalar and a dot product when both arguments have identical grades, the left contraction also satisfies the property
+\begin{flalign}
+\left(a \wedge b\right) \rfloor c 
+    & = a \rfloor \left(b \rfloor c\right)
+\end{flalign}
+which allows us to extend the notion of projection to pairs of blades of any grade.\cite{Dorst_inner_products}
+The right contraction is simply the reverse of the left contraction:
+\begin{flalign}
+\left(a \lfloor b\right)^\dagger
+    & = b^\dagger \rfloor a^\dagger
+\end{flalign}
+These operations are implemented in CliffordNumbers.jl as operators that can be typed with \verb|\intprod| and \verb|\intprodr|, respectively.
+
 \subsection{Transformations}
 
 As mentioned previously, $k$-versors are the geometric product of $k$ $1$-blades, and these $1$-blades correspond to reflections augmented with a magnitude.
@@ -196,39 +302,56 @@ v_{T}
     & = T^* v T^{-1} \\
     & = T v \left(T^*\right)^{-1}
 \end{flalign}
-
-\subsection{Mirror space and homogeneous models}
-
-A standard description of a vector in linear algebra is an object with magnitude and direction.
-This maps nicely onto the visual depiction of vectors as arrows pointing from an origin point, but this depiction can be simplified to the point at the tip of the arrow.
-
-In geometric algebra, it is common to use an alternative convention: $1$-blades are mirror planes, with the arrow corresponding to the direction that is reversed by the reflection.
-This \textit{mirror space} interpretation corresponds to the transformation that is
+Although we have derived these formulas assuming that the magnitude of the versor operating on the blade is irrelevant, we can perform transformations that also include scaling if we use the reverse instead of the inverse of $T$ in the sandwich product.
 
 \subsection{Families of geometric algebras}
 
 For the sake of simplicity, we started by defining our quadratic form as the dot product of a vector with itself.
 But in practice, we can make use of non-positive definite or degenerate quadratic forms to produce useful algebras.
 
+\subsubsection{Vanilla geometric algebra}
+
 A geometric algebra generated with a positive-definite quadratic form is commonly referred to as a \textit{vanilla geometric algebra} (VGA).
-The term "vector space geometric algebra" was previously used, but 
+The term "vector space geometric algebra" was previously used, but is discouraged as all geometric algebras are vector spaces.
 The most commonly used example is the \textit{algebra of physical space} (APS), $\ClR{3,0,0}$.
-Vanilla geometric algebras form the basis of more complicated modeling algebras.
+Vanilla geometric algebras form the basis of the larger modeling algebras we describe here.
+
+\subsubsection{Spacetime and Lorentzian geometric algebra}
 
 The algebra of physical space can be extended to the \textit{spacetime algebra} (STA), $\ClR{1,3,0}$ or $\ClR{3,1,0}$ depending on the choice of metric signature.
-Although these algebras are not isomorphic, their even subalgebras are both $\ClR{3,0,0}$, the algebra of physical space.
+Although these algebras are not isomorphic, their even subalgebras are both $\ClR{3,0,0}$, the algebra of physical space.\cite{hestenes_spacetime_ga}
 in general, the even subalgebras of both $\ClR{1,n,0}$ or $\ClR{n,1,0}$ are $\ClR{n,0,0}$.
-$1$-vectors in a spacetime algebra can be projected into the even subalgebra with the use of a \textit{spacetime split}:
-by multiplying any $1$-vector with the timelike vector $\gamma_0$, the result is projected into the even subalgebra, with timelike components becoming scalars and spacelike components becoming vectors.
-In this Article and in CliffordNumbers.jl, we use the general term \textit{Lorentzian geometric algebra} for algebras that combine a single timelike dimension with multiple spacelike dimensions.
+Odd blades of STA can be projected APS with the use of a \textit{spacetime split}:
+by multiplying any $1$-blade of STA with the timelike vector $\gamma_0$, the result is projected into the even subalgebra, with timelike components becoming scalars and spacelike components becoming $1$-blades of APS.
+This operation naturally maps relativistic vector quantities (such as the electromagnetic four-potential) onto classical pairs of scalar and vector quantities (such as voltage and the magnetic potential).
+Along with ordinary VGA rotors, rotors constructed from a bivector with a timelike component have a natural interpretation as Lorentz boosts.
+In this Article and in CliffordNumbers.jl, we use the general term \textit{Lorentzian geometric algebra} (LGA) for algebras that combine a single timelike dimension with multiple spacelike dimensions.
 
-If we extend an $n$-dimensional vanilla geometric algebra with a single degenerate dimension, we obtain a projective geometric algebra (PGA), $\ClR{n,0,1}$.
-The original formulation of this model uses $1$-blades to describe points, but the alternative mirror space convention
+\subsubsection{Projective and plane-based geometric algebra}
 
-Conformal geometric algebra (CGA) augments a vanilla geometric algebra with two extra dimensions, one positive-squaring and one negative-squaring, corresponding to the Clifford algebra $\ClR{n+1,1,0}$.
+If we extend an $n$-dimensional vanilla geometric algebra with a single degenerate dimension spanned by a basis vector $e_0$, we obtain a projective geometric algebra (PGA), $\ClR{n,0,1}$.
+The original formulation of this model uses $1$-blades to describe points, but the alternative mirror space convention is preferred in more recent literature due to the fundamental role that reflections play in describing transformations, and this specific approach is commonly called \textit{plane-based} geometric algebra.\cite{PGA4CS}
+PGA is a homogeneous model, meaning that scalar multiples of blades represent equivalent geometry, identically to how multiplying both sides of the equation of a plane $ax + by + cz = d$ by the same constant does not change the plane represented by the equation.
+The wedge product of $1$-blades is commonly called the \textit{meet}, as it represents the intersection of planes, or equivalently, an underdetermined linear system.
+In 3D PGA, the wedge product of two $1$-blades is a line, and the description of lines in 3D space as bivectors is exactly identical to Plücker coordinates.\cite{nguyen_notes_2020}
+
+The versors of PGA correspond to elements of the Euclidean group $\operatorname{E}\left(n\right)$: the exponentiation of bivectors can produce the usual VGA rotors, but bivectors with the degenerate $e_0$ component produce translations.
+These rotors with degenerate components are known as \textit{motors}.
+It is also possible to construct projective geometric algebras with modeling dimensions that do not square to zero, and the sign of the square of the modeling dimension corresponds to the curvature of the space.\cite{Gunn_PGA}
+This allows us to reinterpret $n$-dimensional VGA as a homogeneous model of geometry on an $n$-sphere.
+
+\subsubsection{Conformal geometric algebra}
+
+Conformal geometric algebra (CGA) augments a vanilla geometric algebra with two extra dimensions, one positive-squaring and one negative-squaring, corresponding to the Clifford algebra $\ClR{n+1,1,0}$.\cite{Doran2002}
 The two extra modeling dimensions are spanned by a basis of two null vectors, $n_0$ and $n_\infty$, corresponding to the point at the origin and the point at infinity.
+The $1$-blades of CGA are $n$-spheres, and like in PGA, the wedge product of $k$ 1-blades corresponds to the intersections between $k$ spheres, which are also spheres of lower dimension.
+However, these spheres may have radius 0 (points), infinite radius (planes), or even a negative radius, supplying information about the orientation of the object.
+All compass-and-straightedge constructions can be performed in two-dimensional CGA, and these can be generalized to any number of dimensions.
 
-In this Article, we preferentially use \textit{geometric algebra} to emphasize the importance of the geometric product and wedge product
+CGA can also represent all of the elements of PGA in a succinct way:
+for example, a hyperplane can be thought of as an $n$-sphere of infinite radius, and a straight line can be thought of as a defined by three points, one of which is the special point at infinity, $n_\infty$.
+When linking the two formalisms, the spherical objects of CGA are referred to as "rounds", and the elements that 
+It can also represent the rotors and motors of PGA, but it also allows for arbitrary conformal transformations to be constructed.
 
 \section{Architecture}
 
