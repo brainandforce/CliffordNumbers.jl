@@ -22,8 +22,7 @@
 
 \begin{abstract}
 
-This is a guide for authors who are preparing papers for JuliaCon using the \LaTeX{} document
-preparation system and the \verb|juliacon|  class file.
+
 
 \end{abstract}
 
@@ -31,13 +30,13 @@ preparation system and the \verb|juliacon|  class file.
 
 One of the great challenges of modeling physical systems is the treatement of dimensions.
 Historically, two major conventions have been used to model 3D space.
-In 1843, William Rowan Hamilton famously inscribed the formula $i^2 = j^2 = k^2 = ijk = -1$  into the stone of Brougham Bridge with a pocket knife, defining the quaternions.
+In 1843, William Rowan Hamilton famously inscribed the formula $i^2 = j^2 = k^2 = ijk = -1$  into the stone of Brougham Bridge with a pocket knife, defining the quaternions.\cite{hamilton-quaternions}
 Quaternions can encode both scalar quantities and three-dimensional vectors in a single object, and they permit addition, multiplication, and their inverses.
 Although the quaternions immediately found use in the physical sciences, notably in Maxwell's first publication of his famous equations, they were also considered unwieldy: Maxwell originally published 20 equations instead of the four we know today.
 Part of this unwieldiness stems from the noncommutativity of quaternion multiplication, but this property is necessary to describe rotations in three dimensions.
-More troubling was that 3D vectors would always have negative squares, which requires careful manipulation of signs to ensure that quantities are correctly computed.
+More troubling was that 3D vectors would always have negative squares, which requires careful manipulation of signs to ensure that quantities are correctly computed.\cite{vector-algebra-war}
 
-The deficiencies of quaternions led Josiah Willard Gibbs to develop a new formalism, vector algebra, which is the dominant formalism in all but a few niche applications today.
+The deficiencies of quaternions led Josiah Willard Gibbs to develop a new formalism, vector algebra, which is the dominant formalism in all but a few niche applications today.\cite{multiple-algebra}
 Rather than a single quaternion product, vector algebra uses two products, the dot and cross product, splitting the commutative and anticommutative components of the quaternion product into two different operations.
 However, vector algebra is not free of unwieldiness, either, particularly with the cross product.
 The cross product of two vectors does not transform like the input vectors under a reflection or other transformation that reverses the orientation of the space.
@@ -52,14 +51,14 @@ It is possible to generalize the cross product to an $n-1$-ary operator on $n$-d
 (A seven-dimensional generalization exists, but does not satisfy the Jacobi identity.)\cite{lounesto2001clifford}
 
 While Hamilton's quaternions and Gibbs' vector algebra battled for dominance in the scientific community, a third formalism developed in the shadows.
-In 1844, Hermann Grassmann introduced \textit{Ausdehnungslehre} (\textit{Theory of Extension}), which we call \textit{exterior algebra} today.
+In 1844, Hermann Grassmann introduced \textit{Ausdehnungslehre} (\textit{Theory of Extension}), which we call \textit{exterior algebra} today.\cite{Ausdehnungslehre}
 This algebra combines $k$ $d$-dimensional vectors into new objects called \textit{$k$-vectors} (with the \textit{grade}, $k$, ranging from 0 to $d$), with $\binom{d}{k}$ components, using a new operation, the \textit{wedge product} ($\wedge$).
 With the wedge product, objects of any dimension from 0 to $d$ residing in a $d$-dimensional space can be rigorously described.
 In three dimensions, the wedge product of two vectors is calculated exactly as the cross product is, but the result is a not an ordinary vector, but a $2$-vector (or bivector).
 This distinction explains why axial vectors and pseudovectors transform differently in the vector calculus formalism: axial vectors are $1$-vectors, and pseudovectors are $2$-vectors (or more generally $\left(d-1\right)$-vectors in $d$ dimensions).
 
 In 1878, William Kingdon Clifford, familiar with the work of Hamilton and Grassmann realized that the "vector" components of quaternions actually transformed like the bivectors of a three-dimensional exterior algebra.
-He then constructed a new family of algebras, which he called \textit{$n$-way geometric algebras}, which extended the exterior algebra to include quaternion-like constructions which worked in any number of dimensions.
+He then constructed a new family of algebras, which he called \textit{$n$-way geometric algebras}, which extended the exterior algebra to include quaternion-like constructions which worked in any number of dimensions.\cite{clifford-geometric-algebra}
 Today, these algebras are called \textit{Clifford algebras} in his honor.
 
 Clifford's geometric algebra, as he formulated it, faded into obscurity.
@@ -79,6 +78,7 @@ CliffordNumbers.jl aims to provide an implementation of geometric algebras that 
 It supports algebras of arbitrary dimension, but the most common anticipated use cases are algebras of low dimensionality, which can take advantage of Julia's compiler infrastructure to produce highly optimized code for common numeric types, including the use of SIMD instructions.
 Although it is possible to use matrix representations to perform all of the operations of a Clifford algebra, it is rare to require an explicit representation of all linearly independent components, so CliffordNumbers.jl provides small types for handling those cases efficiently.
 All types representing elements of a Clifford algebra provided by the package subtype \texttt{Number} rather than \texttt{Array}, allowing them to interoperate seamlessly with existing Julia \texttt{Number} types and operations, including the type promotion mechanism.
+With this architecture, we hope to allow users to generalize algorithms for one-dimensional problems to spaces of higher dimension simply by replacing real numbers with types from CliffordNumbers.jl.
 
 \section{Mathematical background}
 
@@ -200,6 +200,7 @@ The inverse of $I$ depends on the dimension of the algebra $n$ as well as the qu
 I^{-1} & = \left(-1\right)^{\lfloor \frac{1}{2} n + q \rfloor}I
 \end{flalign}
 where $q$ is the number of dimensions with negative square.
+However, the idea of an inverse pseudoscalar breaks down if the Clifford algebra has a degenerate quadratic form.
 
 However, we can extend our idea of duality if we base it on the wedge product.
 For a basis blade $e$, the \textit{right complement} $\overline{e}$ and \textit{left complement} $\underline{e}$ are the basis blades that satisfy the following relations:
@@ -332,26 +333,45 @@ In this Article and in CliffordNumbers.jl, we use the general term \textit{Loren
 If we extend an $n$-dimensional vanilla geometric algebra with a single degenerate dimension spanned by a basis vector $e_0$, we obtain a projective geometric algebra (PGA), $\ClR{n,0,1}$.
 The original formulation of this model uses $1$-blades to describe points, but the alternative mirror space convention is preferred in more recent literature due to the fundamental role that reflections play in describing transformations, and this specific approach is commonly called \textit{plane-based} geometric algebra.\cite{PGA4CS}
 PGA is a homogeneous model, meaning that scalar multiples of blades represent equivalent geometry, identically to how multiplying both sides of the equation of a plane $ax + by + cz = d$ by the same constant does not change the plane represented by the equation.
-The wedge product of $1$-blades is commonly called the \textit{meet}, as it represents the intersection of planes, or equivalently, an underdetermined linear system.
-In 3D PGA, the wedge product of two $1$-blades is a line, and the description of lines in 3D space as bivectors is exactly identical to Plücker coordinates.\cite{nguyen_notes_2020}
+The wedge product of blades is commonly called the \textit{meet}, as it represents the intersection of planes, or equivalently, an underdetermined linear system.
+Similarly, the regressive product is the \textit{join}, as it unites the subspaces spanned by two or more blades.
+In $n$-dimensional PGA, the wedge product of $n-1$ $1$-blades is a line.
+The description of lines in 3D space as bivectors is exactly identical to Plücker coordinates.\cite{nguyen_notes_2020}
 
 The versors of PGA correspond to elements of the Euclidean group $\operatorname{E}\left(n\right)$: the exponentiation of bivectors can produce the usual VGA rotors, but bivectors with the degenerate $e_0$ component produce translations.
-These rotors with degenerate components are known as \textit{motors}.
+We refer to motors with a translation component \textit{motors}, and this term includes pure translations as well as screw motions, their composition with rotations.
 It is also possible to construct projective geometric algebras with modeling dimensions that do not square to zero, and the sign of the square of the modeling dimension corresponds to the curvature of the space.\cite{Gunn_PGA}
 This allows us to reinterpret $n$-dimensional VGA as a homogeneous model of geometry on an $n$-sphere.
 
 \subsubsection{Conformal geometric algebra}
 
 Conformal geometric algebra (CGA) augments a vanilla geometric algebra with two extra dimensions, one positive-squaring and one negative-squaring, corresponding to the Clifford algebra $\ClR{n+1,1,0}$.\cite{Doran2002}
-The two extra modeling dimensions are spanned by a basis of two null vectors, $n_0$ and $n_\infty$, corresponding to the point at the origin and the point at infinity.
-The $1$-blades of CGA are $n$-spheres, and like in PGA, the wedge product of $k$ 1-blades corresponds to the intersections between $k$ spheres, which are also spheres of lower dimension.
-However, these spheres may have radius 0 (points), infinite radius (planes), or even a negative radius, supplying information about the orientation of the object.
-All compass-and-straightedge constructions can be performed in two-dimensional CGA, and these can be generalized to any number of dimensions.
+The two extra modeling dimensions are spanned by the basis $1$-blades, which we denote here as $e_{-}$ and $e_{+}$, squaring to $-1$ and $+1$, respectively.
+However, it is usually more convenient to use a basis of two null (zero-squaring) $1$-blades, $n_0$ and $n_\infty$, corresponding to the point at the origin and the point at infinity:
+\begin{flalign}
+n_0
+    & = \frac{1}{2}(e_{-} - e_{+}) \\
+n_\infty
+    & = e_{-} + e_{+}
+\end{flalign}
+The $1$-blades of CGA are $\left(n - 1\right)$-spheres, and like in PGA, the wedge product of $k$ $1$-blades corresponds to the intersections between $k$ spheres (or a $k$-pencil of spheres), which are also spheres of lower dimension.\cite{chomicki_pencils_2024}
+However, these spheres may have radius 0 (points), infinite radius (flat planes), or even an imaginary radius, supplying information about the orientation of the object or how two objects intersect.
+A sphere of radius $r$ and with coordinates $\left(x, y, z\right)$ is given by a blade of the form 
+\begin{flalign}
+b
+    & = w\left(xe_1 + ye_2 + ze_3 + n_0 + \frac{x^2 + y^2 + z^2 - r^2}{2}n_\infty \right)
+\end{flalign}
+with $w$ being a weight factor irrelevant to the geometry, as CGA is also a homogeneous model.
+The squared radius of a pencil of spheres, $p$, is given by the equation
+\begin{equation}
+\operatorname{rad}^2 \left(p\right) = p p^* \left(n_\infty \rfloor p\right)^{-2}
+\end{equation}
 
+All compass-and-straightedge constructions can be performed in two-dimensional CGA, and these can be generalized to any number of dimensions.
 CGA can also represent all of the elements of PGA in a succinct way:
 for example, a hyperplane can be thought of as an $n$-sphere of infinite radius, and a straight line can be thought of as a defined by three points, one of which is the special point at infinity, $n_\infty$.
-When linking the two formalisms, the spherical objects of CGA are referred to as "rounds", and the elements that 
-It can also represent the rotors and motors of PGA, but it also allows for arbitrary conformal transformations to be constructed.
+When linking the two formalisms, the unique spherical objects of CGA are referred to as "rounds", and the elements that are present in PGA are "flats".
+CGA can also represent the rotors and motors of PGA, but it also allows for arbitrary conformal transformations to be constructed.
 
 \section{Architecture}
 
@@ -375,7 +395,9 @@ Although the mathematical operations defined in these algebras is identical, it 
 Code for handling the specification of an algebra is found in the \texttt{Metrics} submodule.
 Aside from the \texttt{AbstractSignature} and generic \texttt{Signature} types, this submodule provides types for most commonly used algebras.
 \texttt{AbstractSignature} is a subtype of \texttt{AbstractVector\string{Int8\string}} which takes on values of either $+1$, $-1$, or $0$, corresponding to the metric signature.
-The indices of 
+In essence, \texttt{AbstractSignature} objects are the diagonals of metric tensors.
+The indices of an \texttt{AbstractSignature} are a \texttt{UnitRange}, representing the indices of basis blades for an algebra defintion.
+This allows us to produce nicer printed representations of algebras with $e_0$ components, like STA or PGA.
 
 \begin{table}
 \tbl{Types and aliases for commonly used geometric algebras}{
@@ -409,39 +431,73 @@ When constructing a \texttt{BitIndex\string{Q\string}} from the integer indices 
 The coefficients of a \texttt{CliffordNumber} are stored in the natural binary order imparted by \texttt{BitIndex\string{Q\string}}.
 For \texttt{EvenCliffordNumber} and \texttt{OddCliffordNumber}, the natural binary ordering can still be used efficiently:
 the integer indices of either of these types can be mapped to the indices of a \texttt{CliffordNumber} by adding an extra bit to the index and setting it to zero or one to make the Hamming weight of the integer even or odd.
-The case of \texttt{KVector} is the most complicated, but is implemented in a generated function to avoid executing unrolled loops.
+The case of \texttt{KVector} is the most complicated, but is implemented in a generated function to unroll any loops with with size determined by the type.
 
-The use of \texttt{Int} to store the basis blade information limits the maximum algebra size on an $n$-bit system to one generated by $n-1$ elements, but this does not represent a practical limit on the maximum algebra size.
+Additionally, we provide the \texttt{BitIndices\string{Q,C\string}} type, a statically sized vector all of the valid \texttt{BitIndex{Q}} object for a Clifford number of type \texttt{C}.
+This type is used in the implementation of various algorithms that iterate over the scalar coefficients of multivectors, incluiding the products of geometric algebra.
+On top of this, we provide another type, \texttt{TransformedBitIndices}, which lazily computes a transformation to a \texttt{BitIndices} object.
 
 \subsection{Implementation of products}
 
 Internally, CliffordNumbers.jl provides the function \texttt{CliffordNumbers.mul}, which takes two multivectors as an argument along with an instance of the singleton type \texttt{CliffordNumbers.GradeFilter}.
-The \texttt{GradeFilter} object represents how elementwise products are incorporated into the final result.
-For instance, the wedge product omits any components which are not linearly independent, so a specialization on \texttt{GradeFilter\string{:\\wedge\string}} ensures that the results of those products are set to zero.
+The \texttt{GradeFilter} object represents the rules for incorporating the product of basis blade coefficients into the final result.
+For instance, the wedge product omits any components which are not linearly independent, so a specialization on \texttt{GradeFilter\string{:$\mathtt{\wedge}$ \string}} ensures that the results of those products are set to zero.
+The geometric product is special in that no rejection of coefficient products is performed.
 
-Performance is maximized by the use of generated functions, which manually unroll operations on all \texttt{AbstractCliffordNumber} subtypes by leveraging their fixed size.
-These generated functions are designed to leverage SIMD and fma instructions present in modern CPUs if they are available.
+Calculating the geometric product starts with the rules for multiplying orthonormal basis $1$-blades:
+\begin{flalign}
+e_i e_j & = \begin{cases}
+    e_i \wedge e_j, = -e_j \wedge e_i, & i \neq j \\
+    e_i \cdot e_j, & i = j
+\end{cases}
+\end{flalign}
+It is trivial to reproduce this behavior with the \texttt{BitIndex} objects we introduced earlier by simply performing \texttt{xor} on their bits.
+The only remaining task is obtaining the correct sign, as that depends on the permutation of input blades.
+To calculate the geometric product, we iterate through the \texttt{BitIndices} of one multivector, using each \texttt{BitIndex} to shuffle the coefficients and flip the signs of the other multivector.
+The shuffle result is then scaled by the coefficient of the multivector associated with that \texttt{BitIndex} and accumulated in the result by summation.
+
+Because modern CPUs with SIMD extensions implement shuffle operations and vectorized fused multiply-add (fma), the geometric product can be calculated very efficiently.
+All blades and versors of APS can fit into a single 256-bit register (as in Intel AVX2) if the scalar coefficients are double-precision floats, and the same is true of STA, 3D PGA, and 2D CGA if the scalar coefficients are single-precision floats.
+However, we cannot write this code using \texttt{for} loops, vectorization, or \texttt{map}, and take advantage of SIMD instructions, even with heavy use of \texttt{@inline}.
+
+To accomplish this, we need to manually unroll the operations using generated functions, allowing Julia's compiler to emit optimized SIMD code for any pair of arguments.
+This unrolling is sensitive to the lengths of the input multivectors, and will preferentially loop over the indices of the smaller multivector so that there are fewer total iterations and the full SIMD register width is used when possible.
+The use of generated functions also allows us to pre-compute all constants used in the multiplication (such as shuffle indices) at compile time.
+
+\subsection{Interoperation with other \texttt{Number} types}
+
+Julia uses type promotion heavily with nearly all of its numerical operations, allowing for generic operator defintions that work with a wide variety of inputs, even if the types are mismatched.
+CliffordNumbers.jl defines promotion rules for operations that combine \texttt{AbstractCliffordNumber} subtypes with Julia's base \texttt{Number} types, \texttt{Real} and \texttt{Complex}.
+One important decision is that almost all operations that return scalar values with \texttt{AbstractCliffordNumber\string{Q\string}} inputs will return a \texttt{KVector\string{0,Q\string}}, so that information about the algebra \texttt{Q} is propagated to the result.
+
+Because \texttt{AbstractCliffordNumber\string{Q,T\string}} is not an \texttt{AbstractArray} or otherwise iterable object, calling \texttt{eltype(x::AbstractCliffordNumber)} returns \texttt{typeof(x)} as with ordinary numbers, and \texttt{length(x::AbstractCliffordNumber)} is always $1$.
+For this reason, we provide the functions \texttt{scalar_type} and \texttt{nblades} to obtain this information without interfering with the expected behavior of \texttt{eltype} and \texttt{length}.
 
 \section{Usage examples}
 
 \section{Limitations}
 
-Some discourse around geometric algebra treats it as a total replacement for linear algebra.
+Geometric algebra is a promising alternative approach to many problems in numerical computing, but is not a universal solution to every problem.
 In theory, it is possible to use the Clifford algebra $\ClR{n,n,0}$ to represent any $n$-dimensional matrix, and therefore perform any operation in linear algebra.
-But in practice, the number of operations needed to implement such an approach exceeds that of ordinary matrix multiplication.
-We still recommend the use of tools designed for linear algebra when dealing with objects of very high dimensionality.
+But in practice, the number of operations needed to implement such an approach far exceeds that of ordinary matrix multiplication.
+We still recommend the use of linear algebra libraries when dealing with objects of very high dimensionality.
 
 \subsection{Large algebras}
 
 Operations on the \texttt{Tuple} type are subject to inlining limits imposed by Julia.
 In practice, this means that the best performance is limited to algebras generated by a six-dimensional vector space.
 In practice, this will be sufficient for almost all work with commonly used algebras, including 2D and 3D VGA, PGA and CGA, as well as the spacetime algebra.
+Future work on the Julia compiler, particularly on the implementation of \texttt{NTuple}, may improve on these bounds.
 
 \subsection{Numerical stability}
 
 Not all operations in this package are necessarily numerically stable.
 In particular, this is true of the wedge product: repeated wedge products can accumulate significant error.\cite{de_keninck_hyperwedge_2020}
 We plan to mitigate this in the case of wedging $n$ $1$-blades together by using the techinques from linear algebra suggested by de Keninck et. al., but we also seek to improve the stability when wedging fewer than $n$ blades together.
+
+However, this should not be taken to mean that geometric algebra is necessarily an inferior choice where numerical stability is critical.
+The choice of approach should factor in the different ways error can manifest in a particular application.
+In cases where the preservation of orthonormality is critical, transforms built with versor composition can never introduce shearing, unlike matrix-based methods.
 
 \section{Future work}
 
@@ -451,15 +507,22 @@ Of interest is the ability to express the Gram-Schmidt process in terms of wedge
 
 We plan to extend CliffordNumbers.jl to interoperate with more of the Julia ecosystem, particularly Julia's standard libraries.
 Package extensions already exist for the LinearAlgebra standard library,  StaticArrays.jl, and Quaternions.jl to encourage interoperation with existing code.
-Work has begun on integrating \texttt{AbstractCliffordNumber} with Julia's random number generation functionality, including methods for \texttt{randn} and \texttt{rand} for $1$-blades of VGA, PGA, and CGA.
+One of our primary goals is to provide support for using CliffordNumbers.jl with the extensive Julia ecosystem for automatic differentiation (AD).
+The implementation of forward mode automatic differentiation may be facilitated by the fact that dual numbers are the Clifford algebra $\ClR{0,0,1}$, and dualization of the components of the algebra can be accomplished simply by adding a degenerate dimension.
+This will facilitate the use of multivector types from CliffordNumbers.jl as drop-in replacements for ordinary scalar weights.
+
+Additionally, work has begun on integrating \texttt{AbstractCliffordNumber} with Julia's random number generation functionality, including methods for \texttt{randn} and \texttt{rand} for $1$-blades of VGA, PGA, and CGA.
 This work will be extended to the Distributions.jl package\cite{JSSv098i16} to support other useful distributions of blades or rotors over Clifford algebras.
+In the far future, we hope to work on providing an implementation of the Clifford-Fourier transform.\cite{clifford-fourier}
+This transform generalizes the Fourier transform to arbitrary dimensions without the need for complex numbers.
+Along with a single-sided transform that generalizes the bivector properties of the complex numbers, a double-sided transform can also be constructed from the sandwich product.\cite{double-sided-clifford-fourier}
 
 \section{Acknowledgements}
 
 B. S. Flores would like to acknowledge the members of the geometric algebra community at bivector.net.
 Specifically, this includes David Cohoe (sudgylacmoe), Steven de Keninck (enki), Hamish Todd, and Moab Croft (Slackline).
 B. S. Flores would also like to acknowledge Chris Doran and Cédric Belmant (serenity7) for discussing the implementation of Clifford algebras in Julia, as well as Mateusz Baran for discussion of the related StaticArrays.jl package.
-Finally, B. S. Flores would like to acknowledge Dr. Michael Davies for bringing him an appreciation for computing on all levels, from hardware to the human.
+Finally, B. S. Flores would like to acknowledge Dr. Michael Davies for bringing him a deeper appreciation for computing on all levels, from hardware to the human.
 
 \input{bib.tex}
 
