@@ -1,16 +1,17 @@
 title: "CliffordNumbers.jl: numeric primitives for geometry"
 keywords:
   - Julia
+  - Geometry
   - Geometric algebra
   - Clifford algebra
   - Exterior algebra
-  - Higher dimensions
+  - Numerical libraries
 authors:
   - name: Brandon S. Flores
-    orcid: 0000-0003-1361-440X
+    orcid: 0000-0003-0816-4491
     affiliation: 1
   - name: Victor M. Zavala
-    orcid: 0000-0003-1361-440X
+    orcid: 0000-0002-5744-7378
     affiliation: 1
 affiliations:
   - name: Scalable Systems Lab, University of Wisconsin-Madison
