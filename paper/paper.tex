@@ -1,4 +1,3 @@
-
 % JuliaCon proceedings template
 \documentclass{juliacon}
 
@@ -318,7 +317,7 @@ But in practice, we can make use of non-positive definite or degenerate quadrati
 
 A geometric algebra generated with a positive-definite quadratic form is commonly referred to as a \textit{vanilla geometric algebra} (VGA).
 The term "vector space geometric algebra" was previously used, but is discouraged as all geometric algebras are vector spaces.
-The most commonly used example is the \textit{algebra of physical space} (APS), $\ClR{3,0,0}$.
+The most commonly used example is the \textit{algebra of physical space} (APS), $\ClR{3,0,0}$, whose matrix representation is the Pauli matrices.
 Vanilla geometric algebras form the basis of the larger modeling algebras we describe here.
 
 \subsubsection{Spacetime and Lorentzian geometric algebra}
@@ -326,6 +325,7 @@ Vanilla geometric algebras form the basis of the larger modeling algebras we des
 The algebra of physical space can be extended to the \textit{spacetime algebra} (STA), $\ClR{1,3,0}$ or $\ClR{3,1,0}$ depending on the choice of metric signature.
 Although these algebras are not isomorphic, their even subalgebras are both $\ClR{3,0,0}$, the algebra of physical space \cite{hestenes_spacetime_ga}.
 in general, the even subalgebras of both $\ClR{1,n,0}$ or $\ClR{n,1,0}$ are $\ClR{n,0,0}$.
+
 Odd blades of STA can be projected APS with the use of a \textit{spacetime split}:
 by multiplying any $1$-blade of STA with the timelike vector $\gamma_0$, the result is projected into the even subalgebra, with timelike components becoming scalars and spacelike components becoming $1$-blades of APS.
 This operation naturally maps relativistic vector quantities (such as the electromagnetic four-potential) onto classical pairs of scalar and vector quantities (such as voltage and the magnetic potential).
@@ -363,12 +363,12 @@ However, these spheres may have radius 0 (points), infinite radius (flat planes)
 A sphere of radius $r$ and with coordinates $\left(x, y, z\right)$ is given by a blade of the form 
 \begin{flalign}
 b
-    & = w\left(xe_1 + ye_2 + ze_3 + n_0 + \frac{x^2 + y^2 + z^2 - r^2}{2}n_\infty \right)
+    & = w\left(xe_1 + ye_2 + ze_3 + wn_0 + \frac{x^2 + y^2 + z^2 - r^2}{2}n_\infty \right)
 \end{flalign}
 with $w$ being a weight factor irrelevant to the geometry, as CGA is also a homogeneous model.
 The squared radius of a pencil of spheres, $p$, is given by the equation
 \begin{equation}
-\operatorname{rad}^2 \left(p\right) = p p^* \left(n_\infty \rfloor p\right)^{-2}
+\operatorname{rad}^2 \left(p\right) = p p^\dagger \left( \left(n_\infty \rfloor p\right) \left(n_\infty \rfloor p\right)^\dagger \right)^{-1}
 \end{equation}
 
 All compass-and-straightedge constructions can be performed in two-dimensional CGA, and these can be generalized to any number of dimensions.
@@ -479,15 +479,98 @@ For this reason, we provide the functions \texttt{scalar_type} and \texttt{nblad
 
 \section{Usage examples}
 
-Figures accompanying the examples were generated with Makie.jl.
+Figures accompanying the examples were generated with Makie.jl \cite{Makie.jl}.
 Makie.jl does not have built-in support for natively plotting the types present in CliffordNumbers.jl, so we wrote our own functions for plotting various elements of geometric algebras as different types of objects.
 While CliffordNumbers.jl does not intend to impose a particular geometric interpretation on the types it provides, integrating plotting support though a package extension is a future goal for the package.
+
+\subsection{Making multivectors plottable}
+
+Makie.jl uses the GeometryBasics.jl package internally, which provides definitions for how different types of objects should be plotted.
+The most important types for plotting will be \texttt{Point\string{N,T\string}} and \texttt{Hypersphere\string{N,T\string}}, which are recognized by Makie.jl for various common plot types, such as scatter plots.
+
+In VGA, converting $1$-blades to \texttt{Point} objects is trivial.
+Converting an $(n-1)$-blade of VGA to \texttt{Point} is also relatively easy, but we have to factor out the null component.
+and center.
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={plotting:points}, 
+    caption={Converting VGA $1$-blades and and PGA $n-1$-blades to GeometryBasics points.}
+]
+using CliffordNumbers
+using GeometryBasics, StaticArrays
+
+function Point(x::KVector{1,Q}) where Q
+    Q isa VGA || error("input must be a VGA element.")
+    return SVector(Tuple(x))
+end
+
+function Point(x::KVector{K,Q}) where {K,Q}
+    D = dimension(Q)
+    (Q isa PGA && K = D - 1) || error("input needs to have grade $(D - 1) for PGA elements.")
+    return SVector(Base.tail(Tuple(x))) / x[BitIndex(x, 0)]
+end
+\end{lstlisting}
+
+Converting a CGA 1-blade to a hypersphere requires us to recover the radius and center.
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={plotting:hypersphere}, 
+    caption={Converting 1-blades of CGA to GeometryBasics.jl hyperspheres.}
+]
+using CliffordNumbers
+using GeometryBasics, StaticArrays
+
+function ninf(x::AbstractCliffordNumber{Q,T}) where {Q,T}
+    Q isa CGA || error("input must be a CGA element.")
+    return KVector{1,Q}(one(T), one(T), ntuple(Returns(zero(T)), Val(dimension(Q)))...)
+end
+
+function radius2(x::KVector)
+    w = left_contraction(ninf(x), x)
+    return (x * x') * inv(w * w')
+end
+
+function center_vector(x::KVector{1,Q}) where Q
+    w = left_contraction(ninf(x), x)
+    return SVector{dimension(Q)}((x / w)[i] for i in BitIndices(x)[3:end])
+end
+
+function GeometryBasics.Hypersphere(x::KVector{1,Q,T}) where Q
+    N = dimension(Q)
+    return Hypersphere{dimension(Q),T}(center_vector(x), sqrt(radius2(x)))
+end
+\end{lstlisting}
+
+The most difficult challenge is plotting the $1$-blades of 2D CGA as hyperplanes.
+Makie.jl does not have a built-in function to directly plot a line of the form $ax + by = c$, but it does have the \texttt{ablines} function for plotting a line in slope-intercept form, $y = mx + b$.
+We can transform our coefficients to produce the correct form for \texttt{ablines}, but vertical lines will not plot at all.
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={plotting:hyperplanes}, 
+    caption={Plotting 1-blades of PGA to GeometryBasics.jl hyperspheres.}
+]
+using CliffordNumbers
+using Makie
+
+function Makie.convert_arguments(
+	::Type{<:ABLines},
+	xs::AbstractVector{<:KVector{1,PGA(2)}}
+)
+	slopes = [-x[BitIndex(x, 1)] / x[BitIndex(x, 2)] for x in xs]
+	intercepts = [x[BitIndex(x, 0)] / x[BitIndex(x, 2)] for x in xs]
+	return (intercepts, slopes)
+end
+\end{lstlisting}
 
 \subsection{The Cauchy distribution}
 
 The Cauchy distribution is a probability distribution with probability density function
 \begin{flalign}
-\frac{1}{\pi \gamma \left[1 + \left(\frac{x - x_0}{\gamma}\right)\right]}
+\operatorname{Cauchy}\left(x, x_0, \gamma\right)
+    & = \frac{1}{\pi \gamma \left[1 + \left(\frac{x - x_0}{\gamma}\right)\right]}
 \end{flalign}
 where $x_0$ is the median and $\gamma$ is the median absolute deviation.
 While the Cauchy distribution is pathological in that it has no mean or variance, it does arise naturally as the ratio distribution of two normally distributed random variables with zero mean.
@@ -554,18 +637,21 @@ We can do this easily with CGA tooling: along with a function for generating CGA
 using CliffordNumbers
 using StaticArrays
 
+function ninf(x::AbstractCliffordNumber{Q,T}) where {Q,T}
+    Q isa CGA || error("input must be a CGA element.")
+    return KVector{1,Q}(one(T), one(T), ntuple(Returns(zero(T)), Val(dimension(Q)))...)
+end
+
 function CGA_sphere(point::StaticVector{D}, radius) where D
     # add n0 to the coordinates
     x = KVector{1,CGA(D)}(1//2, -1//2, point...)
     # construct n\infty
-    ninf = KVector{1,CGA(D)}(1, 1, zero(point)...)
-    return x + 1//2 * (sum(point.^2) - radius^2) * ninf
+    return x + 1//2 * (sum(point.^2) - radius^2) * ninf(x)
 end
 
-function CGA_squared_radius(x::KVector{K,Q}) where {K,Q}
-    Q isa CGA || error("input blade must be an element of a CGA.")
-    ninf = KVector{1,Q}(1, 1, zero(SVector{dimension(x) - 2})...)
-    return x * grade_involution(x) * left_contraction(ninf, x)^-2
+function radius2(x::KVector)
+    w = left_contraction(ninf(x), x)
+    return (x * x') * inv(w * w')
 end
 \end{lstlisting}
 In most cases, we use a common filtration radius $r$ across all points when constructing a complex, which allows us to rephrase the question as determining whether the minimum bounding sphere of a group of $k$ points is less than or equal to $r$.
@@ -576,7 +662,7 @@ This can be accomplished by taking the wedge product of up to $n+1$ points, repr
 The initial result of this operation is not necessarily an $\left(n-1\right)$-sphere.
 But given a CGA round $r$, we can always construct a sphere with the same center and radius of $r$ (called the \textit{container} of $r$)\footnote{If CGA 1-blades are taken to be points, this construction is called the \textit{center}.} using the formula
 \begin{flalign}
-s = \left( \left(r I^{-1}\right) \wedge n_\infty \right) \vee r
+\operatorname{container}\left(r\right) = \left( \left(r I^{-1}\right) \wedge n_\infty \right) \vee r
 \end{flalign}
 With CliffordNumbers.jl, we can define a function to perform this construction as part of Welzl's algorithm.
 \begin{lstlisting}[
@@ -594,12 +680,43 @@ function CGA_container(r::KVector{K,Q}) where {K,Q}
     return wedge(wedge(r * pseudoscalar(r), ninf), r)
 end
 \end{lstlisting}
-This facilitates constructing a sphere that passes through less than $n+1$ points.
+This facilitates constructing a sphere that passes through less than $n+1$ points, regardless of the number of spatial dimensions.
+
+\iffalse
+\subsection{Tracing geodesics on manifolds}
+
+A \textit{Riemannian manifold} $M$ is a smooth manifold associated with a smoothly varying positive-definite inner product at every manifold point, known as a \textit{Riemannian metric}.
+On a sufficiently small scale, Riemannian manifolds are effectively Euclidean at every point.
+This property allows us to construct local Euclidean vector spaces, the \textit{tangent space} $T_{x} M$, and its dual space, the \textit{cotangent space} $T_{x}^{*} M$, at every manifold point $x$.
+The Riemannian metric at $x$, $g\left(x\right)$, becomes a constant inner product of the tangent and cotangent space.
+Collectively, these tangent and cotangent spaces over all manifold points form the \textit{tangent bundle} $TM$ and \textit{cotangent bundle} $T^{*} M$, with dimension twice that of $M$.
+
+A vector space and an inner product are sufficient to allow us to construct a geometric algebra over the tangent space at $x$, which we call $\Cl\left(T_{x} M\right)$.
+Collectively, these geometric algebras form the \textit{Clifford bundle} over $M$, $\Cl\left(M\right)$.
+
+Given two points on a manifold, we may want to construct a \textit{geodesic}, the shortest path between them.
+We can trace a path between to points with a parametric function $f : \left[0, 1\right] \to M$, mapping a finite interval to the points on the path.
+Then we can use the calculus of variations to minimize either the distance functional $L\left[f\right]$ or the energy functional $E\left[f\right]$:
+\begin{flalign}
+L\left[f\right]
+    & = \int_{0}^{1} \sqrt{g_{f(t)} \left( \frac{df}{dt}, \frac{df}{dt} \right)} dt \\
+E\left[f\right]
+    & = \frac{1}{2} \int_{0}^{1} g_{f(t)} \left( \frac{df}{dt}, \frac{df}{dt} \right) dt
+\end{flalign}
+In practice, $E\left[f\right]$ is a convex functional, and thus far better behaved.
+The geodesic 
+\begin{flalign}
+\frac{d^2 f}{dt^2}
+    & = - \Gamma
+\end{flalign}
+
+For this example, we use a set of cyclic voltammograms that 
+\fi
 
 \section{Limitations}
 
 Geometric algebra is a promising alternative approach to many problems in numerical computing, but is not a universal solution to every problem.
-In theory, it is possible to use the Clifford algebra $\ClR{n,n,0}$ to represent any $n$-dimensional matrix, and therefore perform any operation in linear algebra.
+In theory, it is possible to use the Clifford algebra $\ClR{n,n,0}$ to represent any $n$-dimensional matrix \cite{Dorst_mother_algebra}, and therefore perform any operation in linear algebra.
 But in practice, the number of operations needed to implement such an approach far exceeds that of ordinary matrix multiplication.
 We still recommend the use of linear algebra libraries when dealing with objects of very high dimensionality.
 
@@ -655,7 +772,7 @@ CliffordNumbers.jl is not the only geometric algebra package for Julia.
 The authors would like to acknowledge existing geometric algebra packages for Julia, including GeometricAlgebra.jl by Joseph Wilson (Jollywatt) \cite{GeometricAlgebra.jl}, CliffordAlgebras.jl by Andreas Tell (ATell-SoundTheory) \cite{CliffordAlgebras.jl}, Multivectors.jl by Michael Alexander Ewert (digitaldomain) \cite{Multivectors.jl}, Grassmann.jl by Michael Reed (chakravala) \cite{Grassmann.jl}, and SymbolicGA.jl by Cédric Belmant (serenity4) \cite{SymbolicGA.jl}.
 
 B. S. Flores would like to acknowledge the members of the geometric algebra community at bivector.net.
-Specifically, this includes Steven de Keninck (enki), developer of ganja.js, Hamish Todd, Moab Croft (Slackline), and David Cohoe (sudgylacmoe), who produces educational videos about geometric algebra, including the video that introduced him to the field, \textit{A Swift Introduction to Geometric Algebra}.
+Specifically, this includes Adam Jarhaus (Kruglord), Steven de Keninck (enki), Hamish Todd, Moab Croft (Slackline), and David Cohoe (sudgylacmoe), who produces educational videos about geometric algebra, including the video that introduced him to the field, \textit{A Swift Introduction to Geometric Algebra} \cite{swift-intro}.
 B. S. Flores would also like to acknowledge Chris Doran, Mason Protter, and Cédric Belmant (serenity4) for discussing the implementation of Clifford algebras in Julia, as well as Prof. Mateusz Baran for discussion of the related StaticArrays.jl package.
 Finally, B. S. Flores would like to acknowledge Dr. Jessica Geisenhoff for restoring his love for math after numerous challenging undergraduate classes, and Dr. Michael Davies for bringing him a deeper appreciation for computing on all levels, from hardware to the human.
 
