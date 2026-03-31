@@ -25,7 +25,7 @@
 Vector algebra, with its familiar cross product and dot product, has long been the \textit{lingua franca} of physics and 3D geometry, mostly replacing the older quaternion formalism.
 While vector algebra managed to clean up some of the clunkier aspects of quaternions, it also introduced its own issues, particularly with the cross product, and remains limited to describing 3D space like the quaternions.
 An alternative formalism, \textit{geometric algebra}, or \textit{Clifford algebra}, generalizes the geometric concepts of vector algebra, quaternions, complex numbers, and dual numbers to any number of dimensions, and offers greater conceptual clarity for learners.
-In service of the goal of making geometric algebra more accessible to the broader community, CliffordNumbers.jl provides a first-class implementation of geometric algebras in Julia.
+In service of the goal of making geometric algebra more accessible to the broader community, CliffordNumbers.jl provides a first-class numerical implementation of geometric algebras in Julia.
 Here, we provide an introduction to geometric algebra for those not familiar with the topic, and provide details about the architecture of CliffordNumbers.jl, as well as usage examples.
 
 \end{abstract}
@@ -651,10 +651,13 @@ Along with a single-sided transform that generalizes the bivector properties of 
 
 \section{Acknowledgements}
 
+CliffordNumbers.jl is not the only geometric algebra package for Julia.
+The authors would like to acknowledge existing geometric algebra packages for Julia, including GeometricAlgebra.jl by Joseph Wilson (Jollywatt) \cite{GeometricAlgebra.jl}, CliffordAlgebras.jl by Andreas Tell (ATell-SoundTheory) \cite{CliffordAlgebras.jl}, Multivectors.jl by Michael Alexander Ewert (digitaldomain) \cite{Multivectors.jl}, Grassmann.jl by Michael Reed (chakravala) \cite{Grassmann.jl}, and SymbolicGA.jl by Cédric Belmant (serenity4) \cite{SymbolicGA.jl}.
+
 B. S. Flores would like to acknowledge the members of the geometric algebra community at bivector.net.
-Specifically, this includes David Cohoe (sudgylacmoe), Steven de Keninck (enki), Hamish Todd, and Moab Croft (Slackline).
-B. S. Flores would also like to acknowledge Chris Doran and Cédric Belmant (serenity7) for discussing the implementation of Clifford algebras in Julia, as well as Mateusz Baran for discussion of the related StaticArrays.jl package.
-Finally, B. S. Flores would like to acknowledge Dr. Michael Davies for bringing him a deeper appreciation for computing on all levels, from hardware to the human.
+Specifically, this includes Steven de Keninck (enki), developer of ganja.js, Hamish Todd, Moab Croft (Slackline), and David Cohoe (sudgylacmoe), who produces educational videos about geometric algebra, including the video that introduced him to the field, \textit{A Swift Introduction to Geometric Algebra}.
+B. S. Flores would also like to acknowledge Chris Doran, Mason Protter, and Cédric Belmant (serenity4) for discussing the implementation of Clifford algebras in Julia, as well as Prof. Mateusz Baran for discussion of the related StaticArrays.jl package.
+Finally, B. S. Flores would like to acknowledge Dr. Jessica Geisenhoff for restoring his love for math after numerous challenging undergraduate classes, and Dr. Michael Davies for bringing him a deeper appreciation for computing on all levels, from hardware to the human.
 
 \input{bib.tex}
 
