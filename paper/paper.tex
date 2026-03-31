@@ -479,13 +479,17 @@ For this reason, we provide the functions \texttt{scalar_type} and \texttt{nblad
 
 \section{Usage examples}
 
+Figures accompanying the examples were generated with Makie.jl.
+Makie.jl does not have built-in support for natively plotting the types present in CliffordNumbers.jl, so we wrote our own functions for plotting various elements of geometric algebras as different types of objects.
+While CliffordNumbers.jl does not intend to impose a particular geometric interpretation on the types it provides, integrating plotting support though a package extension is a future goal for the package.
+
 \subsection{The Cauchy distribution}
 
 The Cauchy distribution is a probability distribution with probability density function
 \begin{flalign}
 \frac{1}{\pi \gamma \left[1 + \left(\frac{x - x_0}{\gamma}\right)\right]}
 \end{flalign}
-where $x_0$ is a location parameter and $\gamma$ is a scale parameter.
+where $x_0$ is the median and $\gamma$ is the median absolute deviation.
 While the Cauchy distribution is pathological in that it has no mean or variance, it does arise naturally as the ratio distribution of two normally distributed random variables with zero mean.
 
 One of the most common constructions of the Cauchy distribution is from the intersection of uniformly distributed random rays with a plane.
@@ -538,7 +542,58 @@ This illustrates that the Cauchy distribution is intrinsically linked to the ide
 
 \subsection{Intersections of circles and spheres}
 
-The intersection of 
+Finding intersections between spheres of various dimensions is a critical step in the construction of simplicial complexes and filtrations used in topological data analysis (TDA).
+To construct a filtration, we take a point cloud and select a range of radii to filter the data with.
+We can do this easily with CGA tooling: along with a function for generating CGA spheres, we also include a function for measuring their squared radii.
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={tda:cga_sphere}, 
+    caption={Constructing and measuring CGA spheres.}
+]
+using CliffordNumbers
+using StaticArrays
+
+function CGA_sphere(point::StaticVector{D}, radius) where D
+    # add n0 to the coordinates
+    x = KVector{1,CGA(D)}(1//2, -1//2, point...)
+    # construct n\infty
+    ninf = KVector{1,CGA(D)}(1, 1, zero(point)...)
+    return x + 1//2 * (sum(point.^2) - radius^2) * ninf
+end
+
+function CGA_squared_radius(x::KVector{K,Q}) where {K,Q}
+    Q isa CGA || error("input blade must be an element of a CGA.")
+    ninf = KVector{1,Q}(1, 1, zero(SVector{dimension(x) - 2})...)
+    return x * grade_involution(x) * left_contraction(ninf, x)^-2
+end
+\end{lstlisting}
+In most cases, we use a common filtration radius $r$ across all points when constructing a complex, which allows us to rephrase the question as determining whether the minimum bounding sphere of a group of $k$ points is less than or equal to $r$.
+Welzl's algorithm can be used to determine the minimum bounding sphere of a set of $k$ points in $\text{O}\left(k\right)$ time on average. \cite{welzl-algorithm}
+As part of this algorithm, we may need to construct spheres that pass through up to $n+1$ points in an $n$-dimensional space.
+This can be accomplished by taking the wedge product of up to $n+1$ points, represented by spheres of zero radius.
+The initial result of this operation is not necessarily an $\left(n-1\right)$-sphere.
+But given a CGA round $r$, we can always construct a sphere with the same center and radius of $r$ (called the \textit{container} of $r$) using the formula
+\begin{flalign}
+s = \left( \left(r I^{-1}\right) \wedge n_\infty \right) \vee r
+\end{flalign}
+With CliffordNumbers.jl, we can define a function to perform this construction as part of Welzl's algorithm.
+\begin{lstlisting}[
+    language = Julia, 
+    numbers=left, 
+    label={tda:cga}, 
+    caption={Constructing a sphere from any round.}
+]
+using CliffordNumbers
+
+function CGA_container(r::KVector{K,Q}) where {K,Q}
+    Q isa CGA || error("input blade must be an element of a CGA.")
+    # construct n\infty
+    ninf = KVector{1,CGA(D)}(1, 1, zero(point)...)
+    return wedge(wedge(r * pseudoscalar(r), ninf), r)
+end
+\end{lstlisting}
+This facilitates constructing a sphere that passes through less than $n+1$ points.
 
 \section{Limitations}
 
