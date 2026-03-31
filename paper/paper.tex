@@ -34,13 +34,13 @@ Here, we provide an introduction to geometric algebra for those not familiar wit
 
 One of the great challenges of modeling physical systems is the treatement of dimensions.
 Historically, two major conventions have been used to model 3D space.
-In 1843, William Rowan Hamilton famously inscribed the formula $i^2 = j^2 = k^2 = ijk = -1$  into the stone of Brougham Bridge with a pocket knife, defining the quaternions.\cite{hamilton-quaternions}
+In 1843, William Rowan Hamilton famously inscribed the formula $i^2 = j^2 = k^2 = ijk = -1$  into the stone of Brougham Bridge with a pocket knife, defining the quaternions \cite{hamilton-quaternions}.
 Quaternions can encode both scalar quantities and three-dimensional vectors in a single object, and they permit addition, multiplication, and their inverses.
 Although the quaternions immediately found use in the physical sciences, notably in Maxwell's first publication of his famous equations, they were also considered unwieldy: Maxwell originally published 20 equations instead of the four we know today.
 Part of this unwieldiness stems from the noncommutativity of quaternion multiplication, but this property is necessary to describe rotations in three dimensions.
-More troubling was that 3D vectors would always have negative squares, which requires careful manipulation of signs to ensure that quantities are correctly computed.\cite{vector-algebra-war}
+More troubling was that 3D vectors would always have negative squares, which requires careful manipulation of signs to ensure that scalar quantities are correctly computed \cite{vector-algebra-war}.
 
-The deficiencies of quaternions led Josiah Willard Gibbs to develop a new formalism, vector algebra, which is the dominant formalism in all but a few niche applications today.\cite{multiple-algebra}
+The deficiencies of quaternions led Josiah Willard Gibbs to develop a new formalism, vector algebra, which is the dominant formalism in all but a few niche applications today \cite{multiple-algebra}.
 Rather than a single quaternion product, vector algebra uses two products, the dot and cross product, splitting the commutative and anticommutative components of the quaternion product into two different operations.
 However, vector algebra is not free of unwieldiness, either, particularly with the cross product.
 The cross product of two vectors does not transform like the input vectors under a reflection or other transformation that reverses the orientation of the space.
@@ -52,23 +52,23 @@ By contrast, quaternions see relatively little practical use, with the most nota
 However, both quaternions and vector algebra also share one glaring deficiency: they are limited to describing 3D space.
 This is obvious from the limited size of quaternions, but even vector algebra is deficient in this regard without combining it with matrix algebra.
 It is possible to generalize the cross product to an $(n-1)$-ary operator on $n$-dimensional vectors, but this implies that the binary nature of the cross product is dependent on three dimensions.
-(A seven-dimensional generalization exists, but does not satisfy the Jacobi identity.)\cite{lounesto2001clifford}
+(A seven-dimensional generalization exists, but does not satisfy the Jacobi identity \cite{lounesto2001clifford}.)
 
 While Hamilton's quaternions and Gibbs' vector algebra battled for dominance in the scientific community, a third formalism developed in the shadows.
-In 1844, Hermann Grassmann introduced \textit{Ausdehnungslehre} (\textit{Theory of Extension}), which we call \textit{exterior algebra} today.\cite{Ausdehnungslehre}
+In 1844, Hermann Grassmann introduced \textit{Ausdehnungslehre} (\textit{Theory of Extension}), which we call \textit{exterior algebra} today \cite{Ausdehnungslehre}.
 This algebra combines $k$ $d$-dimensional vectors into new objects called \textit{$k$-vectors} (with the \textit{grade}, $k$, ranging from 0 to $d$), with $\binom{d}{k}$ components, using a new operation, the \textit{wedge product} ($\wedge$).
 With the wedge product, objects of any dimension from 0 to $d$ residing in a $d$-dimensional space can be rigorously described.
 In three dimensions, the wedge product of two vectors is calculated exactly as the cross product is, but the result is a not an ordinary vector, but a $2$-vector (or bivector).
 This distinction explains why axial vectors and pseudovectors transform differently in the vector calculus formalism: axial vectors are $1$-vectors, and pseudovectors are $2$-vectors (or more generally $\left(d-1\right)$-vectors in $d$ dimensions).
 
 In 1878, William Kingdon Clifford, familiar with the work of Hamilton and Grassmann realized that the "vector" components of quaternions actually transformed like the bivectors of a three-dimensional exterior algebra.
-He then constructed a new family of algebras, which he called \textit{$n$-way geometric algebras}, which extended the exterior algebra to include quaternion-like constructions which worked in any number of dimensions.\cite{clifford-geometric-algebra}
+He then constructed a new family of algebras, which he called \textit{$n$-way geometric algebras}, which extended the exterior algebra to include quaternion-like constructions which worked in any number of dimensions \cite{clifford-geometric-algebra}.
 Today, these algebras are called \textit{Clifford algebras} in his honor.
 
 Clifford's geometric algebra, as he formulated it, faded into obscurity.
 Notably, Paul Dirac used the geometric algebra of spacetime in his derivation of his eponymous equation, but phrased it in the language of matrices.
 Most literature on Clifford algebras uses the matrix-based formalism of representation theory, unlike Clifford's approach which treated Clifford algebras as a hypercomplex number system.
-David Hestenes advocated for a return to Clifford's original geometric approach, and used this framework to develop new approaches to geometric and physical problems.\cite{CA2GC}
+David Hestenes advocated for a return to Clifford's original geometric approach, and used this framework to develop new approaches to geometric and physical problems \cite{CA2GC} \cite{real-spinor-fields}.
 Although geometric algebra is still a niche formalism today, there has been a recent resurgence of interest in the topic: in part due to potential increases in computational efficiently, but primarily due to the conceptual and pedagogical clarity of the approach.
 
 \subsection*{Statement of need}
@@ -238,7 +238,7 @@ Aside from behaving like a scalar product when one argument is a scalar and a do
 \left(a \wedge b\right) \rfloor c 
     & = a \rfloor \left(b \rfloor c\right)
 \end{flalign}
-which allows us to extend the notion of projection to pairs of blades of any grade.\cite{Dorst_inner_products}
+which allows us to extend the notion of projection to pairs of blades of any grade \cite{Dorst_inner_products}.
 The right contraction is simply the reverse of the left contraction:
 \begin{flalign}
 \left(a \lfloor b\right)^\dagger
@@ -324,7 +324,7 @@ Vanilla geometric algebras form the basis of the larger modeling algebras we des
 \subsubsection{Spacetime and Lorentzian geometric algebra}
 
 The algebra of physical space can be extended to the \textit{spacetime algebra} (STA), $\ClR{1,3,0}$ or $\ClR{3,1,0}$ depending on the choice of metric signature.
-Although these algebras are not isomorphic, their even subalgebras are both $\ClR{3,0,0}$, the algebra of physical space.\cite{hestenes_spacetime_ga}
+Although these algebras are not isomorphic, their even subalgebras are both $\ClR{3,0,0}$, the algebra of physical space \cite{hestenes_spacetime_ga}.
 in general, the even subalgebras of both $\ClR{1,n,0}$ or $\ClR{n,1,0}$ are $\ClR{n,0,0}$.
 Odd blades of STA can be projected APS with the use of a \textit{spacetime split}:
 by multiplying any $1$-blade of STA with the timelike vector $\gamma_0$, the result is projected into the even subalgebra, with timelike components becoming scalars and spacelike components becoming $1$-blades of APS.
@@ -335,21 +335,21 @@ In this Article and in CliffordNumbers.jl, we use the general term \textit{Loren
 \subsubsection{Projective and plane-based geometric algebra}
 
 If we extend an $n$-dimensional vanilla geometric algebra with a single degenerate dimension spanned by a basis vector $e_0$, we obtain a projective geometric algebra (PGA), $\ClR{n,0,1}$.
-The original formulation of this model uses $1$-blades to describe points, but the alternative mirror space convention is preferred in more recent literature due to the fundamental role that reflections play in describing transformations, and this specific approach is commonly called \textit{plane-based} geometric algebra.\cite{PGA4CS}
+The original formulation of this model uses $1$-blades to describe points, but the alternative mirror space convention is preferred in more recent literature due to the fundamental role that reflections play in describing transformations, and this specific approach is commonly called \textit{plane-based} geometric algebra \cite{PGA4CS}.
 PGA is a homogeneous model, meaning that scalar multiples of blades represent equivalent geometry, identically to how multiplying both sides of the equation of a plane $ax + by + cz = d$ by the same constant does not change the plane represented by the equation.
 The wedge product of blades is commonly called the \textit{meet}, as it represents the intersection of planes, or equivalently, an underdetermined linear system.
 Similarly, the regressive product is the \textit{join}, as it unites the subspaces spanned by two or more blades.
 In $n$-dimensional PGA, the wedge product of $n-1$ $1$-blades is a line.
-The description of lines in 3D space as bivectors is exactly identical to Plücker coordinates.\cite{nguyen_notes_2020}
+The description of lines in 3D space as bivectors is exactly identical to Plücker coordinates \cite{nguyen_notes_2020}.
 
 The versors of PGA correspond to elements of the Euclidean group $\operatorname{E}\left(n\right)$: the exponentiation of bivectors can produce the usual VGA rotors, but bivectors with the degenerate $e_0$ component produce translations.
 We refer to motors with a translation component \textit{motors}, and this term includes pure translations as well as screw motions, their composition with rotations.
-It is also possible to construct projective geometric algebras with modeling dimensions that do not square to zero, and the sign of the square of the modeling dimension corresponds to the curvature of the space.\cite{Gunn_PGA}
+It is also possible to construct projective geometric algebras with modeling dimensions that do not square to zero, and the sign of the square of the modeling dimension corresponds to the curvature of the space \cite{Gunn_PGA}.
 This allows us to reinterpret $n$-dimensional VGA as a homogeneous model of geometry on an $n$-sphere.
 
 \subsubsection{Conformal geometric algebra}
 
-Conformal geometric algebra (CGA) augments a vanilla geometric algebra with two extra dimensions, one positive-squaring and one negative-squaring, corresponding to the Clifford algebra $\ClR{n+1,1,0}$.\cite{Doran2002}
+Conformal geometric algebra (CGA) augments a vanilla geometric algebra with two extra dimensions, one positive-squaring and one negative-squaring, corresponding to the Clifford algebra $\ClR{n+1,1,0}$ \cite{Doran2002}.
 The two extra modeling dimensions are spanned by the basis $1$-blades, which we denote here as $e_{-}$ and $e_{+}$, squaring to $-1$ and $+1$, respectively.
 However, it is usually more convenient to use a basis of two null (zero-squaring) $1$-blades, $n_0$ and $n_\infty$, corresponding to the point at the origin and the point at infinity:
 \begin{flalign}
@@ -358,7 +358,7 @@ n_0
 n_\infty
     & = e_{-} + e_{+}
 \end{flalign}
-The $1$-blades of CGA are $\left(n - 1\right)$-spheres, and like in PGA, the wedge product of $k$ $1$-blades corresponds to the intersections between $k$ spheres (or a $k$-pencil of spheres), which are also spheres of lower dimension.\cite{chomicki_pencils_2024}
+The $1$-blades of CGA are $\left(n - 1\right)$-spheres, and like in PGA, the wedge product of $k$ $1$-blades corresponds to the intersections between $k$ spheres (or a $k$-pencil of spheres), which are also spheres of lower dimension \cite{chomicki_pencils_2024}.
 However, these spheres may have radius 0 (points), infinite radius (flat planes), or even an imaginary radius, supplying information about the orientation of the object or how two objects intersect.
 A sphere of radius $r$ and with coordinates $\left(x, y, z\right)$ is given by a blade of the form 
 \begin{flalign}
@@ -612,7 +612,7 @@ Future work on the Julia compiler, particularly on the implementation of \texttt
 
 \subsection{Operator precedence and associativity}
 
-In some published literature\cite{GA4P}\cite{CA2GC} and some software packages in different languages (such as galgebra)\cite{galgebra}, the geometric product is generally given lower precedence than the wedge product, which is lower than either contractions or dot products. 
+In some published literature \cite{GA4P}\cite{CA2GC} and some software packages in different languages (such as galgebra)\cite{galgebra}, the geometric product is generally given lower precedence than the wedge product, which is lower than either contractions or dot products. 
 However, these conventions do not appear to be standardized, and precedence may not even be defined for some operations, like the regressive product.
 
 In Julia, the list of allowed operators and their precedences are hard-coded into the language.
@@ -624,8 +624,8 @@ For this reason, we strongly recommend explicitly using parentheses when orderin
 \subsection{Numerical stability}
 
 Not all operations in this package are necessarily numerically stable.
-In particular, this is true of the wedge product: repeated wedge products can accumulate significant error.\cite{de_keninck_hyperwedge_2020}
-We plan to mitigate this in the case of wedging $n$ $1$-blades together by using the techinques from linear algebra suggested by de Keninck et. al., but we also seek to improve the stability when wedging fewer than $n$ blades together.
+In particular, this is true of the wedge product: repeated wedge products can accumulate significant error \cite{de_keninck_hyperwedge_2020}.
+We plan to mitigate this in the case of wedging $n$ $1$-blades together by using the techinques from linear algebra suggested by de Keninck et. al., but we also seek to improve numerical stability when wedging fewer than $n$ blades together.
 
 However, this should not be taken to mean that geometric algebra is necessarily an inferior choice where numerical stability is critical.
 The choice of approach should factor in the different ways error can manifest in a particular application.
@@ -635,7 +635,7 @@ In cases where the preservation of orthonormality is critical, transforms built 
 
 The highest priorities in future releases of CliffordNumbers.jl is ensuring that package methods are numerically stable and providing performant implementations of commonly used sequences of operations, such as the sandwich product.
 While the topic of numerical stability for operations in geometric algebra has not been thoroughly explored, we may use existing techniques from linear algebra or develop analogous modifications to naive algorithms.
-Of interest is the ability to express the Gram-Schmidt process in terms of wedge products,\cite{GA4P} since the naively implemented Gram-Schmidt process is numerically unstable, but admits modifications and alternative algorithms that are stable.
+Of interest is the ability to express the Gram-Schmidt process in terms of wedge products \cite{GA4P}, since the naively implemented Gram-Schmidt process is numerically unstable, but admits modifications and alternative algorithms that are stable.
 
 We plan to extend CliffordNumbers.jl to interoperate with more of the Julia ecosystem, particularly Julia's standard libraries.
 Package extensions already exist for the LinearAlgebra standard library,  StaticArrays.jl, and Quaternions.jl to encourage interoperation with existing code.
@@ -644,10 +644,10 @@ The implementation of forward mode automatic differentiation may be facilitated 
 This will facilitate the use of multivector types from CliffordNumbers.jl as drop-in replacements for ordinary scalar weights.
 
 Additionally, work has begun on integrating \texttt{AbstractCliffordNumber} with Julia's random number generation functionality, including methods for \texttt{randn} and \texttt{rand} for $1$-blades of VGA, PGA, and CGA.
-This work will be extended to the Distributions.jl package\cite{JSSv098i16} to support other useful distributions of blades or rotors over Clifford algebras.
-In the far future, we hope to work on providing an implementation of the Clifford-Fourier transform.\cite{clifford-fourier}
+This work will be extended to the Distributions.jl package \cite{JSSv098i16} to support other useful distributions of blades or rotors over Clifford algebras.
+In the far future, we hope to work on providing an implementation of the Clifford-Fourier transform \cite{clifford-fourier}.
 This transform generalizes the Fourier transform to arbitrary dimensions without the need for complex numbers.
-Along with a single-sided transform that generalizes the bivector properties of the complex numbers, a double-sided transform can also be constructed from the sandwich product.\cite{double-sided-clifford-fourier}
+Along with a single-sided transform that generalizes the bivector properties of the complex numbers, a double-sided transform can also be constructed from the sandwich product \cite{double-sided-clifford-fourier}.
 
 \section{Acknowledgements}
 
