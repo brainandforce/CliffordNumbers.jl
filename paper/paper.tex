@@ -433,7 +433,8 @@ Converting an $(n-1)$-blade of VGA to \texttt{Point} is also relatively easy, bu
 and center.
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={plotting:points}, 
     caption={Converting VGA $1$-blades and and PGA $n-1$-blades to GeometryBasics points.}
 ]
@@ -455,7 +456,8 @@ end
 Converting a CGA 1-blade to a hypersphere requires us to recover the radius and center.
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={plotting:hypersphere}, 
     caption={Converting 1-blades of CGA to GeometryBasics.jl hyperspheres.}
 ]
@@ -488,7 +490,8 @@ Makie.jl does not have a built-in function to directly plot a line of the form $
 We can transform our coefficients to produce the correct form for \texttt{ablines}, but vertical lines will not plot at all.
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={plotting:hyperplanes}, 
     caption={Plotting 1-blades of PGA to GeometryBasics.jl hyperspheres.}
 ]
@@ -518,7 +521,8 @@ While the Cauchy distribution is pathological in that it has no mean or variance
 One of the most common constructions of the Cauchy distribution is from the intersection of uniformly distributed random rays with a plane. This process can be illustrated easily with 2D PGA. We generate random rays through the origin, then find their meet by taking their wedge product with the line at $y = -1$:
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={cauchy:ray-line}, 
     caption={Ray-line intersections.}
 ]
@@ -541,7 +545,8 @@ intersections = wedge.(line, rays)
 The multidimensional Cauchy distribution also arises naturally in $n$-dimensional PGA by generating $n-1$-blades with coefficients drawn from a standard normal distribution. We recover the coordinates of a point by dividing all other blade coefficients by the $e_0$ coefficient, which generates the Cauchy distribution as a ratio distribution.
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={cauchy:multidimensional}, 
     caption={The multidimensional Cauchy distribution.}
 ]
@@ -567,7 +572,8 @@ To construct a filtration, we take a point cloud and select a range of radii to 
 We can do this easily with CGA tooling: along with a function for generating CGA spheres, we also include a function for measuring their squared radii.
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={tda:cga_sphere}, 
     caption={Constructing and measuring CGA spheres.}
 ]
@@ -604,7 +610,8 @@ But given a CGA round $r$, we can always construct a sphere with the same center
 With CliffordNumbers.jl, we can define a function to perform this construction as part of Welzl's algorithm.
 \begin{lstlisting}[
     language = Julia, 
-    numbers=left, 
+    numbers=left,
+    breaklines,
     label={tda:cga}, 
     caption={Constructing a sphere from any round.}
 ]
