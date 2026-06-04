@@ -39,6 +39,24 @@ end
     @test conj(k3) === KVector{3,VGA(3),Float64}(1)
 end
 
+@testset "Sign automorphism parity across types" begin
+    # The closed-form (KVector) and `@generated` (dense / Z2) implementations must agree with the
+    # original generic indexing semantics `T(x[f.(BladeIndices(T))])` for every type and grade.
+    # This also locks in `reverse(::KVector)` and the GPU-safe generated paths in src/math/duals.jl.
+    refauto(f, x) = (T = typeof(x); T(x[f.(CliffordNumbers.BladeIndices(T))]))
+    types = (
+        CliffordNumber{VGA(3)}, EvenCliffordNumber{VGA(3)}, OddCliffordNumber{VGA(3)},
+        KVector{0,VGA(3)}, KVector{1,VGA(3)}, KVector{2,VGA(3)}, KVector{3,VGA(3)},
+        CliffordNumber{STA}, EvenCliffordNumber{PGA(3)}, KVector{2,PGA(3)},
+    )
+    for C in types
+        x = C(ntuple(i -> Float64(i) - 2.5, nblades(C)))
+        for f in (reverse, adjoint, conj, grade_involution)
+            @test f(x) === refauto(f, x)
+        end
+    end
+end
+
 @testset "Complements and duals" begin
     # We don't have support for the wedge product of BladeIndex
     # But assuming an orthonormal basis, the geometric product suffices
