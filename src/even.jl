@@ -17,7 +17,9 @@ This type is not exported, and usually you will want to refer to the following a
 struct Z2CliffordNumber{P,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function Z2CliffordNumber{P,Q,T,L}(x::Tuple) where {P,Q,T,L}
-        @assert P isa Bool "The first type parameter must be a Bool (got $P)."
+        # Constant (non-interpolated) assertion messages: an interpolated message allocates a
+        # `String` in the throw path, which GPU compilers reject (`jl_alloc_string` is unsupported).
+        @assert P isa Bool "The first type parameter of Z2CliffordNumber must be a Bool."
         check_element_count(div(blade_count(Q), 2), L, x)
         return new(x)
     end

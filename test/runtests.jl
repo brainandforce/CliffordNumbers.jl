@@ -1,6 +1,7 @@
 using CliffordNumbers
 using Aqua, Test
 using LinearAlgebra, Quaternions, StaticArrays, Unitful
+using Adapt
 
 Aqua.test_all(CliffordNumbers; unbound_args = false)
 
@@ -20,6 +21,7 @@ end
     include("indexing.jl")
     include("conversion.jl")
     include("operations.jl")
+    include("ext/Adapt.jl")
     include("ext/LinearAlgebra.jl")
     include("ext/Quaternions.jl")
     include("ext/StaticArraysCore.jl")
