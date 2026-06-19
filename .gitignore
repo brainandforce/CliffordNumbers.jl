@@ -29,3 +29,6 @@ Manifest.toml
 
 # Custom sysimage (made by PackageCompiler.jl)
 JuliaSysimage.so
+
+# Local scratch, planning docs, and per-session memory (not part of the package)
+.local/
