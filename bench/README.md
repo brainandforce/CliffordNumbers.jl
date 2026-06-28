@@ -1,0 +1,77 @@
+# CliffordNumbers benchmark suite
+
+A CliffordNumbers-owned benchmark suite keyed off the Julia primitives users
+reach for when geometric algebra "feels slow". Each workload pairs a Clifford
+type with the stdlib / `Quaternions.jl` baseline it is isomorphic to, so every
+row reports **both** a timing ratio and an algebra-drift check (the Clifford
+result compared to the primitive result). That makes the suite useful as a
+correctness regression even when the timing budget is too small for meaningful
+numbers.
+
+## Running
+
+```sh
+# CI smoke (default 0.5 s per workload)
+julia bench/runbenchmarks.jl
+
+# Real numbers, threaded
+BENCH_SECONDS=5 julia -t auto bench/runbenchmarks.jl
+```
+
+The runner activates and instantiates the `bench/` environment itself; the
+`[sources]` entry in `bench/Project.toml` pins it to the in-repo CliffordNumbers
+rather than a registered release. The process exits non-zero if any
+algebra-drift check fails.
+
+`BENCH_SECONDS` is the per-workload time budget: 0.5 s is a quick smoke value,
+5 s gives stable numbers.
+
+## Layout
+
+- `harness.jl` — `BENCH_SECONDS`, the ℂ/ℍ isomorphism helpers, the
+  `dense`/`densematch` compact-vs-dense helpers, and the measure-and-report
+  scaffolding.
+- `bench_complex.jl` — `Spinor{T} = EvenCliffordNumber{VGA(2),T,2}` (≅ ℂ):
+  pointwise `*`, `z² + c`, Horner deg-8, Mandelbrot/Julia escape grids, a
+  contour integral, and single-call `*` / `inv` / `versor_inverse` microbenches.
+  This is the acceptance baseline for PR-SpinorFastPaths.
+- `bench_quaternion.jl` — `Rotor{T} = EvenCliffordNumber{VGA(3),T,4}` (Cl⁺(3) ≅ ℍ):
+  compose, single and batched sandwich (`N ∈ {100, 100k, 1M}`), slerp, and
+  chain-compose. The batched-sandwich rows are the hot spots PR-ArrayVectorization
+  targets.
+- `bench_multivector.jl` — `KVector` / `EvenCliffordNumber` / `OddCliffordNumber`
+  / `CliffordNumber` over PGA/CGA/VGA, mirroring the operations of
+  ComputationalGeometricAlgebra.jl: `meet` (`∧`), `join` (`∨`), `project`,
+  `move`/`rotate` and `reflect` (the sandwich `M X M̃`), `exp`-generated rotors /
+  motors, contractions, complements, automorphisms and inverses. Each row times
+  the **compact** representation an application actually stores against the
+  identical computation on the fully **dense** `CliffordNumber`; the ratio is the
+  payoff of the tight type and the drift check is coefficient equality between the
+  two. Groups: `bench_kvector` (primitives & incidence), `bench_even` (rotors /
+  motors), `bench_odd` (reflections), `bench_general` (full multivectors &
+  inverse validation), and `bench_simd` — the same kernels broadcast over arrays
+  at `N ∈ {1024, 65536, 1M}` to surface SIMD/throughput hot spots.
+
+## A note on the compact-vs-dense baseline
+
+The general Clifford types have no single stdlib primitive to race against the
+way `Complex`/`Quaternion` serve the ℂ/ℍ benches. Instead `bench_multivector.jl`
+times the compact representation (`KVector` for a geometric primitive,
+`EvenCliffordNumber` for a rotor/motor, `OddCliffordNumber` for a reflection)
+against the *same* operation carried out on the dense `CliffordNumber` of the
+same algebra. `CN/ref < 1` means the compact type wins (the usual case — it never
+computes the zero coefficients dense storage carries); `CN/ref > 1` flags a
+compact path that is *slower* than brute-forcing the dense multivector and is a
+concrete optimization target. The drift check (`densematch`) embeds the compact
+result back into the dense type and compares coefficients, so it is convention-
+free and doubles as a correctness regression.
+
+## A note on the ℍ isomorphism
+
+The vector-space conversion `Quaternion(::EvenCliffordNumber)` shipped by
+CliffordNumbers is not a ring homomorphism in raw coordinates — the two trailing
+bivector slots line up with the quaternion j/k axes in swapped order. The
+compose/chain workloads therefore go through `as_hamilton` (defined in
+`harness.jl`), which applies that swap so `as_hamilton(a*b) == as_hamilton(a) * as_hamilton(b)`
+and ℍ multiplication is a valid drift oracle. The sandwich workloads avoid the
+question entirely by checking norm preservation, which is convention-free.
