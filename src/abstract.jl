@@ -240,14 +240,18 @@ for type (must be an `Int`) and value (must be equal to `sz`).
 
 This function returns nothing, but throws an `AssertionError` for failed checks.
 """
+# The assertion messages here are deliberately constant `String` literals rather than interpolated
+# strings: an interpolated message allocates a `String` in the (compiled but rarely taken) throw
+# path, and GPU compilers reject that allocation (`jl_alloc_string` has no device implementation).
+# For concrete types these checks are statically true and get eliminated entirely on device.
 @inline function check_element_count(sz, data)
-    @assert length(data) == sz "Expected $sz scalars from input, got $(length(data))"
+    @assert length(data) == sz "Number of input scalars does not match the expected count for this type."
     return nothing
 end
 
 @inline function check_element_count(sz, L, data)
-    @assert L isa Int "Length type parameter must be an Int (got $(typeof(L)))."
-    @assert L == sz "Length type parameter must equal $sz (got $L)."
+    @assert L isa Int "The length type parameter L must be an Int."
+    @assert L == sz "The length type parameter L does not match the expected number of scalars."
     check_element_count(sz, data)
 end
 

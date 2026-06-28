@@ -9,7 +9,9 @@ k-vectors have `binomial(dimension(Q), K)` components.
 struct KVector{K,Q,T<:BaseNumber,L} <: AbstractCliffordNumber{Q,T}
     data::NTuple{L,T}
     function KVector{K,Q,T,L}(x::Tuple) where {K,Q,T,L}
-        @assert 0 <= K <= dimension(Q) "K can only range from 0 to $(dimension(Q)) (got $K)."
+        # Constant (non-interpolated) assertion message to keep the throw path GPU-safe; an
+        # interpolated message allocates a `String`, which GPU compilers cannot lower.
+        @assert 0 <= K <= dimension(Q) "K is outside the valid grade range 0:dimension(Q)."
         check_element_count(binomial(dimension(Q), K), L, x)
         return new{K,Q,T,L}(x)
     end
