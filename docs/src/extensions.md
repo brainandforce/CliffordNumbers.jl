@@ -60,12 +60,11 @@ automorphisms (`reverse`, `adjoint`, `conj`, `grade_involution`), [`scalar_produ
 through these rules — no dedicated rule is needed.
 
 The cotangent (gradient) of a Clifford number is itself a Clifford number of the same type, and a
-`ChainRulesCore.ProjectTo` is registered so that gradients are always projected back onto the grade
-structure of the primal. The geometric-product pullback is the exact transpose of the bilinear
-Cayley product, computed at compile time from the same machinery as the product itself, so it is
-correct in every metric signature — Euclidean, indefinite (e.g. spacetime algebra), and degenerate
-(e.g. projective GA) alike. In a positive-definite algebra it reduces to the familiar form
-`Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
+`ChainRulesCore.ProjectTo` is registered to project gradients back onto the grade structure of the
+primal. The geometric-product pullback is the exact transpose of the bilinear Cayley product,
+computed at compile time from the same machinery as the product, so it is correct in every metric
+signature (Euclidean, indefinite, and degenerate). In a positive-definite algebra it reduces to the
+familiar `Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
 
 ```julia-repl
 julia> using CliffordNumbers, Zygote

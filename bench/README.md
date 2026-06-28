@@ -1,12 +1,11 @@
 # CliffordNumbers benchmark suite
 
-A CliffordNumbers-owned benchmark suite keyed off the Julia primitives users
-reach for when geometric algebra "feels slow". Each workload pairs a Clifford
-type with the stdlib / `Quaternions.jl` baseline it is isomorphic to, so every
-row reports **both** a timing ratio and an algebra-drift check (the Clifford
-result compared to the primitive result). That makes the suite useful as a
-correctness regression even when the timing budget is too small for meaningful
-numbers.
+A benchmark suite keyed off the Julia primitives users reach for when geometric
+algebra "feels slow". Each workload pairs a Clifford type with the stdlib /
+`Quaternions.jl` baseline it is isomorphic to and reports a timing ratio together
+with an algebra-drift check (the Clifford result compared to the primitive
+result), so the suite is also a correctness regression when the timing budget is
+too small for meaningful numbers.
 
 ## Running
 
@@ -63,34 +62,30 @@ consolidated branch; every row passes its algebra-drift check.
   ComputationalGeometricAlgebra.jl: `meet` (`∧`), `join` (`∨`), `project`,
   `move`/`rotate` and `reflect` (the sandwich `M X M̃`), `exp`-generated rotors /
   motors, contractions, complements, automorphisms and inverses. Each row times
-  the **compact** representation an application actually stores against the
-  identical computation on the fully **dense** `CliffordNumber`; the ratio is the
-  payoff of the tight type and the drift check is coefficient equality between the
-  two. Groups: `bench_kvector` (primitives & incidence), `bench_even` (rotors /
-  motors), `bench_odd` (reflections), `bench_general` (full multivectors &
-  inverse validation), and `bench_simd` — the same kernels broadcast over arrays
-  at `N ∈ {1024, 65536, 1M}` to surface SIMD/throughput hot spots.
+  the compact representation against the same computation on the dense
+  `CliffordNumber` (see the note below). Groups: `bench_kvector` (primitives &
+  incidence), `bench_even` (rotors / motors), `bench_odd` (reflections),
+  `bench_general` (full multivectors & inverse validation), and `bench_simd`, the
+  same kernels broadcast over arrays at `N ∈ {1024, 65536, 1M}`.
 
 ## A note on the compact-vs-dense baseline
 
 The general Clifford types have no single stdlib primitive to race against the
 way `Complex`/`Quaternion` serve the ℂ/ℍ benches. Instead `bench_multivector.jl`
-times the compact representation (`KVector` for a geometric primitive,
-`EvenCliffordNumber` for a rotor/motor, `OddCliffordNumber` for a reflection)
-against the *same* operation carried out on the dense `CliffordNumber` of the
-same algebra. `CN/ref < 1` means the compact type wins (the usual case — it never
-computes the zero coefficients dense storage carries); `CN/ref > 1` flags a
-compact path that is *slower* than brute-forcing the dense multivector and is a
-concrete optimization target. The drift check (`densematch`) embeds the compact
-result back into the dense type and compares coefficients, so it is convention-
-free and doubles as a correctness regression.
+times the compact representation (`KVector`, `EvenCliffordNumber`, or
+`OddCliffordNumber`) against the same operation on the dense `CliffordNumber` of
+the same algebra. `CN/ref < 1` means the compact type wins, since it never
+computes the zero coefficients dense storage carries; `CN/ref > 1` flags a
+compact path slower than the dense one, an optimization target. The drift check
+(`densematch`) embeds the compact result into the dense type and compares
+coefficients, so it is convention-free.
 
 ## A note on the ℍ isomorphism
 
 The vector-space conversion `Quaternion(::EvenCliffordNumber)` shipped by
-CliffordNumbers is not a ring homomorphism in raw coordinates — the two trailing
+CliffordNumbers is not a ring homomorphism in raw coordinates: the two trailing
 bivector slots line up with the quaternion j/k axes in swapped order. The
-compose/chain workloads therefore go through `as_hamilton` (defined in
-`harness.jl`), which applies that swap so `as_hamilton(a*b) == as_hamilton(a) * as_hamilton(b)`
-and ℍ multiplication is a valid drift oracle. The sandwich workloads avoid the
-question entirely by checking norm preservation, which is convention-free.
+compose/chain workloads therefore go through `as_hamilton` (in `harness.jl`),
+which applies that swap so `as_hamilton(a*b) == as_hamilton(a) * as_hamilton(b)`
+and ℍ multiplication is a valid drift oracle. The sandwich workloads instead
+check norm preservation, which is convention-free.

@@ -1,15 +1,11 @@
 #---Logarithms and square roots of even multivectors-----------------------------------------------#
-# These operations invert `exp` on the even subalgebra: they map a rotor or motor (a versor of even
-# grade, with `x * x' ≈ 1`) back to the bivector that generates it. The algorithms here follow the
-# "simple invariant decomposition" of Hadfield, Wieser, and Lasenby: a bivector in fewer than six
-# dimensions splits into at most two commuting simple bivectors, each of which exponentiates within
-# its own plane. The decomposition is recovered from the scalar, grade-2, and grade-4 parts of the
-# rotor, which lets `log` and `sqrt` cover the Euclidean (elliptic), Lorentzian (hyperbolic), and
-# degenerate (parabolic/ideal) cases uniformly.
-#
-# Scope: these methods assume `x` is a unit rotor or motor (the image of `exp` on a bivector). They
-# are not intended for general even multivectors that carry both a rotor and an independent ideal
-# part beyond the motor case, nor for non-unit dilators.
+# These invert `exp` on the even subalgebra, mapping a unit rotor or motor
+# (`x * x' ≈ 1`) back to its generating bivector. The algorithm is the "simple
+# invariant decomposition" of Hadfield, Wieser, and Lasenby: below six dimensions
+# a bivector splits into at most two commuting simple bivectors, recovered from
+# the scalar, grade-2, and grade-4 parts of the rotor. This covers the elliptic,
+# hyperbolic, and degenerate (ideal) cases uniformly. Non-unit dilators and even
+# multivectors with an ideal part beyond the motor case are out of scope.
 
 @inline _grade2(x::AbstractCliffordNumber{Q}) where Q = KVector{2,Q}(x)
 @inline _grade4(x::AbstractCliffordNumber{Q}) where Q = KVector{4,Q}(x)

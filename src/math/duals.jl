@@ -6,11 +6,10 @@
 Applies the sign-changing grade automorphism named by the `Symbol` `F` (`:adjoint`, `:reverse`,
 `:conj`, or `:grade_involution`) to `x`.
 
-These automorphisms act blade-by-blade: each coefficient maps to a fixed storage position with a
-fixed sign. The generic indexing form `T(x[F.(BladeIndices(T))])` resolves those positions at
-runtime through `to_index`, which does not lower on the GPU (it allocates and dispatches
-dynamically). This generated implementation resolves every position and sign at compile time and
-emits pure tuple arithmetic, which is allocation-free and GPU-safe.
+Each coefficient maps to a fixed storage position with a fixed sign. The generic indexing form
+`T(x[F.(BladeIndices(T))])` resolves those positions at runtime through `to_index`, which does not
+lower on the GPU. This generated form resolves every position and sign at compile time, emitting
+allocation-free, GPU-safe tuple arithmetic.
 """
 @generated function _sign_automorphism(x::T, ::Val{F}) where {T<:AbstractCliffordNumber,F}
     f = getfield(@__MODULE__, F)
@@ -51,7 +50,7 @@ complement applied to each output blade index, mirroring the definitions
 
 where `C = complement_type(T)`. Resolving each output coefficient to a tuple position and sign at
 compile time avoids the runtime `to_index` blade search the generic indexing path incurs for
-`KVector` (and the dynamic dispatch that path emits, which does not lower on GPU).
+`KVector`, and lowers on the GPU.
 """
 function _complement_expr(::Type{T}, blade_complement) where T<:AbstractCliffordNumber
     C = complement_type(T)

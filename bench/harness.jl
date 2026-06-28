@@ -1,10 +1,8 @@
-# Shared scaffolding for the CliffordNumbers benchmark suite.
-#
-# Every workload is measured against the Julia primitive a user would otherwise
-# reach for (`Complex{T}` or `Quaternion{T}`), so each row reports both a timing
-# ratio *and* an algebra-drift check: the Clifford result is compared to the
-# primitive result, and a mismatch flags a regression in the geometric product /
-# inverse / reverse path even when the timing budget is too small to be useful.
+# Shared scaffolding for the benchmark suite. Every workload is measured against
+# the Julia primitive a user would otherwise reach for (`Complex{T}` or
+# `Quaternion{T}`) and reports a timing ratio plus an algebra-drift check, so a
+# mismatch flags a regression even when the timing budget is too small to be
+# useful.
 
 using BenchmarkTools
 using CliffordNumbers
@@ -24,14 +22,11 @@ const Spinor{T} = EvenCliffordNumber{VGA(2),T,2}
 tospinor(z::Complex{T}) where T = Spinor{T}((real(z), imag(z)))
 ascomplex(s::Spinor) = (t = Tuple(s); complex(t[1], t[2]))
 
-# The even subalgebra of VGA(3) is isomorphic to ℍ. Note that the vector-space
-# conversion `Quaternion(::EvenCliffordNumber)` shipped by CliffordNumbers is NOT
-# a ring homomorphism in raw coordinates: the two trailing bivector slots line up
-# with the quaternion j/k axes in swapped order. `as_hamilton` applies that swap,
-# giving `as_hamilton(a*b) == as_hamilton(a) * as_hamilton(b)`, which is what lets
-# the rotor-compose workloads use ℍ multiplication as a drift oracle. (The raw
-# `Quaternion(...)` is still used for the slerp check, which is self-consistent
-# through CliffordNumbers' own slerp regardless of the swap.)
+# The even subalgebra of VGA(3) is isomorphic to ℍ, but `Quaternion(::Even...)`
+# is not a ring homomorphism in raw coordinates: the two trailing bivector slots
+# match the quaternion j/k axes in swapped order. `as_hamilton` applies that swap
+# so `as_hamilton(a*b) == as_hamilton(a) * as_hamilton(b)`, making ℍ
+# multiplication a valid drift oracle for the compose workloads.
 const Rotor{T} = EvenCliffordNumber{VGA(3),T,4}
 const Vec3{T} = KVector{1,VGA(3),T,3}
 
@@ -68,12 +63,9 @@ end
 """Element-wise `isapprox` over two equal-length collections."""
 approxall(a, b; kw...) = length(a) == length(b) && all(((x, y),) -> isapprox(x, y; kw...), zip(a, b))
 
-# The multivector workloads (`bench_kvector` / `bench_even` / `bench_odd`) have no
-# stdlib primitive to compare against the way `Complex`/`Quaternion` serve the ℂ/ℍ
-# benches. Instead they time a *compact* representation (`KVector`, `EvenCliffordNumber`,
-# `OddCliffordNumber`) against the identical computation on the fully *dense*
-# `CliffordNumber`, so the ratio measures the payoff of choosing the tight type and the
-# drift check is convention-free coefficient equality between the two representations.
+# The multivector workloads have no stdlib primitive, so they time a compact
+# representation against the same computation on the dense `CliffordNumber`. The
+# drift check is convention-free coefficient equality between the two.
 dense(x::AbstractCliffordNumber{Q}) where Q = CliffordNumber{Q}(x)
 dense(x::Number) = x   # scalar-valued ops (e.g. `scalar_product`) compare directly
 

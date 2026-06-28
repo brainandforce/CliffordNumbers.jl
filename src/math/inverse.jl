@@ -24,10 +24,9 @@ dimensions, 1 + e₁ has no inverse). To validate the result, use `inv(x)` inste
 versor_inverse(x::AbstractCliffordNumber) = x' / abs2(x)
 
 # Closed forms for the low-dimensional positive-definite even subalgebras (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ).
-# These emit `x' / abs2(x)` as a single fused expression: the reverse `x'` is folded into the
-# component signs (no intermediate Clifford number), `abs2` is the inlined sum of squares, and the
-# modulus is reciprocated once and multiplied through rather than dividing each component (one divide
-# instead of 2 / 4).
+# These emit `x' / abs2(x)` as one fused expression: the reverse is folded into the component signs,
+# `abs2` is the inlined sum of squares, and the modulus is reciprocated once and multiplied through
+# (one divide instead of 2 / 4).
 function versor_inverse(x::EvenCliffordNumber{VGA(2)})
     (a, b) = Tuple(x)
     s = inv(muladd(a, a, b * b))
