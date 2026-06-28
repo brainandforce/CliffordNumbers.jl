@@ -1,6 +1,6 @@
 using CliffordNumbers
 using Aqua, Test
-using LinearAlgebra, Quaternions, StaticArrays, Unitful
+using LinearAlgebra, Quaternions, StaticArrays, StructArrays, Unitful
 using Adapt
 using Random
 
@@ -26,5 +26,6 @@ end
     include("ext/LinearAlgebra.jl")
     include("ext/Quaternions.jl")
     include("ext/StaticArraysCore.jl")
+    include("ext/StructArrays.jl")
     include("ext/Unitful.jl")
 end

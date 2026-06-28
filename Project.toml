@@ -8,6 +8,7 @@ Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Quaternions = "94ee1d12-ae83-5a48-8b1c-48b8ff168ae0"
 StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [extensions]
@@ -15,6 +16,7 @@ CliffordNumbersAdaptExt = "Adapt"
 CliffordNumbersLinearAlgebraExt = "LinearAlgebra"
 CliffordNumbersQuaternionsExt = "Quaternions"
 CliffordNumbersStaticArraysCoreExt = "StaticArraysCore"
+CliffordNumbersStructArraysExt = "StructArrays"
 CliffordNumbersUnitfulExt = "Unitful"
 
 [compat]
@@ -22,5 +24,6 @@ Adapt = "3, 4"
 LinearAlgebra = "1"
 Quaternions = "0.7"
 StaticArraysCore = "1"
+StructArrays = "0.6, 0.7"
 Unitful = "1"
 julia = "1.9"
