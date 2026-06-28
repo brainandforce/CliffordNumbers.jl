@@ -25,10 +25,10 @@ using .Hamming
 # New module for metric signatures
 include("metrics.jl")
 using .Metrics
-import .Metrics: dimension, blade_count, grades, is_degenerate, is_positive_definite
+import .Metrics: dimension, blade_count, grades, is_degenerate, is_positive_definite, metric_tuple
 export Metrics
 export Signature, VGA, PGA, CGA, LGA, LGAEast, LGAWest, Exterior
-export dimension, blade_count, grades, is_degenerate, is_positive_definite
+export dimension, blade_count, grades, is_degenerate, is_positive_definite, metric_tuple
 export VGA2D, VGA3D, PGA2D, PGA3D, CGA2D, CGA3D, STA, STAEast, STAWest, STAP, STAPEast, STAPWest
 # Abstract supertype for all Clifford numbers
 include("abstract.jl")

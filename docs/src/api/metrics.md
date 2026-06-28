@@ -44,4 +44,6 @@ CliffordNumbers.blade_count
 CliffordNumbers.grades
 CliffordNumbers.is_degenerate
 CliffordNumbers.is_positive_definite
+CliffordNumbers.Metrics.metric_tuple
+CliffordNumbers.Metrics.Signature(::CliffordNumbers.Metrics.AbstractSignature)
 ```
