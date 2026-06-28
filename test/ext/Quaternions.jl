@@ -46,4 +46,12 @@
     @test Quaternion(slerp(a, b, 0.5)) === slerp(qa, qb, 0.5)
     @test Quaternion(slerp(qa, b, 0.5)) === slerp(qa, qb, 0.5)
     @test Quaternion(slerp(a, qb, 0.5)) === slerp(qa, qb, 0.5)
+    # `sqrt` and `log` agree with the corresponding quaternion operations under the VGA(3) ≅ ℍ
+    # isomorphism
+    for v in ((1.0, 2.0, 3.0), (0.3, -0.5, 0.1), (2.0, 0.0, 0.0))
+        R = exp(0.7 * KVector{2,VGA(3)}(v...))
+        qR = Quaternion(R)
+        @test Quaternion(sqrt(R)) ≈ sqrt(qR)
+        @test Quaternion(log(R)) ≈ log(qR)
+    end
 end

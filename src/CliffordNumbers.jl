@@ -4,7 +4,7 @@ import Base: @propagate_inbounds, length, size, axes, getindex, to_index
 import Base: zero, one, oneunit
 import Base: signbit, sign, copysign, flipsign
 import Base: reverse, adjoint, conj, ~
-import Base: ==, isequal, isapprox, +, -, *, /, //, muladd, abs, abs2, sqrt, exp, ^
+import Base: ==, isequal, isapprox, +, -, *, /, //, muladd, abs, abs2, sqrt, exp, log, ^
 import Base: isfinite, isinf, isnan, isreal, isinteger, iseven, isodd
 import Base: promote_rule, convert, similar, float, big
 import Base: print, show, summary
@@ -79,6 +79,8 @@ export versor_inverse
 # Exponentiation
 include("math/exponential.jl")
 export exppi, exptau
+# Logarithms and square roots of rotors/motors (even multivectors)
+include("math/logarithm.jl")
 # Pretty printing
 include("show.jl")
 # Generate basis variables with a macro

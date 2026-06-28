@@ -2,6 +2,7 @@ using CliffordNumbers
 using Aqua, Test
 using LinearAlgebra, Quaternions, StaticArrays, Unitful
 using Adapt
+using Random
 
 Aqua.test_all(CliffordNumbers; unbound_args = false)
 

@@ -551,6 +551,64 @@ end
     @test_throws DomainError sqrt(KVector{0,VGA(3)}(-1))
 end
 
+@testset "exp of mixed-signature bivectors" begin
+    # In mixed-signature algebras (CGA, STA, ...) a bivector's `abs2` can be negative; when it lands
+    # in (-1, 0) the power-of-two scaling exponent in `exp_taylor` went negative and `exp` threw a
+    # DomainError. Construct such a bivector explicitly (abs2 ≈ -1/2) for each affected algebra.
+    for Q in (CGA(3), STA)
+        nb = binomial(CliffordNumbers.dimension(Q), 2)
+        rng = MersenneTwister(0xCA75)
+        local b
+        # a bivector that squares to a negative scalar, rescaled so abs2 lands in the danger zone
+        while true
+            b = KVector{2,Q}(ntuple(_ -> randn(rng), nb))
+            CliffordNumbers.abs2(b) < -0.1 && break
+        end
+        b *= sqrt(0.5 / -CliffordNumbers.abs2(b))
+        @test -1 < CliffordNumbers.abs2(b) < 0          # confirm we are in the danger zone
+        r = @test_nowarn exp(b)                         # formerly threw a DomainError
+        @test all(isfinite, Tuple(r))
+        @test isapprox(scalar(r * r'), 1; atol = 1e-8)  # exp(b) is a unit rotor
+    end
+end
+
+@testset "Logarithms and square roots of rotors" begin
+    rng = MersenneTwister(0x10AD)
+    # `exp`/`log` and `exp`/`sqrt` round-trips across vanilla, projective, conformal, and
+    # spacetime algebras, covering elliptic, hyperbolic, and degenerate (ideal) planes.
+    for Q in (VGA(2), VGA(3), VGA(4), PGA(2), PGA(3), PGA(4), STA, CGA(3))
+        d = CliffordNumbers.dimension(Q)
+        nb = binomial(d, 2)
+        for _ in 1:50
+            B = KVector{2,Q}(ntuple(_ -> 0.5 * randn(rng), nb))
+            R = exp(B)
+            # `log` inverts `exp` (principal branch round-trips through `exp`)
+            @test isapprox(exp(log(R)), R; atol = 1e-8)
+            # `log` returns a bivector
+            @test log(R) isa KVector{2,Q}
+            # `sqrt` squares back to the rotor and halves the generator
+            S = sqrt(R)
+            @test isapprox(S * S, R; atol = 1e-8)
+            @test S isa EvenCliffordNumber{Q}
+        end
+    end
+    # Principal branch: `log(exp(B)) == B` for a bivector of small magnitude
+    for Q in (VGA(3), PGA(3), STA, CGA(3))
+        d = CliffordNumbers.dimension(Q)
+        B = KVector{2,Q}(ntuple(i -> 0.1 / i, binomial(d, 2)))
+        @test isapprox(log(exp(B)), B; atol = 1e-12)
+    end
+    # Isoclinic rotor (coincident invariant planes) is a documented edge case
+    iso = KVector{2,VGA(4)}(0.7, 0, 0, 0, 0, 0.7)
+    @test isapprox(exp(log(exp(iso))), exp(iso); atol = 1e-10)
+    @test isapprox(log(exp(iso)), iso; atol = 1e-10)
+    # Type stability and allocation-freedom on the simple (≅ ℍ) path
+    R32 = exp(KVector{2,VGA(3),Float32}(0.3f0, 0.2f0, -0.1f0))
+    @test log(R32) isa KVector{2,VGA(3),Float32}
+    @test sqrt(R32) isa EvenCliffordNumber{VGA(3),Float32}
+    @test (@allocated log(R32)) == 0
+end
+
 @testset "Miscellaneous properties" begin
     # Finiteness
     @test isfinite(EvenCliffordNumber{VGA(3)}(0, 1, 2, 3))

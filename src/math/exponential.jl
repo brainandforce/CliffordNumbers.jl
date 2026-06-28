@@ -100,7 +100,10 @@ bottleneck.
         # Scale down the magnitude of x to prevent overflow
         # Use a power of 2 to simplify the later exponentiation
         # TODO: do this with abs2 instead of abs?
-        r = div(exponent(2*abs2(x) + 1), 2)
+        # In mixed-signature algebras `abs2(x)` can be negative. Clamp `2*abs2 + 1` to at least 1 so
+        # the scaling exponent `r` is never negative (which would scale the argument *up*, and make
+        # `2^r` throw for `r::Int < 0`) and `exponent` is never handed `±0.0` (which it rejects).
+        r = div(exponent(max(2*abs2(x) + 1, one(real(scalar_type(x))))), 2)
         # Promote the argument to the final return type
         y = convert($T, x / (2^r))
     end
