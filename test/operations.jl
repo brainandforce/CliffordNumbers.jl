@@ -270,6 +270,85 @@ end
     @test_throws CliffordNumbers.InverseException inv(1 + KVector{1,VGA(2)}(1, 0))
 end
 
+@testset "Even subalgebra fast paths" begin
+    import CliffordNumbers: versor_inverse
+    # Split (e₁₂² = +1) and dual (e₁₂² = 0) dimension-2 signatures, to cover every σ branch of the
+    # closed-form spinor product alongside VGA(2) (e₁₂² = -1).
+    Qsplit = CliffordNumbers.Metrics.Signature(2, 0b10, 0b00)   # e₂² = -1 ⟹ e₁₂² = +1
+    Qdual = PGA(1)                                              # e₀² =  0 ⟹ e₀₁² =  0
+
+    @testset "Closed-form spinor product / square" begin
+        # Exact integer cases pin the (a·c + σ·b·d, a·d + b·c) formula per signature
+        @test EvenCliffordNumber{VGA(2)}(2, 3) * EvenCliffordNumber{VGA(2)}(4, 5) ===
+            EvenCliffordNumber{VGA(2)}(2*4 - 3*5, 2*5 + 3*4)        # σ = -1 → (-7, 22)
+        @test EvenCliffordNumber{Qsplit}(2, 3) * EvenCliffordNumber{Qsplit}(4, 5) ===
+            EvenCliffordNumber{Qsplit}(2*4 + 3*5, 2*5 + 3*4)        # σ = +1 → (23, 22)
+        @test EvenCliffordNumber{Qdual}(2, 3) * EvenCliffordNumber{Qdual}(4, 5) ===
+            EvenCliffordNumber{Qdual}(2*4, 2*5 + 3*4)               # σ =  0 → (8, 22)
+        @test EvenCliffordNumber{VGA(2)}(2, 3)^2 === EvenCliffordNumber{VGA(2)}(2*2 - 3*3, 2*2*3)
+        # The closed form must agree with the generic kernel (reached via CliffordNumber promotion)
+        # and, for VGA(2), with ℂ. The wedge must still take the generic path, not the `*` fast path.
+        for _ in 1:50
+            (a, b, c, d) = randn(4)
+            s1 = EvenCliffordNumber{VGA(2)}(a, b)
+            s2 = EvenCliffordNumber{VGA(2)}(c, d)
+            generic = CliffordNumber{VGA(2)}(s1) * CliffordNumber{VGA(2)}(s2)
+            @test s1 * s2 ≈ EvenCliffordNumber{VGA(2)}(generic)
+            @test all(Tuple(s1 * s2) .≈ reim(Complex(a, b) * Complex(c, d)))
+            @test s1^2 ≈ EvenCliffordNumber{VGA(2)}(reim(Complex(a, b)^2)...)
+        end
+        @test EvenCliffordNumber{VGA(2)}(2, 3) ∧ EvenCliffordNumber{VGA(2)}(4, 5) ===
+            EvenCliffordNumber{VGA(2)}(2*4, 2*5 + 3*4)              # wedge: e₁₂ ∧ e₁₂ = 0
+    end
+
+    @testset "Rotor (ℍ) geometric product / square" begin
+        # Even VGA(3) × even VGA(3) (the rotor product) was not directly covered before. Exact
+        # integer case pins the Hamilton-product structure.
+        @test EvenCliffordNumber{VGA(3)}(2, 3, 5, 7) * EvenCliffordNumber{VGA(3)}(11, 13, 17, 19) ===
+            EvenCliffordNumber{VGA(3)}(-235, 83, 55, 129)
+        # Agreement with the 8-component product reached via CliffordNumber promotion.
+        for _ in 1:50
+            x = EvenCliffordNumber{VGA(3)}(ntuple(_ -> randn(), 4))
+            y = EvenCliffordNumber{VGA(3)}(ntuple(_ -> randn(), 4))
+            @test x * y ≈ EvenCliffordNumber{VGA(3)}(CliffordNumber{VGA(3)}(x) * CliffordNumber{VGA(3)}(y))
+            @test x^2 ≈ EvenCliffordNumber{VGA(3)}(CliffordNumber{VGA(3)}(x)^2)
+            @test x ∧ y ≈ EvenCliffordNumber{VGA(3)}(CliffordNumber{VGA(3)}(x) ∧ CliffordNumber{VGA(3)}(y))
+        end
+    end
+
+    @testset "Closed-form abs2 (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ)" begin
+        @test abs2(EvenCliffordNumber{VGA(2)}(3, 4)) === 25
+        @test abs2(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4)) === 30
+        for _ in 1:50
+            s = EvenCliffordNumber{VGA(2)}(randn(), randn())
+            r = EvenCliffordNumber{VGA(3)}(randn(), randn(), randn(), randn())
+            @test abs2(s) ≈ scalar_product(s, s')
+            @test abs2(r) ≈ scalar_product(r, r')
+        end
+    end
+
+    @testset "Validation-free / closed-form inv and versor_inverse" begin
+        # Generic versor formula, built from methods this PR does not specialize, as a reference
+        generic_versor(x) = adjoint(x) / scalar_product(x, x')
+        for _ in 1:50
+            s = EvenCliffordNumber{VGA(2)}(randn(), randn())
+            r = EvenCliffordNumber{VGA(3)}(randn(), randn(), randn(), randn())
+            @test s * inv(s) ≈ one(s)
+            @test inv(s) * s ≈ one(s)
+            @test inv(s) === versor_inverse(s)              # inv delegates, no validation
+            @test versor_inverse(s) ≈ generic_versor(s)     # closed form == x'/abs2(x)
+            @test all(Tuple(inv(s)) .≈ reim(inv(Complex(Tuple(s)...))))
+            @test r * inv(r) ≈ one(r)
+            @test inv(r) === versor_inverse(r)
+            @test versor_inverse(r) ≈ generic_versor(r)
+        end
+        # Integer input promotes to the same float type as the generic versor formula
+        @test versor_inverse(EvenCliffordNumber{VGA(2)}(3, 4)) isa EvenCliffordNumber{VGA(2),Float64,2}
+        @test typeof(versor_inverse(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4))) ===
+            typeof(generic_versor(EvenCliffordNumber{VGA(3)}(1, 2, 3, 4)))
+    end
+end
+
 @testset "Contractions and dot products" begin
     import CliffordNumbers: dot, hestenes_dot
     k = KVector{1,VGA(3)}(1, 2, 3)
@@ -364,7 +443,7 @@ end
     # Also, multiplying by x as opposed to EvenCliffordNumber{Q}(x) can have unexpected effects on
     # the signs of the result
     # TODO: try to ensure signs are propagated correctly in these tests
-    @test k^3 === k * 20 
+    @test k^3 === k * 20
     @test l^3 === EvenCliffordNumber(l) * EvenCliffordNumber{VGA(3)}(-117)
     @test m^3 === KVector{0,VGA(3),Float64}(8000)
     # Redo the same tests with an exponent variable

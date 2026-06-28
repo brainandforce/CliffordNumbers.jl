@@ -23,6 +23,23 @@ dimensions, 1 + e₁ has no inverse). To validate the result, use `inv(x)` inste
 """
 versor_inverse(x::AbstractCliffordNumber) = x' / abs2(x)
 
+# Closed forms for the low-dimensional positive-definite even subalgebras (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ).
+# These emit `x' / abs2(x)` as a single fused expression: the reverse `x'` is folded into the
+# component signs (no intermediate Clifford number), `abs2` is the inlined sum of squares, and the
+# modulus is reciprocated once and multiplied through rather than dividing each component (one divide
+# instead of 2 / 4).
+function versor_inverse(x::EvenCliffordNumber{VGA(2)})
+    (a, b) = Tuple(x)
+    s = inv(muladd(a, a, b * b))
+    return EvenCliffordNumber{VGA(2)}((a * s, -b * s))
+end
+
+function versor_inverse(x::EvenCliffordNumber{VGA(3)})
+    (a, b, c, d) = Tuple(x)
+    s = inv(muladd(a, a, muladd(b, b, muladd(c, c, d * d))))
+    return EvenCliffordNumber{VGA(3)}((a * s, -b * s, -c * s, -d * s))
+end
+
 """
     inv(x::AbstractCliffordNumber) -> AbstractCliffordNumber
 
@@ -51,6 +68,12 @@ end
 
 Base.inv(x::KVector{0,Q}) where Q = KVector{0,Q}(inv(scalar(x)))
 Base.inv(x::KVector{1,Q}) where Q = versor_inverse(x)
+
+# The even subalgebras of the low-dimensional positive-definite VGAs are division algebras
+# (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ), so an inverse exists for every `x` with `abs2(x) ≠ 0`; it equals the
+# (closed-form) versor inverse, with no need for the validating product check in the generic `inv`.
+Base.inv(x::EvenCliffordNumber{VGA(2)}) = versor_inverse(x)
+Base.inv(x::EvenCliffordNumber{VGA(3)}) = versor_inverse(x)
 
 /(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q = x * inv(y)
 \(x::AbstractCliffordNumber{Q}, y::AbstractCliffordNumber{Q}) where Q = inv(x) * y

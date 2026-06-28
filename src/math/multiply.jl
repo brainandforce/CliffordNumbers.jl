@@ -291,6 +291,47 @@ kernel just returns the geometric product.
     return :(($C)($ex))
 end
 
+"""
+    CliffordNumbers.mul(x::EvenCliffordNumber{Q,T,2}, y::EvenCliffordNumber{Q,T,2}, ::GradeFilter{:*})
+
+Closed-form geometric product for the even subalgebra of a dimension-2 algebra, whose elements
+`a + b·e₁₂` form a 2-component spinor (≅ ℂ for `VGA(2)`, the split/dual analogues for other
+signatures). Writing `σ = e₁₂²` (the sign of the pseudoscalar's square, `±1` or `0`),
+
+    (a + b·e₁₂)(c + d·e₁₂) = (a·c + σ·b·d) + (a·d + b·c)·e₁₂
+
+The generic kernel lowers this to a `map(muladd, …)` chain seeded with `zero_tuple`, whose leading
+`muladd(0, 0, x)` cannot be folded away under IEEE signed-zero rules; emitting the closed form
+directly removes that overhead. `x^2` benefits transitively, since `literal_pow(^, x, Val(2))` is
+`x * x`. Other products (`∧`, contractions) keep the generic kernel by dispatching only on
+`GradeFilter{:*}`.
+"""
+@generated function mul(
+    x::EvenCliffordNumber{Q,T,2},
+    y::EvenCliffordNumber{Q,T,2},
+    ::GradeFilter{:*} = GradeFilter{:*}()
+) where {Q,T<:BaseNumber}
+    σ = sign_of_square(last(BladeIndices(EvenCliffordNumber{Q,T,2})))
+    re = if σ > 0
+        :(muladd(a, c, b * d))
+    elseif σ < 0
+        :(muladd(a, c, -(b * d)))
+    else
+        :(a * c)
+    end
+    return quote
+        (a, b) = Tuple(x)
+        (c, d) = Tuple(y)
+        return EvenCliffordNumber{Q,T,2}(($re, muladd(a, d, b * c)))
+    end
+end
+
+# NOTE: a closed-form Hamilton product for `EvenCliffordNumber{VGA(3),T,4}` (≅ ℍ) was tried and
+# dropped. Unlike the 2-component spinor, the generic kernel below already SIMD-vectorizes the
+# 4-component product (`map(muladd, …)` over 4-tuples), so removing its `zero_tuple` seed gave no
+# benefit and a scalar/broadcast closed form measured *slower* in the compute-bound reduce case
+# (chain-compose ≈ 5.3 ns/mul generic vs ≈ 7.4–7.9 ns/mul closed). See bench/results_spinor.md.
+
 #= Update (2024-05-07)
     The performance bottlenecks for KVector arguments have been (mostly) resolved.
     This was done by resolving all BladeIndex objects to tuple indices at compile time, avoiding

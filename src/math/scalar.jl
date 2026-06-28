@@ -100,6 +100,16 @@ If `abs2(x)` is zero (possible in any non-positive-definite metric), `x` is retu
 """
 normalize(x::AbstractCliffordNumber) = (n = abs(x); ifelse(iszero(n), x, x / n))
 
+# Closed-form modulus for the positive-definite even subalgebras (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ). There
+# every even blade satisfies `sign_of_square(b) * reverse_sign(grade(b)) == +1`, so `abs2` reduces to
+# a plain sum of squares. This avoids building the reverse `x'` and the three-tuple `mapreduce` that
+# the generic `abs2(x) = scalar_product(x, x')` goes through.
+abs2(x::EvenCliffordNumber{VGA(2)}) = (t = Tuple(x); muladd(t[1], t[1], t[2] * t[2]))
+function abs2(x::EvenCliffordNumber{VGA(3)})
+    (a, b, c, d) = Tuple(x)
+    return muladd(a, a, muladd(b, b, muladd(c, c, d * d)))
+end
+
 # Optimized versions for `KVector` scalars
 abs(k::KVector{0}) = abs(scalar(k))
 abs2(k::KVector{0}) = abs2(scalar(k))
