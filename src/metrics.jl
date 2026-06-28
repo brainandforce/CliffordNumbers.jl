@@ -20,7 +20,7 @@ Aside from the generic [`Metrics.Signature`](@ref) subtype, types for commonly u
 available, including [`Metrics.VGA`](@ref), [`Metrics.PGA`](@ref), and [`Metrics.CGA`](@ref). Custom
 signatures with firmer bounds on their behavior can be implemented by subtyping this type.
 """
-abstract type AbstractSignature <: AbstractVector{Int8}
+abstract type AbstractSignature <: AbstractVector{Int16}
 end
 
 Base.IndexStyle(::Type{<:AbstractSignature}) = IndexLinear()

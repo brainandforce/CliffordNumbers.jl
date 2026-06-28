@@ -6,19 +6,12 @@
 Applies the sign-changing grade automorphism named by the `Symbol` `F` (`:adjoint`, `:reverse`,
 `:conj`, or `:grade_involution`) to `x`.
 
-Each coefficient maps to a fixed storage position with a fixed sign. The generic indexing form
-`T(x[F.(BladeIndices(T))])` resolves those positions at runtime through `to_index`, which does not
-lower on the GPU. This generated form resolves every position and sign at compile time, emitting
-allocation-free, GPU-safe tuple arithmetic.
+Each named automorphism maps every basis blade to ±itself, so the operation is the branch-free,
+allocation-free, GPU-safe `T(Tuple(x) .* blade_signs(T, Val(F)))`, with the per-slot signs resolved
+at compile time by [`blade_signs`](@ref CliffordNumbers.blade_signs).
 """
-@generated function _sign_automorphism(x::T, ::Val{F}) where {T<:AbstractCliffordNumber,F}
-    f = getfield(@__MODULE__, F)
-    inds = BladeIndices(T)
-    elements = map(1:length(inds)) do i
-        b = f(inds[i])
-        return :($(sign(b)) * Tuple(x)[$(to_index(T, b))])
-    end
-    return :(T(($(elements...),)))
+function _sign_automorphism(x::T, ::Val{F}) where {T<:AbstractCliffordNumber,F}
+    return T(map(*, Tuple(x), blade_signs(T, Val(F))))
 end
 
 for f in (:adjoint, :conj, :grade_involution, :reverse)

@@ -64,6 +64,8 @@ export widen_grade, scalar_promote
 include("math/multiply.jl")
 # Addition, subtraction, (approximate) equality
 include("math/arithmetic.jl")
+# Compile-time blade indices and automorphism signs
+include("math/bitindices.jl")
 # Grade automorphisms, complements, duals, etc.
 include("math/duals.jl")
 # Scalar products, absolute values, scalar multiplication
@@ -76,6 +78,8 @@ export ⨼, ⨽, ∧, ∨, ×, ⨰
 # Inverses, if they exist
 include("math/inverse.jl")
 export versor_inverse
+# Determinant, trace, and characteristic polynomial of the left-multiplication operator
+include("math/determinant.jl")
 # Exponentiation
 include("math/exponential.jl")
 export exppi, exptau

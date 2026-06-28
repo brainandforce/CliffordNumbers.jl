@@ -54,6 +54,9 @@
     @test a * b === BladeIndex(Val{VGA(3)}(), 1, 2)
     @test b * a === BladeIndex(Val{VGA(3)}(), 2, 1)
     @test b * a === -BladeIndex(Val{VGA(3)}(), 1, 2)
+    @test sign_of_mult(a, b) === Int8(1)
+    @test sign_of_mult(b, a) === Int8(-1)
+    @test sign_of_mult(a, a) === Int8(1)        # e₁² = +1, nondegenerate
     @test adjoint(a) === reverse(a)
     @test (a * b)' === b * a
     @test CliffordNumbers.has_wedge(a, BladeIndex(Val{VGA(3)}())) === true
@@ -77,6 +80,7 @@
     @test nondegenerate_mult(BladeIndex(Val{VGA(3)}(), 1, 3), BladeIndex(Val{VGA(3)}(), 2, 3))
     @test nondegenerate_mult(BladeIndex(Val{QF}(), 5), BladeIndex(Val{QF}(), 5)) === false
     @test nondegenerate_mult(BladeIndex(Val{QF}(), 1, 5), BladeIndex(Val{QF}(), 1, 5)) === false
+    @test sign_of_mult(BladeIndex(Val{QF}(), 5), BladeIndex(Val{QF}(), 5)) === Int8(0)  # degenerate → 0
     @test nondegenerate_mult(BladeIndex(Val{QF}(), 1, 5), BladeIndex(Val{QF}(), 2, 5)) === false
     @test nondegenerate_mult(BladeIndex(Val{QF}(), 2, 5), BladeIndex(Val{QF}(), 1, 5)) === false
     @test nondegenerate_mult(BladeIndex(Val{QF}(), 6), BladeIndex(Val{QF}(), 5)) === true

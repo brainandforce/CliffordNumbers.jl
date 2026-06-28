@@ -299,7 +299,7 @@ Returns an `Int8` that carries the sign associated with the multiplication of tw
 Clifford/geometric algebras of the same quadratic form.
 """
 function sign_of_mult(a::BladeIndex{Q}, b::BladeIndex{Q}) where Q
-    return Int8(-1)^signbit_of_mult(a,b) * !nondegenerate_mult(a,b)
+    return Int8(-1)^signbit_of_mult(a,b) * nondegenerate_mult(a,b)
 end
 
 #---Multiplication and duals-----------------------------------------------------------------------#
