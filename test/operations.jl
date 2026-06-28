@@ -96,6 +96,50 @@ end
     @test right_complement(6*σ1 + 9*σ2) === 6*right_complement(σ1) + 9*right_complement(σ2)
 end
 
+@testset "Regressive product and generated complements" begin
+    # The generated complements must be bit-for-bit identical to the prior generic indexing path
+    # `C(x[blade_complement.(BladeIndices(C))])` across every storage family and signature,
+    # including mixed (CGA), degenerate (PGA), and Lorentzian (STA) metrics.
+    function ref_left_complement(x)
+        C = CliffordNumbers.complement_type(typeof(x))
+        return C(x[right_complement.(CliffordNumbers.BladeIndices(C))])
+    end
+    function ref_right_complement(x)
+        C = CliffordNumbers.complement_type(typeof(x))
+        return C(x[left_complement.(CliffordNumbers.BladeIndices(C))])
+    end
+    for Q in (VGA(2), VGA(3), VGA(4), PGA(2), PGA(3), CGA(2), CGA(3), STA)
+        D = CliffordNumbers.dimension(Q)
+        types = Any[CliffordNumber{Q,Int}, EvenCliffordNumber{Q,Int}, OddCliffordNumber{Q,Int}]
+        append!(types, [KVector{K,Q,Int} for K in 0:D])
+        for T in types
+            n = CliffordNumbers.nblades(T)
+            x = T(ntuple(i -> i - 3, n))    # deterministic mixed-sign coefficients for === checks
+            @test left_complement(x)  === ref_left_complement(x)
+            @test right_complement(x) === ref_right_complement(x)
+            # Round trip: right_complement ∘ left_complement and its mirror are the identity
+            @test right_complement(left_complement(x)) === x
+            @test left_complement(right_complement(x)) === x
+        end
+    end
+    # Regressive product parity against the dense CliffordNumber path, over PGA(2)/PGA(3) grade pairs
+    for Q in (PGA(2), PGA(3))
+        D = CliffordNumbers.dimension(Q)
+        for K1 in 0:D, K2 in 0:D
+            n1 = binomial(D, K1); n2 = binomial(D, K2)
+            a = KVector{K1,Q,Int}(ntuple(i -> i - 2, n1))
+            b = KVector{K2,Q,Int}(ntuple(i -> 3 - i, n2))
+            @test CliffordNumber(a ∨ b) === CliffordNumber(a) ∨ CliffordNumber(b)
+        end
+    end
+    # The compact KVector ∨ KVector path allocates nothing
+    join_op(a, b) = a ∨ b
+    p1 = KVector{3,PGA(3)}(1.0, 2.0, 3.0, 4.0)
+    p2 = KVector{3,PGA(3)}(4.0, 3.0, 2.0, 1.0)
+    join_op(p1, p2)     # warm up
+    @test @allocated(join_op(p1, p2)) == 0
+end
+
 @testset "Addition and subtraction" begin
     x = CliffordNumber{VGA(3)}(1, 2, 3, 4, 5, 6, 7, 8)
     y = CliffordNumber{VGA(3),Float64}(9, -10, 11, -12, 13, 14, -15, 16)
