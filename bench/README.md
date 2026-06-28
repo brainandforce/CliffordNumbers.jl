@@ -26,6 +26,25 @@ algebra-drift check fails.
 `BENCH_SECONDS` is the per-workload time budget: 0.5 s is a quick smoke value,
 5 s gives stable numbers.
 
+## Recorded results
+
+The recorded runs are split one file per benchmark group, each with its own
+environment header, current `CN/ref` table, and analysis:
+
+- [`results_complex.md`](results_complex.md) — `bench_complex` (even VGA(2) ≅ ℂ),
+  including the PR-SpinorFastPaths before/after.
+- [`results_quaternion.md`](results_quaternion.md) — `bench_quaternion`
+  (even VGA(3) ≅ ℍ), including the remaining `compose` gap and the dropped
+  closed-form Hamilton product.
+- [`results_multivector.md`](results_multivector.md) — the compact-vs-dense
+  groups (`bench_kvector`, `bench_even`, `bench_odd`, `bench_general`,
+  `bench_simd`), including what the consolidated PRs fixed (fast `reverse`,
+  generated complements / fast `join`, fast rotor `inv`) and the one remaining
+  hot spot (PGA(3) motor `inv` validation).
+
+All three were recorded together from a single `BENCH_SECONDS=5` run on the
+consolidated branch; every row passes its algebra-drift check.
+
 ## Layout
 
 - `harness.jl` — `BENCH_SECONDS`, the ℂ/ℍ isomorphism helpers, the

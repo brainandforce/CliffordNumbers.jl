@@ -330,7 +330,7 @@ end
 # dropped. Unlike the 2-component spinor, the generic kernel below already SIMD-vectorizes the
 # 4-component product (`map(muladd, …)` over 4-tuples), so removing its `zero_tuple` seed gave no
 # benefit and a scalar/broadcast closed form measured *slower* in the compute-bound reduce case
-# (chain-compose ≈ 5.3 ns/mul generic vs ≈ 7.4–7.9 ns/mul closed). See bench/results_spinor.md.
+# (chain-compose ≈ 5.3 ns/mul generic vs ≈ 7.4–7.9 ns/mul closed). See bench/results_quaternion.md.
 
 #= Update (2024-05-07)
     The performance bottlenecks for KVector arguments have been (mostly) resolved.
