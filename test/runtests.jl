@@ -3,6 +3,7 @@ using Aqua, Test
 using LinearAlgebra, Quaternions, StaticArrays, StructArrays, Unitful
 using Adapt
 using Random
+using ChainRulesCore
 
 Aqua.test_all(CliffordNumbers; unbound_args = false)
 
@@ -23,6 +24,7 @@ end
     include("conversion.jl")
     include("operations.jl")
     include("ext/Adapt.jl")
+    include("ext/ChainRulesCore.jl")
     include("ext/LinearAlgebra.jl")
     include("ext/Quaternions.jl")
     include("ext/StaticArraysCore.jl")

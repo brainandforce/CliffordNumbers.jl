@@ -46,6 +46,41 @@ julia> promote_type(KVector{1,VGA(3),Int}, QuaternionF64)
 CliffordNumber{VGA(3), Float64, 8}
 ```
 
+## [ChainRulesCore.jl]
+
+[ChainRulesCore.jl] defines the `rrule`/`frule` interface that reverse-mode automatic
+differentiation engines (Zygote.jl, Diffractor.jl, and others) build on. Loading it alongside
+CliffordNumbers.jl registers reverse-mode rules so that scalar losses built from Clifford-number
+operations can be differentiated.
+
+Rules are provided for the geometric product, scalar multiplication and division, the grade
+automorphisms (`reverse`, `adjoint`, `conj`, `grade_involution`), [`scalar_product`](@ref),
+`abs2`, and addition/subtraction. The sandwich product `R * p * R'` (and hence rotor application),
+[`versor_inverse`](@ref CliffordNumbers.versor_inverse), and `inv` differentiate by composition
+through these rules — no dedicated rule is needed.
+
+The cotangent (gradient) of a Clifford number is itself a Clifford number of the same type, and a
+`ChainRulesCore.ProjectTo` is registered so that gradients are always projected back onto the grade
+structure of the primal. The geometric-product pullback is the exact transpose of the bilinear
+Cayley product, computed at compile time from the same machinery as the product itself, so it is
+correct in every metric signature — Euclidean, indefinite (e.g. spacetime algebra), and degenerate
+(e.g. projective GA) alike. In a positive-definite algebra it reduces to the familiar form
+`Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
+
+```julia-repl
+julia> using CliffordNumbers, Zygote
+
+julia> p = KVector{1,VGA(3)}(1.0, 0.0, 0.0); q = KVector{1,VGA(3)}(0.0, 1.0, 0.0);
+
+julia> loss(R) = abs2(R * p * R' - q);   # squared error of rotating p onto q
+
+julia> R = one(EvenCliffordNumber{VGA(3),Float64});
+
+julia> only(Zygote.gradient(loss, R))    # gradient is an even Clifford number
+4-element EvenCliffordNumber{VGA(3), Float64}:
+...
+```
+
 ## [Unitful.jl]
 
 [Unitful.jl] provides support for quantities with associated units.
@@ -75,3 +110,4 @@ Supported operations include the geometric product and wedge product.
 
 [Quaternions.jl]:   https://github.com/JuliaGeometry/Quaternions.jl
 [Unitful.jl]: https://github.com/PainterQubits/Unitful.jl
+[ChainRulesCore.jl]: https://github.com/JuliaDiff/ChainRulesCore.jl
