@@ -25,6 +25,7 @@ end
     include("bitindices.jl")
     include("operations.jl")
     include("determinant.jl")
+    include("theorems.jl")
     include("custom_signature.jl")
     include("ext/Adapt.jl")
     include("ext/ChainRulesCore.jl")
