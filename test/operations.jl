@@ -308,6 +308,36 @@ end
     @test k * 2 === k * KVector{0,VGA(3)}(2)
 end
 
+@testset "Broadcasting as a scalar" begin
+    # Per the `scalar_type` docstring (src/abstract.jl), an `AbstractCliffordNumber` behaves like a
+    # number, not an array: it broadcasts as a scalar and `collect` wraps it in a 0-dimensional
+    # array of the Clifford type rather than spilling its coefficients into a vector. These tests
+    # pin that contract on the plain `Array` path (the StructArrays extension covers the SoA path).
+    R = EvenCliffordNumber{VGA(3)}(0.8, 0.1, 0.2, 0.3)
+    S = EvenCliffordNumber{VGA(3)}(0.2, 0.3, 0.4, 0.5)
+    k = KVector{1,VGA(3)}(1.0, 2.0, 3.0)
+    # `broadcastable` keeps the Clifford number intact (it does not become a coefficient container)
+    @test Base.broadcastable(R) === R
+    # `collect` yields an `Array{typeof(R),0}` whose lone element is the number itself
+    c = collect(R)
+    @test c isa Array{typeof(R),0}
+    @test c[] === R
+    # A lone broadcasted product equals the ordinary geometric product, as for `Complex`
+    @test R .* S === R * S
+    # Scalar-broadcast over a 1-D `Vector`, both argument orders, matches the elementwise reference
+    v = [k, 2k, 3k]
+    @test R .* v == [R * x for x in v]
+    @test v .* R == [x * R for x in v]
+    @test R .* v isa Vector{OddCliffordNumber{VGA(3),Float64,4}}
+    # Scalar-broadcast over a 2-D `Array` preserves shape and acts elementwise
+    M = [k 2k; 3k 4k]
+    @test M .* R == [x * R for x in M]
+    @test size(M .* R) == size(M)
+    # Fused chains (the sandwich form) broadcast as a scalar over a `Vector`. A fused broadcast
+    # contracts FMAs in a different order than the scalar product, so it agrees only up to rounding.
+    @test all(R .* v .* R' .≈ [R * x * R' for x in v])
+end
+
 @testset "Inverses and division" begin
     k = KVector{1,VGA(3)}(1, 2, 3)
     l = KVector{2,VGA(3)}(4, 5, 6)
