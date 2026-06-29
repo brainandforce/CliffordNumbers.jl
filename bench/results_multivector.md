@@ -1,4 +1,4 @@
-# Benchmark results — `bench_multivector` (compact vs dense)
+# Benchmark results: `bench_multivector` (compact vs dense)
 
 Recorded run of the multivector groups of the [`bench/`](README.md) suite:
 `bench_kvector`, `bench_even`, `bench_odd`, `bench_general`, and `bench_simd`,
@@ -31,7 +31,7 @@ The `bench_kvector` / `bench_even` / `bench_odd` / `bench_general` rows are
 per-element times from a batched microbench of 1000 items; the `bench_simd` rows
 are wall-clock for the whole broadcast.
 
-## bench_kvector — geometric primitives & incidence (compact vs dense)
+## bench_kvector: geometric primitives & incidence (compact vs dense)
 
 `KVector` of the application grade (PGA(3): point=3, line=2, plane=1; PGA(2):
 point=2, line=1) vs the dense `CliffordNumber`.
@@ -53,7 +53,7 @@ point=2, line=1) vs the dense `CliffordNumber`.
 | commutator B₁×B₂ (VGA3) | 9.4 ns | 29.2 ns | 0.32 | ok |
 | reverse line bivector (PGA3) | 2.8 ns | 7.8 ns | 0.36 | ok |
 
-## bench_even — rotors & motors (EvenCliffordNumber vs dense)
+## bench_even: rotors & motors (EvenCliffordNumber vs dense)
 
 | workload | CN | ref | CN/ref | check |
 |---|---:|---:|---:|:---:|
@@ -73,7 +73,7 @@ The CGA row reports `0.00` in the raw table because the dense
 `CliffordNumber{CGA(3)}` carries 32 coefficients, so its geometric product is
 ~1200× slower than the compact 16-coefficient motor.
 
-## bench_odd — reflections (OddCliffordNumber vs dense)
+## bench_odd: reflections (OddCliffordNumber vs dense)
 
 | workload | CN | ref | CN/ref | check |
 |---|---:|---:|---:|:---:|
@@ -85,7 +85,7 @@ The CGA row reports `0.00` in the raw table because the dense
 | rotor∘reflection r·u → odd (VGA3) | 10.3 ns | 11.3 ns | 0.91 | ok |
 | grade_involution odd versor (VGA3) | 1.8 ns | 3.9 ns | 0.46 | ok |
 
-## bench_general — full multivectors & inverses (CliffordNumber)
+## bench_general: full multivectors & inverses (CliffordNumber)
 
 The dense `CliffordNumber` is the natural type here, so `ref` is a second
 algebraically-equivalent path (block decomposition, or the validation-free
@@ -101,9 +101,9 @@ The full product beating the summed even/odd blocks (0.57) means splitting a
 general multivector into graded blocks is not a win when all grades are needed.
 The motor row is the one remaining hot spot, discussed below.
 
-## bench_simd — batched broadcast at increasing N (compact vs dense)
+## bench_simd: batched broadcast at increasing N (compact vs dense)
 
-One transform broadcast over an array at `N ∈ {1024, 65536, 1M}` — the
+One transform broadcast over an array at `N ∈ {1024, 65536, 1M}`, the
 vertex-buffer / point-cloud workload. A flat ratio across N means the kernel
 scales cleanly.
 
@@ -158,7 +158,7 @@ Three hot spots from the original run on `main` are now closed:
   fixed (PR-RotorPrimitives' Taylor-scaling clamp); the suite keeps `randeven2`
   for CGA only to stay on the closed conformal-versor path.
 
-## Remaining hot spot — motor `inv` validation (10.32×)
+## Remaining hot spot: motor `inv` validation (10.32×)
 
 The PGA(3) motor row is the only `CN/ref > 1` left. It grew from the original
 5.32× because the `@generated` `adjoint` fix dropped the denominator

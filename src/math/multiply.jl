@@ -302,9 +302,8 @@ signatures). Writing `σ = e₁₂²` (the sign of the pseudoscalar's square, `�
 
 The generic kernel lowers this to a `map(muladd, …)` chain seeded with `zero_tuple`, whose leading
 `muladd(0, 0, x)` cannot be folded away under IEEE signed-zero rules; emitting the closed form
-directly removes that overhead. `x^2` benefits transitively, since `literal_pow(^, x, Val(2))` is
-`x * x`. Other products (`∧`, contractions) keep the generic kernel by dispatching only on
-`GradeFilter{:*}`.
+directly avoids that. `x^2` benefits too, since `literal_pow(^, x, Val(2))` is `x * x`. Other
+products (`∧`, contractions) keep the generic kernel by dispatching only on `GradeFilter{:*}`.
 """
 @generated function mul(
     x::EvenCliffordNumber{Q,T,2},
@@ -329,7 +328,7 @@ end
 # NOTE: a closed-form Hamilton product for `EvenCliffordNumber{VGA(3),T,4}` (≅ ℍ) was tried and
 # dropped. Unlike the 2-component spinor, the generic kernel below already SIMD-vectorizes the
 # 4-component product (`map(muladd, …)` over 4-tuples), so removing its `zero_tuple` seed gave no
-# benefit and a scalar/broadcast closed form measured *slower* in the compute-bound reduce case
+# benefit, and a scalar/broadcast closed form measured slower in the compute-bound reduce case
 # (chain-compose ≈ 5.3 ns/mul generic vs ≈ 7.4–7.9 ns/mul closed). See bench/results_quaternion.md.
 
 #= Update (2024-05-07)

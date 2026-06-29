@@ -70,16 +70,17 @@ blade_symbol(s::AbstractSignature) = 'e'
 Returns the metric of `s` as a tuple of `N = dimension(s)` values, each `+1`, `0`, or `-1`, with the
 `i`-th entry equal to the square of the `i`-th basis 1-blade (`s[firstindex(s) + i - 1]`).
 
-This is the *single, world-age-robust source of metric data* for the package: every generated
-kernel and metric mask (`positive_square_bits`/`negative_square_bits`/`zero_square_bits`) derives
-its information from this one function rather than indexing `s` directly. It is the analogue of
+This is the world-age-robust source of metric data for the package. Every generated kernel and
+metric mask (`positive_square_bits`/`negative_square_bits`/`zero_square_bits`) derives its
+information from this function rather than indexing `s` directly. It is the analogue of
 `carrier_signs` in `ComputationalGeometricAlgebra.jl`, and is allocation-free and constant-folded
-whenever `s` is a compile-time constant (the usual case, since the signature is a type parameter).
+whenever `s` is a compile-time constant, which is the usual case since the signature is a type
+parameter.
 
-A custom signature only needs `dimension`, `firstindex`, and `getindex` for this to work; see the
+A custom signature only needs `dimension`, `firstindex`, and `getindex` for this to work. See the
 ["Custom metric signatures"](@ref) tutorial for the full extension story, including why a downstream
-*subtype* must be reduced to a [`Signature`](@ref Metrics.Signature) value (via `Signature(s)`)
-before it can drive the generated kernels.
+subtype must be reduced to a [`Signature`](@ref Metrics.Signature) value (via `Signature(s)`) before
+it can drive the generated kernels.
 """
 @inline function metric_tuple(s::AbstractSignature)
     return ntuple(i -> @inbounds(s[firstindex(s) - 1 + i]), Val(Int(dimension(s))))
@@ -165,12 +166,12 @@ is_positive_definite(s::Signature) = iszero(s.negative) && !is_degenerate(s)
 Reduces any signature `s` to an equivalent generic [`Signature`](@ref Metrics.Signature) value with
 the same metric, first index, and dimension.
 
-This is the **world-age-robust bridge** for custom signatures. The package's generated kernels read
-the metric *inside* their generators, which run at the world age where the kernel was defined (when
-`CliffordNumbers` loaded), so a downstream `AbstractSignature` *subtype* — whose interface methods
-are defined later — cannot drive them directly. A `Signature` value carries its metric as plain
-`isbits` fields the generators read structurally, so building Clifford numbers over `Signature(s)`
-sidesteps the world-age barrier. See the ["Custom metric signatures"](@ref) tutorial.
+This is the world-age-robust bridge for custom signatures. The package's generated kernels read the
+metric inside their generators, which run at the world age where the kernel was defined (when
+`CliffordNumbers` loaded). A downstream `AbstractSignature` subtype, whose interface methods are
+defined later, therefore cannot drive them directly. A `Signature` value carries its metric as plain
+`isbits` fields that the generators read structurally, so building Clifford numbers over
+`Signature(s)` avoids the world-age barrier. See the ["Custom metric signatures"](@ref) tutorial.
 """
 function Signature(s::AbstractSignature)
     s isa Signature && return s

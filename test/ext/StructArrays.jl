@@ -51,11 +51,11 @@
         @test sa[2] === KVector{1,VGA(2)}(2.0, 4.0)
     end
 
-    # Once each blade coefficient is its own column (Stage 1), the *default* StructArrays
-    # broadcast machinery already operates on the SoA columns: geometric-operator broadcasts
+    # Once each blade coefficient is its own column (Stage 1), the default StructArrays
+    # broadcast machinery operates on the SoA columns: geometric-operator broadcasts
     # over an SoA array stay SoA, agree elementwise with the plain-`Vector` path, and (because
     # these types are `isbits`) allocate only the output, never a per-element `KVector`. These
-    # tests lock that behavior in.
+    # tests check that behavior.
     sandwich(rotor, p) = rotor * p * rotor'
 
     @testset "Columnar broadcast: SoA preserved and correct" begin

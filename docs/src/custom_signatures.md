@@ -2,11 +2,11 @@
 
 The pre-defined signature families cover the algebras most code needs:
 
-  * [`VGA`](@ref CliffordNumbers.Metrics.VGA) — vanilla geometric algebras.
-  * [`PGA`](@ref CliffordNumbers.Metrics.PGA) — projective geometric algebras.
-  * [`CGA`](@ref CliffordNumbers.Metrics.CGA) — conformal geometric algebras.
-  * [`LGA`](@ref CliffordNumbers.Metrics.LGA) — Lorentzian geometric algebras.
-  * [`Exterior`](@ref CliffordNumbers.Metrics.Exterior) — exterior algebras.
+  * [`VGA`](@ref CliffordNumbers.Metrics.VGA) represents vanilla geometric algebras.
+  * [`PGA`](@ref CliffordNumbers.Metrics.PGA) represents projective geometric algebras.
+  * [`CGA`](@ref CliffordNumbers.Metrics.CGA) represents conformal geometric algebras.
+  * [`LGA`](@ref CliffordNumbers.Metrics.LGA) represents Lorentzian geometric algebras.
+  * [`Exterior`](@ref CliffordNumbers.Metrics.Exterior) represents exterior algebras.
 
 When none of them fit, or when a downstream package wants a signature type that carries its own
 meaning, there are two ways to supply a custom metric: a generic
@@ -31,9 +31,9 @@ x = one(CliffordNumber{PhaseSpace2D,Float64})
 ```
 
 The value is placed directly in the algebra type parameter (`CliffordNumber{PhaseSpace2D,Float64}`).
-Every operation works with it, because the generated kernels read the metric straight from the
-value's fields. The package's own projective spacetime algebra
-[`STAP`](@ref CliffordNumbers.Metrics.STAP) is defined this way.
+Every operation works with it, because the generated kernels read the metric from the value's fields.
+The package's own projective spacetime algebra [`STAP`](@ref CliffordNumbers.Metrics.STAP) is defined
+this way.
 
 Pass a fourth argument to set a non-default first index. Projective and Lorentzian algebras
 conventionally start at `0` or below: `Signature(5, 0b11100, 0b00001, -1)` is `STAPWest`.
@@ -58,7 +58,7 @@ julia> metric_tuple(PGA(2))
 
 This is the single source of metric data inside the package: the bit masks
 `positive_square_bits`/`negative_square_bits`/`zero_square_bits` that the multiplication kernels use
-are derived from it. It is allocation-free and constant-folded when the signature is a compile-time
+are derived from it. It allocates nothing and is constant-folded when the signature is a compile-time
 constant, which it is whenever the signature lives in a type parameter.
 
 ## Defining a signature type
@@ -68,8 +68,8 @@ signature. Subtype [`Metrics.AbstractSignature`](@ref CliffordNumbers.Metrics.Ab
 implement the interface: `dimension`, `firstindex`, and `getindex` are required, while
 `is_degenerate` and `is_positive_definite` are recommended.
 
-The phase-space signature `(D, D, R)` — `D` dimensions squaring to `+1`, `D` squaring to `-1`, and
-`R` degenerate dimensions — makes a representative example. Both counts are type parameters, so one
+The phase-space signature `(D, D, R)`, with `D` dimensions squaring to `+1`, `D` squaring to `-1`,
+and `R` degenerate dimensions, makes a representative example. Both counts are type parameters, so one
 type describes the whole family:
 
 ```julia
@@ -95,16 +95,16 @@ type works with `metric_tuple`, `dimension`, and everything else that reads the 
 
 ## Generated kernels and world age
 
-CliffordNumbers.jl compiles its hot paths — the geometric product, the automorphisms, the scalar
-product, and `charpoly_coeffs` — with
+CliffordNumbers.jl compiles its hot paths (the geometric product, the automorphisms, the scalar
+product, and `charpoly_coeffs`) with
 [`@generated` functions](https://docs.julialang.org/en/v1/manual/metaprogramming/#Generated-functions).
 A generated function's generator runs in the world age in which the generated function was defined,
 which is when CliffordNumbers.jl was loaded. Methods defined afterwards, in a downstream package, are
 not visible to it.
 
 A bare subtype value therefore cannot drive these kernels. Inside the generator, dispatch on
-`dimension(Q)` and `getindex(Q, i)` falls back to a generic method — the subtype's overrides do not
-exist at that world age — and the product throws:
+`dimension(Q)` and `getindex(Q, i)` falls back to a generic method, because the subtype's overrides do
+not exist at that world age, and the product throws:
 
 ```julia
 Q = PhaseSpace{2,0}()

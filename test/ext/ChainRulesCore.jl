@@ -155,8 +155,8 @@ approx(a, b) = isapprox(a, b; atol = 1.0e-5, rtol = 1.0e-4)
 
     @testset "rotor sandwich gradient (sandwich = product + reverse)" begin
         # f(R) = ‖R p R' - q‖²  for a rotor R and vectors p, q in VGA(3). The gradient w.r.t. R is
-        # obtained purely by composing the product, adjoint, subtraction, and abs2 rules — no
-        # dedicated sandwich rule — and matches finite differences.
+        # obtained purely by composing the product, adjoint, subtraction, and abs2 rules (no
+        # dedicated sandwich rule), and matches finite differences.
         R = randc(EvenCliffordNumber{VGA(3),Float64,4})
         p = randc(KVector{1,VGA(3),Float64,3})
         q = randc(KVector{1,VGA(3),Float64,3})

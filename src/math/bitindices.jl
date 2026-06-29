@@ -1,8 +1,7 @@
 #---Compile-time blade data------------------------------------------------------------------------#
-# Generalises the generated-complements idiom: the blade indices and per-slot automorphism signs of
-# a Clifford number type are pure functions of its type parameters, so they resolve to literal tuples
-# at compile time. `determinant.jl`, the automorphisms in `duals.jl`, and future @generated consumers
-# share these instead of re-deriving blade indices/signs per call.
+# The blade indices and per-slot automorphism signs of a Clifford number type are pure functions of
+# its type parameters, so they resolve to literal tuples at compile time. `determinant.jl` and the
+# automorphisms in `duals.jl` share these instead of re-deriving blade indices and signs per call.
 
 """
     CliffordNumbers.bitindices(::Type{T}) where T<:AbstractCliffordNumber
@@ -23,7 +22,7 @@ grade automorphism named by the `Symbol` `F` (`:reverse`, `:adjoint`, `:conj`, o
 `:grade_involution`) applies to the stored coefficients of `T`.
 
 Each named automorphism maps every basis blade to ±itself with no permutation, so applying it is the
-branch-free `T(Tuple(x) .* blade_signs(T, Val(F)))` — see [`_sign_automorphism`](@ref).
+branch-free `T(Tuple(x) .* blade_signs(T, Val(F)))`; see [`_sign_automorphism`](@ref).
 """
 @generated function blade_signs(::Type{T}, ::Val{F}) where {T<:AbstractCliffordNumber,F}
     f = getfield(@__MODULE__, F)
@@ -35,8 +34,7 @@ end
     CliffordNumbers.grade_negate(x::T, ::Val{G}) where {T<:AbstractCliffordNumber,G}
 
 Returns `x` with the coefficients of every grade in `G` (a `Tuple` of integer grades) negated, all
-other coefficients unchanged. This is the building block of the grade-conjugation ladders, resolving
-the per-slot signs at compile time.
+other coefficients unchanged. The per-slot signs are resolved at compile time.
 """
 @generated function grade_negate(x::T, ::Val{G}) where {T<:AbstractCliffordNumber,G}
     signs = map(b -> ifelse(grade(b) in G, Int8(-1), Int8(1)), Tuple(BladeIndices(T)))

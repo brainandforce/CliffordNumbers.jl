@@ -40,9 +40,9 @@ end
 end
 
 @testset "Sign automorphism parity across types" begin
-    # The closed-form (KVector) and `@generated` (dense / Z2) implementations must agree with the
-    # original generic indexing semantics `T(x[f.(BladeIndices(T))])` for every type and grade.
-    # This also locks in `reverse(::KVector)` and the GPU-safe generated paths in src/math/duals.jl.
+    # The closed-form (KVector) and `@generated` (dense / Z2) implementations agree with the
+    # generic indexing semantics `T(x[f.(BladeIndices(T))])` for every type and grade. This also
+    # covers `reverse(::KVector)` and the GPU-safe generated paths in src/math/duals.jl.
     refauto(f, x) = (T = typeof(x); T(x[f.(CliffordNumbers.BladeIndices(T))]))
     types = (
         CliffordNumber{VGA(3)}, EvenCliffordNumber{VGA(3)}, OddCliffordNumber{VGA(3)},
@@ -115,7 +115,7 @@ end
 end
 
 @testset "Regressive product and generated complements" begin
-    # The generated complements must be bit-for-bit identical to the prior generic indexing path
+    # The generated complements equal the generic indexing path
     # `C(x[blade_complement.(BladeIndices(C))])` across every storage family and signature,
     # including mixed (CGA), degenerate (PGA), and Lorentzian (STA) metrics.
     function ref_left_complement(x)
@@ -311,8 +311,8 @@ end
 @testset "Broadcasting as a scalar" begin
     # Per the `scalar_type` docstring (src/abstract.jl), an `AbstractCliffordNumber` behaves like a
     # number, not an array: it broadcasts as a scalar and `collect` wraps it in a 0-dimensional
-    # array of the Clifford type rather than spilling its coefficients into a vector. These tests
-    # pin that contract on the plain `Array` path (the StructArrays extension covers the SoA path).
+    # array of the Clifford type rather than expanding its coefficients into a vector. These tests
+    # check that behavior on the plain `Array` path (the StructArrays extension covers the SoA path).
     R = EvenCliffordNumber{VGA(3)}(0.8, 0.1, 0.2, 0.3)
     S = EvenCliffordNumber{VGA(3)}(0.2, 0.3, 0.4, 0.5)
     k = KVector{1,VGA(3)}(1.0, 2.0, 3.0)
@@ -334,7 +334,7 @@ end
     @test M .* R == [x * R for x in M]
     @test size(M .* R) == size(M)
     # Fused chains (the sandwich form) broadcast as a scalar over a `Vector`. A fused broadcast
-    # contracts FMAs in a different order than the scalar product, so it agrees only up to rounding.
+    # sums in a different order than the scalar product, so it agrees only up to rounding.
     @test all(R .* v .* R' .≈ [R * x * R' for x in v])
 end
 
@@ -370,7 +370,7 @@ end
     Qdual = PGA(1)                                              # e₀² =  0 ⟹ e₀₁² =  0
 
     @testset "Closed-form spinor product / square" begin
-        # Exact integer cases pin the (a·c + σ·b·d, a·d + b·c) formula per signature
+        # Exact integer cases check the (a·c + σ·b·d, a·d + b·c) formula per signature
         @test EvenCliffordNumber{VGA(2)}(2, 3) * EvenCliffordNumber{VGA(2)}(4, 5) ===
             EvenCliffordNumber{VGA(2)}(2*4 - 3*5, 2*5 + 3*4)        # σ = -1 → (-7, 22)
         @test EvenCliffordNumber{Qsplit}(2, 3) * EvenCliffordNumber{Qsplit}(4, 5) ===
@@ -378,8 +378,8 @@ end
         @test EvenCliffordNumber{Qdual}(2, 3) * EvenCliffordNumber{Qdual}(4, 5) ===
             EvenCliffordNumber{Qdual}(2*4, 2*5 + 3*4)               # σ =  0 → (8, 22)
         @test EvenCliffordNumber{VGA(2)}(2, 3)^2 === EvenCliffordNumber{VGA(2)}(2*2 - 3*3, 2*2*3)
-        # The closed form must agree with the generic kernel (reached via CliffordNumber promotion)
-        # and, for VGA(2), with ℂ. The wedge must still take the generic path, not the `*` fast path.
+        # The closed form agrees with the generic kernel (reached via CliffordNumber promotion)
+        # and, for VGA(2), with ℂ. The wedge still takes the generic path, not the `*` fast path.
         for _ in 1:50
             (a, b, c, d) = randn(4)
             s1 = EvenCliffordNumber{VGA(2)}(a, b)
@@ -394,8 +394,8 @@ end
     end
 
     @testset "Rotor (ℍ) geometric product / square" begin
-        # Even VGA(3) × even VGA(3) (the rotor product) was not directly covered before. Exact
-        # integer case pins the Hamilton-product structure.
+        # Even VGA(3) × even VGA(3) is the rotor product. Exact integer case checks the
+        # Hamilton-product structure.
         @test EvenCliffordNumber{VGA(3)}(2, 3, 5, 7) * EvenCliffordNumber{VGA(3)}(11, 13, 17, 19) ===
             EvenCliffordNumber{VGA(3)}(-235, 83, 55, 129)
         # Agreement with the 8-component product reached via CliffordNumber promotion.
@@ -589,13 +589,13 @@ end
         nb = binomial(CliffordNumbers.dimension(Q), 2)
         rng = MersenneTwister(0xCA75)
         local b
-        # a bivector that squares to a negative scalar, rescaled so abs2 lands in the danger zone
+        # a bivector that squares to a negative scalar, rescaled so abs2 lands in (-1, 0)
         while true
             b = KVector{2,Q}(ntuple(_ -> randn(rng), nb))
             CliffordNumbers.abs2(b) < -0.1 && break
         end
         b *= sqrt(0.5 / -CliffordNumbers.abs2(b))
-        @test -1 < CliffordNumbers.abs2(b) < 0          # confirm we are in the danger zone
+        @test -1 < CliffordNumbers.abs2(b) < 0          # confirm abs2 is in (-1, 0)
         r = @test_nowarn exp(b)                         # formerly threw a DomainError
         @test all(isfinite, Tuple(r))
         @test isapprox(scalar(r * r'), 1; atol = 1e-8)  # exp(b) is a unit rotor

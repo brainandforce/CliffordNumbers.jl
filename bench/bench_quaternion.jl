@@ -1,4 +1,4 @@
-# Rotor (≅ ℍ) workloads — the hot-spot source for PR-ArrayVectorization.
+# Rotor (≅ ℍ) workloads: the batched rows targeted by PR-ArrayVectorization.
 #
 # `Rotor{T} = EvenCliffordNumber{VGA(3),T,4}` is exactly the quaternion shape.
 # Compose / chain-compose are checked against ℍ multiplication through the
@@ -34,7 +34,7 @@ function quaternion_benchmarks()
         () -> map(vt -> q_rotate(qsv, vt), vsvt),
         (outs, _) -> all(((o, n2),) -> sandwich_ok(o, n2), zip(outs, n2sv))))
 
-    # --- batched sandwich at increasing N (the SIMD targets) ---
+    # --- batched sandwich at increasing N ---
     for (N, label) in ((100, "N=100"), (100_000, "N=100k"), (1_000_000, "N=1M"))
         vs = [Vec3{T}(ntuple(_ -> randn(rng), 3)) for _ in 1:N]
         vts = [Tuple(x)[1:3] for x in vs]

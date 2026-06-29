@@ -1,8 +1,8 @@
 #---Determinant, trace, and characteristic polynomial----------------------------------------------#
 # The determinant, trace, and characteristic polynomial of a multivector `x` are those of its
 # left-multiplication operator L_x : y ↦ x*y, a linear map on the 2ⁿ-dimensional algebra. They are
-# intrinsic scalar invariants of `x`: in particular `x` is invertible iff `det(x) ≠ 0`, so this is
-# the foundation a universal multivector inverse builds on.
+# intrinsic scalar invariants of `x`: in particular `x` is invertible iff `det(x) ≠ 0`, which a
+# universal multivector inverse can build on.
 #
 # Everything is computed matrix-free by the Faddeev–LeVerrier recursion on L_x. Each step is one
 # geometric product and one trace, with no 2ⁿ×2ⁿ matrix: the regular representation L is an algebra
@@ -36,7 +36,7 @@ invariant of `x`. It satisfies `det(λ) = λ^(2ⁿ)` for a scalar `λ`, `det(x*y
 For the low-dimensional algebras (`2ⁿ ≤ 32`, i.e. `n ≤ 5`) this is the matrix-free Faddeev–LeVerrier
 recursion, which is allocation-free on the `Float64` carrier. Above that the generated dense product
 becomes too large to compile, so the determinant is instead reduced on the explicit `2ⁿ×2ⁿ` operator
-matrix, built from runtime blade arithmetic (no generated kernel) — this compiles in O(1) at any
+matrix, built from runtime blade arithmetic (no generated kernel), which compiles in O(1) at any
 dimension. When `LinearAlgebra` is loaded, `LinearAlgebra.det` calls this method.
 """
 det(x::AbstractCliffordNumber{Q}) where Q = _det(Val(blade_count(Q) <= 32), x)

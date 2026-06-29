@@ -57,14 +57,14 @@ Rules are provided for the geometric product, scalar multiplication and division
 automorphisms (`reverse`, `adjoint`, `conj`, `grade_involution`), [`scalar_product`](@ref),
 `abs2`, and addition/subtraction. The sandwich product `R * p * R'` (and hence rotor application),
 [`versor_inverse`](@ref CliffordNumbers.versor_inverse), and `inv` differentiate by composition
-through these rules — no dedicated rule is needed.
+through these rules, so no dedicated rule is needed.
 
 The cotangent (gradient) of a Clifford number is itself a Clifford number of the same type, and a
 `ChainRulesCore.ProjectTo` is registered to project gradients back onto the grade structure of the
-primal. The geometric-product pullback is the exact transpose of the bilinear Cayley product,
-computed at compile time from the same machinery as the product, so it is correct in every metric
-signature (Euclidean, indefinite, and degenerate). In a positive-definite algebra it reduces to the
-familiar `Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
+primal. The geometric-product pullback is the transpose of the bilinear Cayley product, computed at
+compile time from the same machinery as the product, so it holds in every metric signature
+(Euclidean, indefinite, and degenerate). In a positive-definite algebra it reduces to
+`Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
 
 ```julia-repl
 julia> using CliffordNumbers, Zygote

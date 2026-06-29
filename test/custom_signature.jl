@@ -1,18 +1,18 @@
 # Phase-space signatures (p, q, r) = (D, D, R): D position dimensions squaring to +1, D momentum
 # dimensions squaring to −1, and R degenerate dimensions. (D, D, 0) is the neutral phase-space metric;
 # (D, D, 1) is its projective extension. A downstream package defines such a metric as a `Signature`
-# *value* — the supported, world-age-safe extension path (the family's own `STAP` is built the same
+# value, the supported world-age-safe extension path (the family's own `STAP` is built the same
 # way). The generated kernels read the metric from the value's `isbits` fields, so no downstream
 # method dispatch happens inside a generator. The tests below exercise both D = 2 (small enough to
 # compile the geometric product) and D = 3 (where the 7D product is gated behind the full-test flag).
 #
 # `det` at n ≥ 6 reduces the explicit operator matrix and needs no geometric product, so it stays
-# fast here. The *raw* geometric product at n = 7 compiles a very large generated kernel, so the one
+# fast here. The raw geometric product at n = 7 compiles a very large generated kernel, so the one
 # test that needs it is gated behind CLIFFORDNUMBERS_FULL_TESTS.
 
 # A would-be custom AbstractSignature *subtype*, parameterized by the position/momentum count D and
 # the degenerate count R. Its interface methods are correct, but they are defined here, downstream of
-# CliffordNumbers — see the "world-age limitation" testset below.
+# CliffordNumbers. See the "world-age limitation" testset below.
 struct PhaseSpace{D,R} <: CliffordNumbers.Metrics.AbstractSignature end
 CliffordNumbers.Metrics.dimension(::PhaseSpace{D,R}) where {D,R} = 2D + R
 Base.firstindex(::PhaseSpace) = 1
@@ -63,7 +63,7 @@ CliffordNumbers.Metrics.is_positive_definite(::PhaseSpace) = false
         @test CliffordNumbers.det(CliffordNumber{PS330,Rational{BigInt}}(λ0)) == λ0^64
         λ1 = Rational{BigInt}(-2, 3)
         @test CliffordNumbers.det(CliffordNumber{PS331,Rational{BigInt}}(λ1)) == λ1^128
-        # 1 + e₁ is a zero divisor (e₁² = +1), hence singular — built by addition, no product needed
+        # 1 + e₁ is a zero divisor (e₁² = +1), hence singular, built by addition, no product needed
         for Q in (PS330, PS331)
             D = CliffordNumber{Q,Rational{BigInt}}
             s = one(D) + KVector{1,Q,Rational{BigInt}}(ntuple(i -> Rational{BigInt}(i == 1), dimension(Q)))
@@ -173,7 +173,7 @@ CliffordNumbers.Metrics.is_positive_definite(::PhaseSpace) = false
         end
 
         # 3D phase space (64 blades): det goes through the product-free matrix path, automorphisms
-        # through the sign path — both work on the bridge without paying the 6D product compile.
+        # through the sign path. Both work on the bridge without paying the 6D product compile.
         @testset "bridged 3D phase space (3, 3, 0)" begin
             PS = Signature(PhaseSpace{3,0}())
             C = CliffordNumber{PS,Float64}

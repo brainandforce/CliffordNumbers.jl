@@ -14,7 +14,7 @@
         return M
     end
 
-    # Exact determinant by Gaussian elimination — independent of the Faddeev–LeVerrier path in `det`.
+    # Exact determinant by Gaussian elimination, independent of the Faddeev–LeVerrier path in `det`.
     function exact_det(A::AbstractMatrix{T}) where T
         M = Matrix{T}(A)
         n = size(M, 1)

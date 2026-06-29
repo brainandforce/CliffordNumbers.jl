@@ -42,9 +42,9 @@ _cotangent(::Type{C}, dΩ::BaseNumber) where C<:AbstractCliffordNumber = C(dΩ)
 #     ȳ[b] = Σ_c Ω̄[c] * ε(b,c) * x[idx(b,c)]
 #
 # Building these directly from the Cayley table (rather than from a `reverse`-based identity) keeps
-# them exact in *every* metric signature, degenerate algebras (PGA, Exterior) included, where the
-# reverse identity `⟨x*y, w⟩ = ⟨y, x̃*w⟩` is blind to null blades. The kernels mirror the two
-# branches of `CliffordNumbers.mul`, so all index/sign resolution happens at compile time.
+# them exact in every metric signature, including degenerate algebras (PGA, Exterior), where the
+# reverse identity `⟨x*y, w⟩ = ⟨y, x̃*w⟩` does not account for null blades. The kernels mirror the
+# two branches of `CliffordNumbers.mul`, so all index/sign resolution happens at compile time.
 
 # Gradient with respect to the left operand `x` of `x * y`; mirrors the `mul` "else" branch.
 @generated function _geometric_grad_left(
@@ -124,7 +124,7 @@ _coeff_dot(a::C, b::C) where C<:AbstractCliffordNumber =
 
 Reverse-mode rule for the geometric product. The pullback is the exact transpose of the bilinear
 Cayley product, so it is correct in every metric signature (including degenerate algebras). For a
-positive-definite algebra it reduces to the familiar `Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
+positive-definite algebra it reduces to `Ω̄ -> (Ω̄ * y', x' * Ω̄)`.
 """
 function rrule(
     ::typeof(*),

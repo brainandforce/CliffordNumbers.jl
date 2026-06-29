@@ -105,8 +105,8 @@ end
 
 Per-element microbenchmark: `cn_call`/`ref_call` each process `n` items (e.g.
 `map(inv, xs)`), and the reported times are divided by `n`. Batching defeats the
-constant-folding that erases a literal single call, while amortizing the closure
-call overhead to nothing — so the CN/ref ratio is the per-op acceptance metric.
+constant-folding that erases a literal single call and amortizes the closure
+call overhead away, so the CN/ref ratio is the per-op acceptance metric.
 """
 function run_per_op(name::AbstractString, n::Integer, cn_call, ref_call, check)
     cn, rf, ok = _measure(cn_call, ref_call, check, n)

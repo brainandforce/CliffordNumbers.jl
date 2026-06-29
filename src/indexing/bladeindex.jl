@@ -212,11 +212,11 @@ conj(i::BladeIndex) = typeof(i)(xor(signbit(i), !iszero((grade(i) + 1) & 2)), UI
 
 # NOTE: <<(UInt(1), x) is faster/easier to inline than UInt(2)^x
 
-# The three masks below all read the metric from `Metrics.metric_tuple` — the single source of
-# metric data — rather than indexing `S` directly, so the package has one place that touches the
-# signature interface. `_square_bits_mask` sets bit `i - 1` for each basis 1-blade whose square has
-# sign `v`; this matches the historical `<<(UInt(1), x - firstindex(S))` convention since
-# `metric_tuple` is ordered from `firstindex(S)`.
+# The three masks below all read the metric from `Metrics.metric_tuple`, the single source of metric
+# data, rather than indexing `S` directly, so the package has one place that touches the signature
+# interface. `_square_bits_mask` sets bit `i - 1` for each basis 1-blade whose square has sign `v`.
+# This matches the historical `<<(UInt(1), x - firstindex(S))` convention since `metric_tuple` is
+# ordered from `firstindex(S)`.
 @inline function _square_bits_mask(m::NTuple{N,Int8}, v::Int8) where N
     mask = zero(UInt)
     for i in 1:N

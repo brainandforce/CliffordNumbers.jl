@@ -1,10 +1,10 @@
-# Spinor (≅ ℂ) workloads — the acceptance baseline for PR-SpinorFastPaths.
+# Spinor (≅ ℂ) workloads: the acceptance baseline for PR-SpinorFastPaths.
 #
 # `Spinor{T} = EvenCliffordNumber{VGA(2),T,2}` is isomorphic to `Complex{T}`
 # coordinate-for-coordinate, so every workload compares the spinor result to the
 # `Complex{T}` result with `≈` (drift check) and times one against the other.
 
-# Generic kernels — these compile identically for `Spinor` and `Complex`.
+# Generic kernels: these compile identically for `Spinor` and `Complex`.
 
 function horner(x, c::NTuple{N}) where N
     acc = c[N] * one(x)
@@ -44,7 +44,7 @@ function escape_grid(point, xs, ys, z0_of, c_of, maxiter; threaded::Bool=false)
 end
 
 # Trapezoidal contour integral of Σ 1/(z - pₖ) around a closed loop of samples.
-# The `dz` factor makes the result ≈ 2πi·(enclosed poles) — a stable nonzero
+# The `dz` factor makes the result ≈ 2πi·(enclosed poles), a stable nonzero
 # reference, unlike the bare residue sum, which cancels to ~0 on a symmetric loop.
 function contour_integral(pts, poles)
     n = length(pts)

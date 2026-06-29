@@ -186,8 +186,8 @@ log(x::EvenCliffordNumber) = _even_log(float(x))
 #---Square roots of even multivectors--------------------------------------------------------------#
 
 @generated function _rotor_sqrt(R::EvenCliffordNumber{Q,T}) where {Q,T}
-    # Positive-definite algebras with no grade-4 part (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ) admit the cheap,
-    # exact closed form sqrt(R) = (1 + R) / |1 + R|.
+    # Positive-definite algebras with no grade-4 part (VGA(2) ≅ ℂ, VGA(3) ≅ ℍ) admit the exact
+    # closed form sqrt(R) = (1 + R) / |1 + R|.
     if is_positive_definite(Q) && dimension(Q) < 4
         return :(normalize(one(R) + R))
     end

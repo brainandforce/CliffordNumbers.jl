@@ -9,10 +9,10 @@ import CliffordNumbers.Metrics
 
 #---Types eligible for structure-of-arrays (SoA) column storage------------------------------------#
 # By default `StructArray(::Vector{KVector{...}})` collapses to a single column holding the inner
-# `NTuple` as one opaque field, useless for columnar kernels. Overriding the `StructArrays` interface
-# (`staticschema` / `component` / `createinstance`) for these `isbits` types gives each blade
-# coefficient its own `Vector{T}` column. The interface is keyed off the full type (including `L`),
-# so distinct grades and algebras get distinct, correctly-named schemas.
+# `NTuple` as one field, which columnar kernels cannot index per coefficient. Overriding the
+# `StructArrays` interface (`staticschema` / `component` / `createinstance`) for these `isbits` types
+# gives each blade coefficient its own `Vector{T}` column. The interface is keyed off the full type
+# (including `L`), so distinct grades and algebras get distinct, correctly-named schemas.
 const SoACliffordNumber = Union{KVector, Z2CliffordNumber}
 
 #---Column names derived from the blade bit patterns-----------------------------------------------#

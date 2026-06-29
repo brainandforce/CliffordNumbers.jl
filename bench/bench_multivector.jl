@@ -1,12 +1,12 @@
-# Multivector workloads — KVector / EvenCliffordNumber / OddCliffordNumber / CliffordNumber.
+# Multivector workloads: KVector / EvenCliffordNumber / OddCliffordNumber / CliffordNumber.
 #
 # Unlike the ℂ/ℍ benches, the general Clifford types have no single stdlib primitive
-# to race against. Instead each workload times the *compact* representation a real
+# to compare against. Instead each workload times the compact representation a real
 # application reaches for (`KVector` for geometric primitives, `EvenCliffordNumber`
 # for rotors/motors, `OddCliffordNumber` for reflections) against the identical
-# computation carried out on the fully *dense* `CliffordNumber`. The ratio is the
-# payoff of choosing the tight type, and the drift check is convention-free
-# coefficient equality between the two representations (`dense`/`densematch` live in
+# computation carried out on the dense `CliffordNumber`. The ratio is the payoff of
+# choosing the compact type, and the drift check is convention-free coefficient
+# equality between the two representations (`dense`/`densematch` live in
 # `harness.jl`).
 #
 # The grades, algebras, and exact operator pipelines mirror those used by
@@ -22,7 +22,7 @@ const RT = sqrt(eps(Float64))   # drift-check tolerance for the compact-vs-dense
 randk(rng::AbstractRNG, K::Integer, Q) = KVector{K,Q,Float64}(ntuple(_ -> randn(rng), binomial(dimension(Q), K)))
 
 # A random even versor (rotor / motor) of algebra `Q`, built as `exp(B)` of a random
-# bivector — exactly how Rotation/Motor reprs are generated in applications.
+# bivector, as Rotation/Motor representations are generated in applications.
 randversor(rng::AbstractRNG, Q) = exp(randk(rng, 2, Q))
 
 # A random even versor as the geometric product of two 1-vectors. Used for CGA, whose
@@ -34,7 +34,7 @@ randeven2(rng::AbstractRNG, Q) = randk(rng, 1, Q) * randk(rng, 1, Q)
 # improper isometry, e.g. a reflection composed with a rotation).
 randodd(rng::AbstractRNG, Q) = randk(rng, 1, Q) * randk(rng, 1, Q) * randk(rng, 1, Q)
 
-# The sandwich/versor product `R X R̃` — the rotation / rigid-motion / reflection kernel.
+# The sandwich/versor product `R X R̃`: the rotation / rigid-motion / reflection kernel.
 sandwich(R, x) = R * x * reverse(R)
 
 #---Per-op registration helpers (compact vs dense, reported per element)----------------------------#
@@ -153,7 +153,7 @@ function odd_benchmarks()
     M = 1000
     rs = WResult[]
 
-    # Grade-1 versor (plane / vector) reflections — the odd-grade sandwich.
+    # Grade-1 versor (plane / vector) reflections: the odd-grade sandwich.
     planes = [randk(rng, 1, PGA(3)) for _ in 1:M]
     planes2 = [randk(rng, 1, PGA(3)) for _ in 1:M]
     points = [randk(rng, 3, PGA(3)) for _ in 1:M]
@@ -186,8 +186,8 @@ function general_benchmarks()
     rs = WResult[]
 
     # Full geometric product in VGA(4) timed against an even/odd block decomposition
-    # of the same product — an algebraic identity (x = x₊ + x₋) and a structure-
-    # exploitation comparison in one row.
+    # of the same product: an algebraic identity (x = x₊ + x₋), comparing the full
+    # product against the summed graded blocks.
     xs = [CliffordNumber{VGA(4),Float64}(ntuple(_ -> randn(rng), 16)) for _ in 1:M]
     ys = [CliffordNumber{VGA(4),Float64}(ntuple(_ -> randn(rng), 16)) for _ in 1:M]
     xes = EvenCliffordNumber{VGA(4)}.(xs); xos = OddCliffordNumber{VGA(4)}.(xs)
@@ -199,8 +199,8 @@ function general_benchmarks()
         (c, r) -> approxall(c, r; rtol = RT)))
 
     # `inv` validates `x·inv ≈ 1`; `versor_inverse` skips the check. For a true versor
-    # the results are equal, so the ratio is the cost of that validation — the same
-    # hot spot the ℂ contour-integral row exposes, here for rotors and motors.
+    # the results are equal, so the ratio is the cost of that validation, here for
+    # rotors and motors.
     r3 = [randversor(rng, VGA(3)) for _ in 1:M]
     motors = [randversor(rng, PGA(3)) for _ in 1:M]
     push!(rs, run_per_op("inv vs versor_inverse: rotor (VGA3)", M,
@@ -216,9 +216,9 @@ end
 # Apply one fixed transform / operation across an array of primitives at increasing N
 # (the vertex-buffer / point-cloud workload). Compact vs dense, with the drift check
 # sampled over the leading slice so the 1M-element rows don't allocate a second dense
-# copy of the whole array just to verify. These rows are the SIMD hot-spot finders:
-# a flat compact/dense ratio across N means the kernel scales; a ratio that grows with
-# N flags a per-element path that fails to vectorize or turns memory-bound.
+# copy of the whole array just to verify. A flat compact/dense ratio across N means
+# the kernel scales; a ratio that grows with N flags a per-element path that fails to
+# vectorize or turns memory-bound.
 
 const SIMD_SIZES = (1_024, 65_536, 1_048_576)
 
@@ -259,12 +259,12 @@ function simd_benchmarks()
     Nmax = maximum(SIMD_SIZES)
     rs = WResult[]
 
-    # Rigid-motion of a point cloud / vertex buffer (PGA3) — the canonical batch.
+    # Rigid-motion of a point cloud / vertex buffer (PGA3).
     M = randversor(rng, PGA(3))
     pts = [randk(rng, 3, PGA(3)) for _ in 1:Nmax]
     simd_sandwich!(rs, "move point M·P·M̃ (PGA3)", M, pts)
 
-    # Reflection of a point cloud across a fixed plane (PGA3) — odd-grade sandwich.
+    # Reflection of a point cloud across a fixed plane (PGA3): odd-grade sandwich.
     plane = randk(rng, 1, PGA(3))
     pts2 = [randk(rng, 3, PGA(3)) for _ in 1:Nmax]
     simd_sandwich!(rs, "reflect point π·P·π (PGA3)", plane, pts2)
@@ -282,7 +282,7 @@ function simd_benchmarks()
     P2 = [randk(rng, 3, PGA(3)) for _ in 1:Nmax]
     simd_binary!(rs, "join point ∨ point (PGA3)", regressive, P1, P2)
 
-    # Rotor composition over arrays (VGA3) — pure even×even geometric product.
+    # Rotor composition over arrays (VGA3): pure even×even geometric product.
     ra = [randversor(rng, VGA(3)) for _ in 1:Nmax]
     rb = [randversor(rng, VGA(3)) for _ in 1:Nmax]
     simd_binary!(rs, "rotor compose r₁r₂ (VGA3)", *, ra, rb)

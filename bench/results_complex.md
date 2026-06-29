@@ -1,4 +1,4 @@
-# Benchmark results — `bench_complex` (even VGA(2) ≅ ℂ)
+# Benchmark results: `bench_complex` (even VGA(2) ≅ ℂ)
 
 Recorded run of the `bench_complex` group of the [`bench/`](README.md) suite.
 `Spinor{T} = EvenCliffordNumber{VGA(2),T,2}` is timed against `Complex{T}`;
@@ -38,7 +38,7 @@ cannot be constant-folded; the others are wall-clock for the whole workload.
 
 The spinor is at parity or better than `Complex{T}` on every workload.
 
-## Before/after — PR-SpinorFastPaths
+## Before/after: PR-SpinorFastPaths
 
 The baseline is the original `main` (`c5ca350`); the "after" column is this
 branch. Both used `BENCH_SECONDS=5`, and every workload still passes its drift

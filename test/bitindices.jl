@@ -32,7 +32,7 @@
     end
 
     @testset "refactored automorphisms preserve semantics" begin
-        # Locks the blade_signs rewrite to the generic indexing reference `T(x[f.(BladeIndices)])`
+        # Check the blade_signs rewrite against the generic indexing reference `T(x[f.(BladeIndices)])`
         refauto(f, x) = (T = typeof(x); T(x[f.(BladeIndices(T))]))
         for C in types
             x = C(ntuple(i -> Float64(i) - 2.5, nblades(C)))

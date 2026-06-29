@@ -1,4 +1,4 @@
-# Benchmark results — `bench_quaternion` (even VGA(3) ≅ ℍ)
+# Benchmark results: `bench_quaternion` (even VGA(3) ≅ ℍ)
 
 Recorded run of the `bench_quaternion` group of the [`bench/`](README.md) suite.
 `Rotor{T} = EvenCliffordNumber{VGA(3),T,4}` is timed against `Quaternion{T}` from

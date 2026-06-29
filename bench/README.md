@@ -1,11 +1,11 @@
 # CliffordNumbers benchmark suite
 
-A benchmark suite keyed off the Julia primitives users reach for when geometric
-algebra "feels slow". Each workload pairs a Clifford type with the stdlib /
-`Quaternions.jl` baseline it is isomorphic to and reports a timing ratio together
-with an algebra-drift check (the Clifford result compared to the primitive
-result), so the suite is also a correctness regression when the timing budget is
-too small for meaningful numbers.
+A benchmark suite keyed off the Julia primitives users reach for in geometric
+algebra. Each workload pairs a Clifford type with the stdlib or `Quaternions.jl`
+baseline it is isomorphic to and reports a timing ratio together with an
+algebra-drift check (the Clifford result compared to the primitive result), so
+the suite is also a correctness regression when the timing budget is too small
+for meaningful numbers.
 
 ## Running
 
@@ -30,15 +30,15 @@ algebra-drift check fails.
 The recorded runs are split one file per benchmark group, each with its own
 environment header, current `CN/ref` table, and analysis:
 
-- [`results_complex.md`](results_complex.md) — `bench_complex` (even VGA(2) ≅ ℂ),
+- [`results_complex.md`](results_complex.md): `bench_complex` (even VGA(2) ≅ ℂ),
   including the PR-SpinorFastPaths before/after.
-- [`results_quaternion.md`](results_quaternion.md) — `bench_quaternion`
+- [`results_quaternion.md`](results_quaternion.md): `bench_quaternion`
   (even VGA(3) ≅ ℍ), including the remaining `compose` gap and the dropped
   closed-form Hamilton product.
-- [`results_multivector.md`](results_multivector.md) — the compact-vs-dense
+- [`results_multivector.md`](results_multivector.md): the compact-vs-dense
   groups (`bench_kvector`, `bench_even`, `bench_odd`, `bench_general`,
   `bench_simd`), including what the consolidated PRs fixed (fast `reverse`,
-  generated complements / fast `join`, fast rotor `inv`) and the one remaining
+  generated complements and fast `join`, fast rotor `inv`) and the one remaining
   hot spot (PGA(3) motor `inv` validation).
 
 All three were recorded together from a single `BENCH_SECONDS=5` run on the
@@ -46,27 +46,27 @@ consolidated branch; every row passes its algebra-drift check.
 
 ## Layout
 
-- `harness.jl` — `BENCH_SECONDS`, the ℂ/ℍ isomorphism helpers, the
+- `harness.jl`: `BENCH_SECONDS`, the ℂ/ℍ isomorphism helpers, the
   `dense`/`densematch` compact-vs-dense helpers, and the measure-and-report
   scaffolding.
-- `bench_complex.jl` — `Spinor{T} = EvenCliffordNumber{VGA(2),T,2}` (≅ ℂ):
+- `bench_complex.jl`: `Spinor{T} = EvenCliffordNumber{VGA(2),T,2}` (≅ ℂ):
   pointwise `*`, `z² + c`, Horner deg-8, Mandelbrot/Julia escape grids, a
   contour integral, and single-call `*` / `inv` / `versor_inverse` microbenches.
   This is the acceptance baseline for PR-SpinorFastPaths.
-- `bench_quaternion.jl` — `Rotor{T} = EvenCliffordNumber{VGA(3),T,4}` (Cl⁺(3) ≅ ℍ):
+- `bench_quaternion.jl`: `Rotor{T} = EvenCliffordNumber{VGA(3),T,4}` (Cl⁺(3) ≅ ℍ):
   compose, single and batched sandwich (`N ∈ {100, 100k, 1M}`), slerp, and
   chain-compose. The batched-sandwich rows are the hot spots PR-ArrayVectorization
   targets.
-- `bench_multivector.jl` — `KVector` / `EvenCliffordNumber` / `OddCliffordNumber`
+- `bench_multivector.jl`: `KVector` / `EvenCliffordNumber` / `OddCliffordNumber`
   / `CliffordNumber` over PGA/CGA/VGA, mirroring the operations of
   ComputationalGeometricAlgebra.jl: `meet` (`∧`), `join` (`∨`), `project`,
   `move`/`rotate` and `reflect` (the sandwich `M X M̃`), `exp`-generated rotors /
   motors, contractions, complements, automorphisms and inverses. Each row times
   the compact representation against the same computation on the dense
-  `CliffordNumber` (see the note below). Groups: `bench_kvector` (primitives &
+  `CliffordNumber` (see the note below). Groups: `bench_kvector` (primitives and
   incidence), `bench_even` (rotors / motors), `bench_odd` (reflections),
-  `bench_general` (full multivectors & inverse validation), and `bench_simd`, the
-  same kernels broadcast over arrays at `N ∈ {1024, 65536, 1M}`.
+  `bench_general` (full multivectors and inverse validation), and `bench_simd`,
+  the same kernels broadcast over arrays at `N ∈ {1024, 65536, 1M}`.
 
 ## A note on the compact-vs-dense baseline
 
