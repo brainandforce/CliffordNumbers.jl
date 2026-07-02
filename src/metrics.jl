@@ -78,7 +78,7 @@ whenever `s` is a compile-time constant, which is the usual case since the signa
 parameter.
 
 A custom signature only needs `dimension`, `firstindex`, and `getindex` for this to work. See the
-["Custom metric signatures"](@ref) tutorial for the full extension story, including why a downstream
+[Custom metric signatures](@ref) tutorial for the full extension story, including why a downstream
 subtype must be reduced to a [`Signature`](@ref Metrics.Signature) value (via `Signature(s)`) before
 it can drive the generated kernels.
 """
@@ -171,7 +171,7 @@ metric inside their generators, which run at the world age where the kernel was 
 `CliffordNumbers` loaded). A downstream `AbstractSignature` subtype, whose interface methods are
 defined later, therefore cannot drive them directly. A `Signature` value carries its metric as plain
 `isbits` fields that the generators read structurally, so building Clifford numbers over
-`Signature(s)` avoids the world-age barrier. See the ["Custom metric signatures"](@ref) tutorial.
+`Signature(s)` avoids the world-age barrier. See the [Custom metric signatures](@ref) tutorial.
 """
 function Signature(s::AbstractSignature)
     s isa Signature && return s

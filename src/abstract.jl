@@ -227,6 +227,10 @@ end
 Base.complex(x::AbstractCliffordNumber, y::AbstractCliffordNumber) = complex(promote(x, y)...)
 
 #---Error checking---------------------------------------------------------------------------------#
+# The assertion messages here are deliberately constant `String` literals rather than interpolated
+# strings: an interpolated message allocates a `String` in the (compiled but rarely taken) throw
+# path, and GPU compilers reject that allocation (`jl_alloc_string` has no device implementation).
+# For concrete types these checks are statically true and get eliminated entirely on device.
 """
     CliffordNumbers.check_element_count(sz, [L], data)
 
@@ -240,10 +244,6 @@ for type (must be an `Int`) and value (must be equal to `sz`).
 
 This function returns nothing, but throws an `AssertionError` for failed checks.
 """
-# The assertion messages here are deliberately constant `String` literals rather than interpolated
-# strings: an interpolated message allocates a `String` in the (compiled but rarely taken) throw
-# path, and GPU compilers reject that allocation (`jl_alloc_string` has no device implementation).
-# For concrete types these checks are statically true and get eliminated entirely on device.
 @inline function check_element_count(sz, data)
     @assert length(data) == sz "Number of input scalars does not match the expected count for this type."
     return nothing

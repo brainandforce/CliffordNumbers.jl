@@ -45,6 +45,14 @@ CliffordNumbers.bitindex_shuffle
 CliffordNumbers.exp_taylor
 ```
 
+## Determinant, trace, and characteristic polynomial
+
+```@docs
+CliffordNumbers.det
+CliffordNumbers.tr
+CliffordNumbers.charpoly_coeffs
+```
+
 ## Return types for operations
 
 ```@docs
