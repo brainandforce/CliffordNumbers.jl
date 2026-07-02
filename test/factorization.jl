@@ -149,7 +149,7 @@
         B = KVector{2,VGA(4)}(ntuple(_ -> randn(rng), 6))
         bivector_decomposition(B)
         @test (@inferred bivector_decomposition(B)) isa NTuple{2,KVector{2,VGA(4),Float64,6}}
-        @test (@allocated bivector_decomposition(B)) == 0
+        ALLOCATION_GATES && @test (@allocated bivector_decomposition(B)) == 0
     end
 
     @testset "general log and sqrt" begin

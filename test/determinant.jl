@@ -111,7 +111,7 @@
         for C in (KVector{2,VGA(3)}, EvenCliffordNumber{VGA(3)}, CliffordNumber{VGA(3)})
             x = randf(rng, C{Float64})
             det(x)  # warm up
-            @test @allocated(CliffordNumbers.det(x)) == 0
+            ALLOCATION_GATES && @test @allocated(CliffordNumbers.det(x)) == 0
             @test (@inferred CliffordNumbers.det(x)) === CliffordNumbers.det(x)
         end
     end

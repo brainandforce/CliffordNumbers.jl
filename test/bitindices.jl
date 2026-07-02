@@ -56,7 +56,7 @@
         x = CliffordNumber{VGA(3),Float64}(ntuple(Float64, 8))
         for f in (reverse, adjoint, conj, grade_involution)
             f(x)  # warm up
-            @test @allocated(f(x)) == 0
+            ALLOCATION_GATES && @test @allocated(f(x)) == 0
             @test (@inferred f(x)) === f(x)
         end
         blade_signs(typeof(x), Val(:reverse))

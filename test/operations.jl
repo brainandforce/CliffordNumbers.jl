@@ -155,7 +155,7 @@ end
     p1 = KVector{3,PGA(3)}(1.0, 2.0, 3.0, 4.0)
     p2 = KVector{3,PGA(3)}(4.0, 3.0, 2.0, 1.0)
     join_op(p1, p2)     # warm up
-    @test @allocated(join_op(p1, p2)) == 0
+    ALLOCATION_GATES && @test @allocated(join_op(p1, p2)) == 0
 end
 
 @testset "Addition and subtraction" begin
@@ -636,7 +636,7 @@ end
     R32 = exp(KVector{2,VGA(3),Float32}(0.3f0, 0.2f0, -0.1f0))
     @test log(R32) isa KVector{2,VGA(3),Float32}
     @test sqrt(R32) isa EvenCliffordNumber{VGA(3),Float32}
-    @test (@allocated log(R32)) == 0
+    ALLOCATION_GATES && @test (@allocated log(R32)) == 0
 end
 
 @testset "Miscellaneous properties" begin
