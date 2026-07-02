@@ -38,7 +38,7 @@ cannot be constant-folded; the others are wall-clock for the whole workload.
 
 The spinor is at parity or better than `Complex{T}` on every workload.
 
-## Before/after: PR-SpinorFastPaths
+## Before/after: closed-form even-subalgebra fast paths
 
 The baseline is the original `main` (`c5ca350`); the "after" column is this
 branch. Both used `BENCH_SECONDS=5`, and every workload still passes its drift

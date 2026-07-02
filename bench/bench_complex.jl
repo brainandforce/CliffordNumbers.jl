@@ -1,4 +1,4 @@
-# Spinor (≅ ℂ) workloads: the acceptance baseline for PR-SpinorFastPaths.
+# Spinor (≅ ℂ) workloads: the acceptance baseline for the closed-form even-subalgebra fast paths.
 #
 # `Spinor{T} = EvenCliffordNumber{VGA(2),T,2}` is isomorphic to `Complex{T}`
 # coordinate-for-coordinate, so every workload compares the spinor result to the

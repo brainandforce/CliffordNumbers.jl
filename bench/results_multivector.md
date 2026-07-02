@@ -133,16 +133,16 @@ from 1k to 1M. `join` is now flat at 0.21–0.23 (it was ~0.64 before the
 generated-complement fix). `rotor compose` drifts 0.28 → 0.45 as the dense
 product's extra arithmetic amortizes away once both sides are memory-bound.
 
-## What the consolidated PRs fixed
+## Closed hot spots
 
 Three hot spots from the original run on `main` are now closed:
 
 | symptom | before | after | fix |
 |---|---:|---:|---|
-| reverse line bivector (PGA3) | 5.10 | 0.36 | closed-form `reverse(::KVector)` (PR-GPUEnablement) |
-| join: point ∨ point (PGA3) | 0.66 | 0.19 | `@generated` complements (PR-EnlargedBenchFixes) |
+| reverse line bivector (PGA3) | 5.10 | 0.36 | closed-form `reverse(::KVector)` |
+| join: point ∨ point (PGA3) | 0.66 | 0.19 | `@generated` complements |
 | join: line ∨ point (PGA3) | 0.67 | 0.16 | same |
-| inv vs versor_inverse: rotor (VGA3) | 5.40 | 1.00 | fast `inv` on the ℍ even subalgebra (PR-SpinorFastPaths) |
+| inv vs versor_inverse: rotor (VGA3) | 5.40 | 1.00 | fast `inv` on the ℍ even subalgebra |
 
 - `reverse(::KVector)` previously fell back to the generic
   `T(x[reverse.(BladeIndices(T))])` indexing path (a runtime `to_index` blade
@@ -155,7 +155,7 @@ Three hot spots from the original run on `main` are now closed:
 - `inv` on the VGA(3) rotor now delegates to the validation-free closed-form
   `versor_inverse`, so the row is 1.00 (the same call). The
   `exp`-of-mixed-signature-bivector crash the original run worked around is also
-  fixed (PR-RotorPrimitives' Taylor-scaling clamp); the suite keeps `randeven2`
+  fixed (the `exp_taylor` scaling clamp); the suite keeps `randeven2`
   for CGA only to stay on the closed conformal-versor path.
 
 ## Remaining hot spot: motor `inv` validation (10.32×)

@@ -56,7 +56,7 @@ and chain-compose still come out ahead. See the NOTE in `src/math/multiply.jl`.
 
 ## `inv` on the rotor subalgebra
 
-The closed-form reciprocal from PR-SpinorFastPaths also covers the VGA(3) rotor.
+The closed-form even-subalgebra reciprocal also covers the VGA(3) rotor.
 A focused per-op microbench (`map(inv, xs)` over 1000 elements):
 
 | `inv` per op | previous (generic versor) | closed form | primitive ref |

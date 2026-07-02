@@ -1,4 +1,4 @@
-# Rotor (≅ ℍ) workloads: the batched rows targeted by PR-ArrayVectorization.
+# Rotor (≅ ℍ) workloads: the batched rows exercised by the StructArrays SoA extension.
 #
 # `Rotor{T} = EvenCliffordNumber{VGA(3),T,4}` is exactly the quaternion shape.
 # Compose / chain-compose are checked against ℍ multiplication through the
