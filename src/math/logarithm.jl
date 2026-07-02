@@ -2,10 +2,12 @@
 # These invert `exp` on the even subalgebra, mapping a unit rotor or motor
 # (`x * x' ≈ 1`) back to its generating bivector. The algorithm is the "simple
 # invariant decomposition" of Hadfield, Wieser, and Lasenby: below six dimensions
-# a bivector splits into at most two commuting simple bivectors, recovered from
-# the scalar, grade-2, and grade-4 parts of the rotor. This covers the elliptic,
-# hyperbolic, and degenerate (ideal) cases uniformly. Non-unit dilators and even
-# multivectors with an ideal part beyond the motor case are out of scope.
+# a bivector splits into at most two commuting simple bivectors (`_bivector_split`
+# in factorization.jl, exposed as `bivector_decomposition`), and the per-plane
+# angles are recovered from the scalar, grade-2, and grade-4 parts of the rotor.
+# This covers the elliptic, hyperbolic, and degenerate (ideal) cases uniformly.
+# Non-unit dilators and even multivectors with an ideal part beyond the motor
+# case are out of scope.
 
 @inline _grade2(x::AbstractCliffordNumber{Q}) where Q = KVector{2,Q}(x)
 @inline _grade4(x::AbstractCliffordNumber{Q}) where Q = KVector{4,Q}(x)
@@ -30,28 +32,6 @@ function _simple_log(s, b)
         return (asinh(n) / n) * b
     else                        # null/ideal plane (b² = 0), or the identity (b = 0)
         return iszero(s) ? b : b * inv(s)
-    end
-end
-
-"""
-    CliffordNumbers._iso_log(s, b, P, G4)
-
-Logarithm of an isoclinic rotor, where the two invariant planes rotate by equal angles so the
-generating bivector is a scalar multiple `k * b` of the (non-simple) bivector part `b`. Here `P` is
-`<b²>₀` and `G4` is `<b²>₄`.
-"""
-function _iso_log(s, b, P, G4)
-    bg = _grade2(b * G4)
-    # b * G4 is parallel to b for an isoclinic bivector: b*G4 = σ b.
-    σ = scalar_product(bg, b) / _plane_square(b)
-    μ = P + σ
-    c = one(s) + (s - one(s)) * μ / P
-    if μ < zero(μ)              # elliptic isoclinic
-        ω = sqrt(-μ)
-        return (acos(clamp(c, -one(c), one(c))) / ω) * b
-    else                        # hyperbolic isoclinic
-        ω = sqrt(μ)
-        return (acosh(max(c, one(c))) / ω) * b
     end
 end
 
@@ -114,28 +94,10 @@ end
     # grade-4 machinery would not even type-check).
     dimension(Q) < 4 && return :(_simple_log(scalar(R), _grade2(R)))
     return quote
-        s  = scalar(R)
-        b  = _grade2(R)
-        bb = b * b
-        P  = scalar(bb)
-        G4 = _grade4(bb)
-        g  = scalar_product(G4, G4)
-        disc = P * P - g
-        scale = P * P + abs(g) + one(T)
-        sq = sqrt(max(disc, zero(disc)))
-        # Numerically stable quadratic roots (λ are the two plane squares, with λ1λ2 = g/4): take
-        # the larger-magnitude root directly and the smaller from the product to avoid cancellation
-        # when one plane nearly vanishes (a near-simple rotor).
-        λ1 = (P + copysign(sq, P)) / 2
-        λ2 = iszero(λ1) ? (P - sq) / 2 : (g / 4) / λ1
-        if abs(λ1 - λ2) <= sqrt(eps(T)) * (abs(P) + one(T))
-            # repeated eigenvalues: isoclinic if there is a grade-4 part, otherwise simple
-            (abs(g) <= eps(T) * scale || iszero(P)) && return _simple_log(s, b)
-            return _iso_log(s, b, P, G4)
-        end
-        bg = _grade2(b * G4)
-        b1 = _grade2((λ1 * b - bg / 2) * inv(λ1 - λ2))
-        b2 = _grade2((λ2 * b - bg / 2) * inv(λ2 - λ1))
+        s = scalar(R)
+        b = _grade2(R)
+        (b1, b2) = _bivector_split(b)
+        iszero(b2) && return _simple_log(s, b)
         return _general_log(R, s, b, b1, b2)
     end
 end
@@ -210,3 +172,161 @@ mixed-signature and degenerate algebras (Minkowski, projective, conformal) as we
 See also: [`exp`](@ref), [`log`](@ref).
 """
 sqrt(x::EvenCliffordNumber) = _rotor_sqrt(float(x))
+
+#---Logarithms and square roots of general multivectors--------------------------------------------#
+# Beyond the even/versor case, closed forms exist whenever the non-scalar part `n` of `x = s + n`
+# squares to a scalar: any vector, blade, or simple bivector plus a scalar. Such an `x` lives in a
+# two-dimensional subalgebra isomorphic to ℂ, the split-complex numbers, or the dual numbers,
+# according to the sign of `n²`, and the principal branch is the corresponding planar formula
+# (the "study number" route of De Keninck & Roelfs, "Normalization, Square Roots, and the
+# Exponential and Logarithmic Maps in Geometric Algebras of Less than 6D"). Even multivectors
+# additionally reduce to the rotor logarithm after peeling their magnitude `√(x x̃)`.
+
+"""
+    CliffordNumbers._study_split(x::AbstractCliffordNumber) -> (s, n, β, flat)
+
+Splits `x` into its scalar part `s` and non-scalar part `n`, with `β = ⟨n²⟩₀`. `flat` is `true`
+when `n²` has no non-scalar residue, so that `x` lies in the planar (study number) subalgebra
+where the closed-form logarithm and square root apply.
+"""
+function _study_split(x::AbstractCliffordNumber{Q,T}) where {Q,T}
+    s = scalar(x)
+    n = x - KVector{0,Q}(s)
+    nn = n * n
+    β = scalar(nn)
+    tol = _structure_rtol(T) * sum(abs2, Tuple(x))
+    flat = sum(abs2, Tuple(nn)) - β^2 <= tol^2
+    return (s, n, β, flat)
+end
+
+"""
+    CliffordNumbers._study_log(s, n, β)
+
+Principal logarithm of the study number `s + n` with `β = n²` a scalar: the complex plane formula
+for `β < 0`, the split-complex formula (requiring `s > |n|`) for `β > 0`, and the dual-number
+formula (requiring `s > 0`) for `β = 0`. Throws a `DomainError` off the principal branch.
+"""
+function _study_log(s, n, β)
+    if β < 0                    # elliptic plane: s + n ≅ the complex number s + |n| im
+        m = sqrt(-β)
+        return KVector{0,signature(n)}(log(hypot(s, m))) + (atan(m, s) / m) * n
+    elseif β > 0                # hyperbolic plane: split-complex; the branch needs s > |n|
+        m = sqrt(β)
+        s > m || throw(DomainError(s, "no principal logarithm: s + n with n² > 0 needs s > |n|."))
+        return KVector{0,signature(n)}(log(s^2 - β) / 2) + (atanh(m / s) / m) * n
+    else                        # parabolic plane: dual number s (1 + n/s)
+        s > zero(s) ||
+            throw(DomainError(s, "no principal logarithm: s + n with n² = 0 needs s > 0."))
+        return KVector{0,signature(n)}(log(s)) + n / s
+    end
+end
+
+"""
+    CliffordNumbers._study_sqrt(s, n, β)
+
+Principal square root of the study number `s + n` with `β = n²` a scalar, on the same branches as
+[`_study_log`](@ref CliffordNumbers._study_log). Throws a `DomainError` where no real square root
+exists.
+"""
+function _study_sqrt(s, n, β)
+    if β < 0
+        m = sqrt(-β)
+        ρ = sqrt(hypot(s, m))
+        θ = atan(m, s) / 2
+        return KVector{0,signature(n)}(ρ * cos(θ)) + (ρ * sin(θ) / m) * n
+    elseif β > 0
+        m = sqrt(β)
+        s > m || throw(DomainError(s, "no real square root: s + n with n² > 0 needs s > |n|."))
+        ρ = sqrt(sqrt(s^2 - β))
+        θ = atanh(m / s) / 2
+        return KVector{0,signature(n)}(ρ * cosh(θ)) + (ρ * sinh(θ) / m) * n
+    else
+        s > zero(s) || throw(DomainError(s, "no real square root: s + n with n² = 0 needs s > 0."))
+        return KVector{0,signature(n)}(sqrt(s)) + n / (2 * sqrt(s))
+    end
+end
+
+"""
+    CliffordNumbers._even_content(y::AbstractCliffordNumber{Q,T})
+
+Returns the even-grade content of `y` as an `EvenCliffordNumber{Q,T}`, or `nothing` if `y` has odd
+coefficients. The odd energy is the difference between the total energy and the even projection's,
+since the coefficients partition by parity.
+"""
+function _even_content(y::AbstractCliffordNumber{Q,T}) where {Q,T}
+    e = EvenCliffordNumber{Q,T}(y)
+    tol = _structure_rtol(T)^2 * sum(abs2, Tuple(y))
+    return sum(abs2, Tuple(y)) - sum(abs2, Tuple(e)) <= tol ? e : nothing
+end
+
+"""
+    CliffordNumbers._even_magnitude(e::EvenCliffordNumber)
+
+Returns the squared magnitude `α = e ẽ` when it is a positive scalar — so that `e = √α (e/√α)`
+peels into a magnitude and a unit rotor — or `nothing` otherwise.
+"""
+function _even_magnitude(e::EvenCliffordNumber{Q,T}) where {Q,T}
+    r = e * e'
+    α = scalar(r)
+    tol = _structure_rtol(T) * sum(abs2, Tuple(e))
+    (α > zero(α) && sum(abs2, Tuple(r)) - α^2 <= tol^2) || return nothing
+    return α
+end
+
+"""
+    log(x::AbstractCliffordNumber)
+
+Principal natural logarithm of a general multivector, on the branches where a real logarithm
+exists:
+  * `x = s + n` with `n²` a scalar (a scalar plus a vector, blade, or simple bivector — in
+    particular odd-grade blades): the planar closed form, elliptic (`n² < 0`, always defined),
+    hyperbolic (`n² > 0`, defined for `s > |n|`), or parabolic (`n² = 0`, defined for `s > 0`).
+  * even content with `x x̃` a positive scalar (a rotor or motor scaled by a positive magnitude):
+    `log(x) = log(x x̃)/2 + log(x / sqrt(x x̃))` through the rotor logarithm.
+
+Throws a `DomainError` outside these branches; in particular an odd *versor* has no logarithm (the
+odd component of the Pin group is not connected to the identity). The result is returned as
+`exponential_type(x)`.
+
+See also: [`log(::EvenCliffordNumber)`](@ref), [`exp`](@ref), [`sqrt`](@ref).
+"""
+function log(x::AbstractCliffordNumber)
+    y = float(x)
+    C = exponential_type(y)
+    (s, n, β, flat) = _study_split(y)
+    flat && return convert(C, _study_log(s, n, β))
+    e = _even_content(y)
+    if !isnothing(e)
+        α = _even_magnitude(e)
+        if !isnothing(α)
+            return convert(C, KVector{0,signature(y)}(log(α) / 2) + _even_log(e / sqrt(α)))
+        end
+    end
+    throw(DomainError(x, "no principal logarithm exists for this multivector."))
+end
+
+log(x::KVector{0,Q}) where Q = KVector{0,Q}(log(scalar(x)))
+
+"""
+    sqrt(x::AbstractCliffordNumber)
+
+Principal square root of a general multivector, on the branches where a real square root exists.
+The branches mirror [`log(::AbstractCliffordNumber)`](@ref): the planar closed form for
+`x = s + n` with `n²` a scalar, and `sqrt(x) = (x x̃)^(1/4) sqrt(x / sqrt(x x̃))` through the rotor
+square root for even content with `x x̃` a positive scalar. Throws a `DomainError` outside these
+branches. The result is returned as `exponential_type(x)`.
+
+See also: [`sqrt(::EvenCliffordNumber)`](@ref), [`log(::AbstractCliffordNumber)`](@ref).
+"""
+function sqrt(x::AbstractCliffordNumber)
+    y = float(x)
+    C = exponential_type(y)
+    (s, n, β, flat) = _study_split(y)
+    flat && return convert(C, _study_sqrt(s, n, β))
+    e = _even_content(y)
+    if !isnothing(e)
+        α = _even_magnitude(e)
+        isnothing(α) || return convert(C, sqrt(sqrt(α)) * _rotor_sqrt(e / sqrt(α)))
+    end
+    throw(DomainError(x, "no real square root exists for this multivector."))
+end

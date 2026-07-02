@@ -53,6 +53,28 @@ CliffordNumbers.tr
 CliffordNumbers.charpoly_coeffs
 ```
 
+## Blade and versor structure
+
+```@docs
+CliffordNumbers._structure_rtol
+CliffordNumbers._euclidean
+CliffordNumbers._parity_energy
+CliffordNumbers._plucker_ok
+CliffordNumbers._probe_vectors
+CliffordNumbers._isoclinic_split
+CliffordNumbers._bivector_split
+```
+
+## Logarithms and square roots of general multivectors
+
+```@docs
+CliffordNumbers._study_split
+CliffordNumbers._study_log
+CliffordNumbers._study_sqrt
+CliffordNumbers._even_content
+CliffordNumbers._even_magnitude
+```
+
 ## Return types for operations
 
 ```@docs

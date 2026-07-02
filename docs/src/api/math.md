@@ -64,3 +64,22 @@ Base.exp(::AbstractCliffordNumber)
 CliffordNumbers.exppi
 CliffordNumbers.exptau
 ```
+
+## Logarithms and square roots
+
+```@docs
+Base.log(::EvenCliffordNumber)
+Base.log(::AbstractCliffordNumber)
+Base.sqrt(::EvenCliffordNumber)
+Base.sqrt(::AbstractCliffordNumber)
+```
+
+## Blade and versor structure
+
+```@docs
+CliffordNumbers.isblade
+CliffordNumbers.isversor
+CliffordNumbers.factor_blade
+CliffordNumbers.factor_versor
+CliffordNumbers.bivector_decomposition
+```

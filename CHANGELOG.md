@@ -14,6 +14,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     for interoperability of the `Quaternion` type with `AbstractCliffordNumber`. This includes 
     limited support for `Quaternions.slerp` (only applies to `EvenCliffordNumber{VGA(3)}`).
   - `sqrt` is now defined for `KVector{0}`.
+  - The structure predicates `isblade` and `isversor`.
+  - `factor_blade`, factoring a blade into 1-vectors whose wedge product reproduces it, and
+    `factor_versor`, the Cartan–Dieudonné factorization of a versor into at most `dimension(Q)`
+    reflections.
+  - `bivector_decomposition`, the invariant decomposition of a bivector into two commuting simple
+    bivectors, which the rotor logarithm is now built on.
+  - `log` and `sqrt` for general multivectors on the branches where a principal result exists:
+    `x = s + n` with `n²` a scalar (including odd-grade blades), and even multivectors with a
+    positive scalar `x x̃`. `log` is also now defined for `KVector{0}`.
 
 ### Changed
   - **[BREAKING]** `BitIndex` has been renamed to `BladeIndex`.

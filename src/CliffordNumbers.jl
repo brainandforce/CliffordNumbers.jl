@@ -80,10 +80,13 @@ include("math/inverse.jl")
 export versor_inverse
 # Determinant, trace, and characteristic polynomial of the left-multiplication operator
 include("math/determinant.jl")
+# Blade/versor predicates, factorization into 1-vectors, bivector invariant decomposition
+include("math/factorization.jl")
+export isblade, isversor, factor_blade, factor_versor, bivector_decomposition
 # Exponentiation
 include("math/exponential.jl")
 export exppi, exptau
-# Logarithms and square roots of rotors/motors (even multivectors)
+# Logarithms and square roots of rotors/motors and of general multivectors
 include("math/logarithm.jl")
 # Pretty printing
 include("show.jl")
