@@ -160,3 +160,41 @@ end
 # Long names for operations
 const commutator = ×
 const anticommutator = ⨰
+
+#---Versor sandwich--------------------------------------------------------------------------------#
+"""
+    sandwich(V::AbstractCliffordNumber{Q}, x::AbstractCliffordNumber{Q})
+
+The grade-preserving conjugation of `x` by the versor `V`: `V x V⁻¹` for even `V`, and the twisted
+`V x̂ V⁻¹` (grade involution of the operand) for odd `V`. The twist makes the action of the Pin
+group parity-correct: a 1-vector mirror `u` acts as the proper reflection `v ↦ -u v u⁻¹`, and the
+action extends to every operand grade as an outermorphism, whereas a bare sandwich mis-signs
+odd-grade operands under odd versors.
+
+The inverse is the validation-free [`versor_inverse`](@ref CliffordNumbers.versor_inverse), so the
+result is meaningful when `V` is a versor (check with [`isversor`](@ref)). The parity of `V` is
+read off the type where it is structural (`KVector`, `EvenCliffordNumber`, `OddCliffordNumber`)
+and off the coefficients for a `CliffordNumber`, which must be parity-homogeneous.
+
+See also: [`isversor`](@ref), [`mirror_peel`](@ref).
+"""
+function sandwich(V::EvenCliffordNumber{Q}, x::AbstractCliffordNumber{Q}) where Q
+    return V * x * versor_inverse(V)
+end
+
+function sandwich(V::OddCliffordNumber{Q}, x::AbstractCliffordNumber{Q}) where Q
+    return V * grade_involution(x) * versor_inverse(V)
+end
+
+function sandwich(V::KVector{K,Q}, x::AbstractCliffordNumber{Q}) where {K,Q}
+    return V * (iseven(K) ? x : grade_involution(x)) * versor_inverse(V)
+end
+
+function sandwich(V::CliffordNumber{Q}, x::AbstractCliffordNumber{Q}) where Q
+    (e, o) = _parity_energy(V)
+    return V * (e >= o ? x : grade_involution(x)) * versor_inverse(V)
+end
+
+function sandwich(V::AbstractCliffordNumber, x::AbstractCliffordNumber)
+    throw(AlgebraMismatch(sandwich, (V, x)))
+end

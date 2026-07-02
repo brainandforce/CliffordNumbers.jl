@@ -274,6 +274,54 @@ function factor_versor(x::AbstractCliffordNumber{Q,T}) where {Q,T}
     throw(DomainError(x, "the reflection peel did not terminate."))
 end
 
+#---Odd-versor normal form-------------------------------------------------------------------------#
+"""
+    mirror_peel(x::AbstractCliffordNumber{Q}) -> Tuple{KVector{1,Q}, EvenCliffordNumber{Q}}
+
+Splits an odd versor into `x = v * R` with `v` an invertible 1-vector (the mirror) and `R = v⁻¹ x`
+an even versor. This is the normal form of the Pin group's improper elements: an odd versor has no
+bivector logarithm — the odd component of the group is not connected to the identity — so a mirror
+times a rotor is the canonical representation.
+
+The peel is deterministic: `v` is the grade-1 part of `x` when that is invertible, and otherwise
+the non-null basis vector carrying the greatest coefficient weight over the basis blades of `x`
+that contain it. Exact on exact carriers; carriers not closed under division are promoted. Assumes
+`x` is a versor (check with [`isversor`](@ref)); throws a `DomainError` if `x` does not have odd
+content or no invertible mirror is found.
+
+See also: [`factor_versor`](@ref), [`sandwich`](@ref), [`log(::AbstractCliffordNumber)`](@ref).
+"""
+function mirror_peel(x::AbstractCliffordNumber{Q,T}) where {Q,T}
+    scale = sum(abs2, Tuple(x))
+    κ = _structure_rtol(T)
+    (e, o) = _parity_energy(x)
+    (iszero(scale) || e > κ^2 * scale) && throw(DomainError(x, "not an odd-grade multivector."))
+    S = typeof(inv(one(T)))
+    v = KVector{1,Q,S}(x)
+    if !(abs(scalar_product(v, v)) > κ * scale)
+        # The grade-1 part is null or absent (e.g. a pure trivector): fall back to the non-null
+        # basis vector weighted heaviest by the blades of x that contain it.
+        q = metric_tuple(Q)
+        n = Int(dimension(Q))
+        weights = zeros(real(S), n)
+        for (i, b) in enumerate(Tuple(BladeIndices(x)))
+            bits = Int(b)
+            for j in 1:n
+                iszero(bits >> (j - 1) & 1) || (weights[j] += abs2(Tuple(x)[i]))
+            end
+        end
+        best = 0
+        for j in 1:n
+            iszero(q[j]) && continue
+            (best == 0 || weights[j] > weights[best]) && (best = j)
+        end
+        (best == 0 || iszero(weights[best])) &&
+            throw(DomainError(x, "no invertible mirror found."))
+        v = KVector{1,Q,S}(ntuple(isequal(best), Val(n)))
+    end
+    return (v, EvenCliffordNumber{Q,S}(versor_inverse(v) * x))
+end
+
 #---Invariant decomposition of bivectors-----------------------------------------------------------#
 """
     CliffordNumbers._isoclinic_split(b::KVector{2,Q,T}) -> NTuple{2,KVector{2,Q,T}}

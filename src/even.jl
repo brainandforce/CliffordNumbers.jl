@@ -96,8 +96,22 @@ end
 end
 
 #---Multiplicative identity------------------------------------------------------------------------#
+"""
+    one(::Type{<:CliffordNumbers.Z2CliffordNumber})
 
+The multiplicative identity of a grade-parity carrier. For an even type this is the unit even
+element of the same type. An odd carrier cannot store the scalar identity — the parity-closure law
+(odd·odd = even, odd·even = odd) puts the identity in the even subalgebra — so `one` of an odd
+type is the even identity of the same algebra, which multiplies odd elements without changing
+their carrier. Converting that identity back to the odd type (as `oneunit` does) throws an
+`InexactError`.
+"""
 one(C::Type{<:EvenCliffordNumber{Q}}) where Q = C(ntuple(isone, Val(nblades(C))))
+
+function one(C::Type{<:OddCliffordNumber{Q}}) where Q
+    T = scalar_type(C)
+    return one(EvenCliffordNumber{Q,ifelse(T >: BaseNumber, Bool, T)})
+end
 
 #---Similar types----------------------------------------------------------------------------------#
 

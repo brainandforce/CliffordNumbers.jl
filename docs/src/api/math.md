@@ -81,5 +81,12 @@ CliffordNumbers.isblade
 CliffordNumbers.isversor
 CliffordNumbers.factor_blade
 CliffordNumbers.factor_versor
+CliffordNumbers.mirror_peel
 CliffordNumbers.bivector_decomposition
+```
+
+## Versor actions
+
+```@docs
+CliffordNumbers.sandwich
 ```

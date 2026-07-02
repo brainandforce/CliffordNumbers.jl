@@ -23,10 +23,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `log` and `sqrt` for general multivectors on the branches where a principal result exists:
     `x = s + n` with `n²` a scalar (including odd-grade blades), and even multivectors with a
     positive scalar `x x̃`. `log` is also now defined for `KVector{0}`.
+  - `sandwich`, the grade-preserving conjugation by a versor, with the grade-involution twist that
+    makes odd (Pin-group) versors act correctly on every operand grade.
+  - `mirror_peel`, the normal form `V = v * R` of an odd versor as an invertible mirror times an
+    even versor (odd versors have no bivector logarithm).
 
 ### Changed
   - **[BREAKING]** `BitIndex` has been renamed to `BladeIndex`.
   - **[BREAKING]** `BitIndices` has replaced with `BladeIndices`.
+  - `one` of an `OddCliffordNumber` type returns the even identity of the same algebra: an odd
+    carrier cannot store the scalar identity, and the parity-closure law (odd·odd = even,
+    odd·even = odd) puts it in the even subalgebra.
 
 ### Fixed
   - `dimension` of a plain `Signature` returns a full-width `Int` instead of an `Int8`. On Julia

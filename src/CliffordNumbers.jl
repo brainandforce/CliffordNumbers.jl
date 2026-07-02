@@ -75,14 +75,16 @@ export isscalar, scalar, ispseudoscalar, scalar_product
 include("math/products.jl")
 export left_contraction, right_contraction, wedge, regressive, commutator, anticommutator
 export ⨼, ⨽, ∧, ∨, ×, ⨰
+export sandwich
 # Inverses, if they exist
 include("math/inverse.jl")
 export versor_inverse
 # Determinant, trace, and characteristic polynomial of the left-multiplication operator
 include("math/determinant.jl")
-# Blade/versor predicates, factorization into 1-vectors, bivector invariant decomposition
+# Blade/versor predicates, factorization into 1-vectors, odd-versor normal form, bivector
+# invariant decomposition
 include("math/factorization.jl")
-export isblade, isversor, factor_blade, factor_versor, bivector_decomposition
+export isblade, isversor, factor_blade, factor_versor, mirror_peel, bivector_decomposition
 # Exponentiation
 include("math/exponential.jl")
 export exppi, exptau

@@ -31,6 +31,7 @@ const ALLOCATION_GATES = VERSION >= v"1.12"
     include("operations.jl")
     include("determinant.jl")
     include("factorization.jl")
+    include("pin_versors.jl")
     include("theorems.jl")
     include("custom_signature.jl")
     include("ext/Adapt.jl")
