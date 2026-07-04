@@ -43,3 +43,24 @@ dimensions:
   * `Metrics.PGA(3)` models 3 spatial dimensions with 1 degenerate (zero-squaring) dimension.
   * `Metrics.CGA(3)` models 3 spatial dimensions with 2 extra dimensions.
   * `Metrics.LGAEast(3)` models 3 spatial dimensions with an extra negative-squaring time dimension.
+
+## Reading the metric
+
+The metric of any signature is available as a tuple of `+1`/`0`/`-1` values through
+`Metrics.metric_tuple`, ordered from `firstindex`:
+
+```jldoctest
+julia> using CliffordNumbers
+
+julia> metric_tuple(CGA(2))
+(-1, 1, 1, 1)
+```
+
+This is the single source of metric data used internally by the multiplication kernels.
+
+## Custom signatures
+
+When none of the pre-defined families fit, build a generic `Metrics.Signature` value, or define your
+own `Metrics.AbstractSignature` subtype. The [Custom metric signatures](@ref) tutorial walks through
+both, including the world-age rule that determines which approach can drive the generated kernels and
+the `Signature(s)` bridge that resolves it.

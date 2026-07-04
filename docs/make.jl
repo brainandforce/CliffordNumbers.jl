@@ -25,6 +25,7 @@ makedocs(;
         "Home" => "index.md",
         "Clifford number types" => "numeric.md",
         "Metric signatures" => "metrics.md",
+        "Custom metric signatures" => "custom_signatures.md",
         "Indexing" => "indexing.md",
         "Operations" => "operations.md",
         "Performance tips" => "performance.md",
