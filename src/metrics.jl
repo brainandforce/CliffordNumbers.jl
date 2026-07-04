@@ -27,15 +27,19 @@ Base.IndexStyle(::Type{<:AbstractSignature}) = IndexLinear()
 Base.has_offset_axes(::AbstractSignature) = true
 
 """
-    dimension(s::AbstractSignature) -> Int8
+    dimension(s::AbstractSignature) -> Int
 
 Returns the total number of dimensions associated with `s`. The default implementation returns
-`signed(s.dimensions)`.
+`Int(s.dimensions)`.
+
+The result is a full-width `Int` so that counts derived from it stay integers: on Julia 1.10,
+`binomial` with a narrower integer argument falls back to the `Float64` gamma-function method,
+which would poison `nblades` of a `KVector` in a plain-`Signature` algebra.
 
 The total number of basis blades is equal to to the size of the power set of all basis vectors, and
 is equal to `2^dimension(s)`.
 """
-dimension(s::AbstractSignature) = signed(s.dimensions)
+dimension(s::AbstractSignature) = Int(s.dimensions)
 
 """
     blade_count(s) -> Int

@@ -27,10 +27,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - **[BREAKING]** `BitIndex` has been renamed to `BladeIndex`.
   - **[BREAKING]** `BitIndices` has replaced with `BladeIndices`.
 
+### Fixed
+  - `dimension` of a plain `Signature` returns a full-width `Int` instead of an `Int8`. On Julia
+    1.10 the narrow integer sent `binomial` to its `Float64` gamma-function method, so `nblades`
+    of a `KVector` in a custom-signature algebra returned a `Float64`.
+
 ### Removed
   - **[BREAKING]** `CliffordNumbers.normalize` is no longer exported to avoid a name conflict with
     `LinearAlgebra.normalize`.
   - **[BREAKING]** Support for Julia 1.8 due to the use of package extensions.
+  - **[BREAKING]** Support for Julia 1.9; the minimum supported version is now the 1.10 LTS.
   - **[BREAKING]** `TransformedBitIndices` and its aliases.
 
 ## [0.1.10] - 2024-11-06

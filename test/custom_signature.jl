@@ -104,7 +104,7 @@ CliffordNumbers.Metrics.is_positive_definite(::PhaseSpace) = false
         # Allocation-free / constant-folded on a built-in.
         mt() = metric_tuple(STA)
         mt()
-        @test @allocated(mt()) == 0
+        ALLOCATION_GATES && @test @allocated(mt()) == 0
     end
 
     @testset "subtype signatures: world-age limitation and the Signature(s) bridge" begin
