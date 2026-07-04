@@ -212,17 +212,22 @@ conj(i::BladeIndex) = typeof(i)(xor(signbit(i), !iszero((grade(i) + 1) & 2)), UI
 
 # NOTE: <<(UInt(1), x) is faster/easier to inline than UInt(2)^x
 
-function positive_square_bits(S::Metrics.AbstractSignature)
-    return sum((S[x] === Int8(+1)) * <<(UInt(1), x - firstindex(S)) for x in eachindex(S))
+# The three masks below all read the metric from `Metrics.metric_tuple` — the single source of
+# metric data — rather than indexing `S` directly, so the package has one place that touches the
+# signature interface. `_square_bits_mask` sets bit `i - 1` for each basis 1-blade whose square has
+# sign `v`; this matches the historical `<<(UInt(1), x - firstindex(S))` convention since
+# `metric_tuple` is ordered from `firstindex(S)`.
+@inline function _square_bits_mask(m::NTuple{N,Int8}, v::Int8) where N
+    mask = zero(UInt)
+    for i in 1:N
+        m[i] === v && (mask |= UInt(1) << (i - 1))
+    end
+    return mask
 end
 
-function negative_square_bits(S::Metrics.AbstractSignature)
-    return sum((S[x] === Int8(-1)) * <<(UInt(1), x - firstindex(S)) for x in eachindex(S))
-end
-
-function zero_square_bits(S::Metrics.AbstractSignature)
-    return sum((S[x] === Int8(0)) * <<(UInt(1), x - firstindex(S)) for x in eachindex(S))
-end
+positive_square_bits(S::Metrics.AbstractSignature) = _square_bits_mask(metric_tuple(S), Int8(+1))
+negative_square_bits(S::Metrics.AbstractSignature) = _square_bits_mask(metric_tuple(S), Int8(-1))
+zero_square_bits(S::Metrics.AbstractSignature) = _square_bits_mask(metric_tuple(S), Int8(0))
 
 """
     CliffordNumbers.signbit_of_square(b::BladeIndex) -> Bool

@@ -14,15 +14,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     for interoperability of the `Quaternion` type with `AbstractCliffordNumber`. This includes 
     limited support for `Quaternions.slerp` (only applies to `EvenCliffordNumber{VGA(3)}`).
   - `sqrt` is now defined for `KVector{0}`.
+  - GPU-safe constructors and an `Adapt` package extension, so `AbstractCliffordNumber` values move to
+    and from device arrays and survive `Adapt.adapt` inside GPU kernels. The sign-changing
+    automorphisms (`reverse`, `grade_involution`, and friends) are now branch-free and GPU-safe.
+  - `metric_tuple`, a world-age-robust accessor that returns a signature's metric as an `NTuple` of
+    `Int8`. It is the single source of metric data shared by the blade kernels and the metric masks,
+    and it reads a downstream `AbstractSignature` subtype's interface correctly.
+  - A tutorial on defining your own metric signature (`docs/src/custom_signatures.md`), covering both
+    the `Signature`-value path and a typed `AbstractSignature` subtype bridged through `Signature(s)`.
 
 ### Changed
   - **[BREAKING]** `BitIndex` has been renamed to `BladeIndex`.
   - **[BREAKING]** `BitIndices` has replaced with `BladeIndices`.
 
+### Fixed
+  - `dimension` of a plain `Signature` returns a full-width `Int` instead of an `Int8`. On Julia
+    1.10 the narrow integer sent `binomial` to its `Float64` gamma-function method, so `nblades`
+    of a `KVector` in a custom-signature algebra returned a `Float64`.
+
 ### Removed
   - **[BREAKING]** `CliffordNumbers.normalize` is no longer exported to avoid a name conflict with
     `LinearAlgebra.normalize`.
   - **[BREAKING]** Support for Julia 1.8 due to the use of package extensions.
+  - **[BREAKING]** Support for Julia 1.9; the minimum supported version is now the 1.10 LTS.
   - **[BREAKING]** `TransformedBitIndices` and its aliases.
 
 ## [0.1.10] - 2024-11-06
